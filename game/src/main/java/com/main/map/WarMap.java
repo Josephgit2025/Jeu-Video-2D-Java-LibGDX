@@ -1,10 +1,8 @@
-package com.main;
+package com.main.map;
 
 import java.util.List;
 import java.util.ArrayList;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 public class WarMap {
     private int height;

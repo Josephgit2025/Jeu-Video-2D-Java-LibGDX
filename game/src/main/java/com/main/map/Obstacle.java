@@ -1,5 +1,6 @@
-package com.main;
+package com.main.map;
 
+import com.main.utils.Position;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 

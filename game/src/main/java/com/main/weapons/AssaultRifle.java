@@ -1,4 +1,4 @@
-package com.main;
+package com.main.weapons;
 
 public class AssaultRifle extends Weapon{
     public AssaultRifle(){

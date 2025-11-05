@@ -1,10 +1,14 @@
 package com.main;
 
+import com.main.entities.player.Ghost;
+import com.main.entities.units.Soldier;
+import com.main.entities.enemies.Zombie;
+import com.main.map.Base;
+import com.main.map.WarMap;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
@@ -12,7 +16,6 @@ import javafx.scene.layout.Pane;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javafx.util.Duration;
 
@@ -41,7 +44,7 @@ public class App extends Application {
         this.map = new WarMap(scene);
         this.ghost = new Ghost(0, 0);
 
-        root.getChildren().add(ghost.sprite);
+        root.getChildren().add(ghost.getSprite());
         stage.setScene(scene);
         stage.show();
 

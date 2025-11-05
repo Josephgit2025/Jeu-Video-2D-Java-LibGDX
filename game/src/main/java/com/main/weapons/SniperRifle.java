@@ -1,4 +1,4 @@
-package com.main;
+package com.main.weapons;
 
 public class SniperRifle extends Weapon{
     public SniperRifle(){

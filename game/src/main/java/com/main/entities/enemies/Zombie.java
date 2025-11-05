@@ -1,4 +1,6 @@
-package com.main;
+package com.main.entities.enemies;
+
+import com.main.entities.Unit;
 
 public class Zombie extends Unit {
 
@@ -7,7 +9,8 @@ public class Zombie extends Unit {
         this.health = 100;
         this.attackDamage = 15;
         this.speed = 2;
-        this.attackSpeed = 1;
+        this.attackSpeed = 1; 
     }
 
 }
+    

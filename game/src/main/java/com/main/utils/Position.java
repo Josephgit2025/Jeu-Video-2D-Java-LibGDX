@@ -1,4 +1,4 @@
-package com.main;
+package com.main.utils;
 
 public class Position {
     private int posX;

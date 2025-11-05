@@ -1,4 +1,4 @@
-package com.main;
+package com.main.entities.units;
 
 public class Tank extends Soldier {
     
