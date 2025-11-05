@@ -26,13 +26,13 @@ public class Base {
     private Unit spawnUnit(String type){
         switch (type){
             case "Tank":
-                return new Tank();
+                return new Tank(0,0);
                 break;
             case "Cack":
-                return new Soldier();
+                return new Melee(0,0);
                 break;
             case "Sniper":
-                return new Sniper();
+                return new Sniper(0,0);
                 break;
             default:
                 return null;

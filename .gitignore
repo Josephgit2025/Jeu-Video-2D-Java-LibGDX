@@ -1,1 +1,3 @@
-/target/classes/
+target/
+*/target/
+**/target/

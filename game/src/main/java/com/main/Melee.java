@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Melee extends Soldier {
     
-    public Melee (String filePath, int posX, int posY) {
-        super(filePath, posX, posY);
+    public Melee (int posX, int posY) {
+        super("/com/main/assets/Melle.png", posX, posY);
         this.health = 200;
         this.attackDamage = 20;
         this.speed = 5;
