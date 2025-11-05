@@ -1,4 +1,2 @@
-com/main/SecondaryController.class
-com/main/App.class
-com/main/PrimaryController.class
 module-info.class
+com/main/EventHandler.class

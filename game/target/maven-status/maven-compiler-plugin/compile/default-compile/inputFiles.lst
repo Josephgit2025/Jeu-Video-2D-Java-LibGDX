@@ -1,4 +1,5 @@
-/home/dcyprien/epitech/t-jav500/2DGame/game/src/main/java/com/main/PrimaryController.java
 /home/dcyprien/epitech/t-jav500/2DGame/game/src/main/java/module-info.java
+/home/dcyprien/epitech/t-jav500/2DGame/game/src/main/java/com/main/Ghost.java
+/home/dcyprien/epitech/t-jav500/2DGame/game/src/main/java/com/main/Entity.java
 /home/dcyprien/epitech/t-jav500/2DGame/game/src/main/java/com/main/App.java
-/home/dcyprien/epitech/t-jav500/2DGame/game/src/main/java/com/main/SecondaryController.java
+/home/dcyprien/epitech/t-jav500/2DGame/game/src/main/java/com/main/EventHandler.java
