@@ -27,12 +27,12 @@ public class Base {
         switch (type){
             case "Tank":
                 return new Tank(0,0);
-            case "Cack":
+            case "Melee":
                 return new Melee(0,0);
             case "Sniper":
                 return new Sniper(0,0);
             default:
                 return null;
         }
-    }
+    }   
 }

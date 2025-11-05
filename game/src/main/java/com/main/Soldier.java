@@ -6,3 +6,4 @@ public class Soldier extends Unit {
         super(filePath, posX, posY);
     }
 }
+ 
