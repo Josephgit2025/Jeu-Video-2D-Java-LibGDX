@@ -1,6 +1,7 @@
 Installation:
   - Make
   - GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMING !\
+
 Additional commands :
   - Only compilation : make compile
   - Only run (requires compilation) : make run
