@@ -38,7 +38,7 @@ public class App extends Application {
         enemyBase = new Base(0, 0);
         this.units = new ArrayList<>();
         this.zombies = new ArrayList<>();
-        this.map = new WarMap();
+        this.map = new WarMap(scene);
         this.ghost = new Ghost(0, 0);
 
         root.getChildren().add(ghost.sprite);
