@@ -23,7 +23,6 @@ public class App extends Application {
 
     private static Scene scene;
     private Pane root;
-    private Ghost ghost;
     private EventHandler eventHandler;
 
     private Base playerBase;
@@ -35,16 +34,16 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         root = new Pane();
-        scene = new Scene(root, 640, 480);
+        scene = new Scene(root, 1920, 1080);
         eventHandler = new EventHandler(scene);
         playerBase = new Base(0, (int)scene.getHeight());
         enemyBase = new Base(0, 0);
         this.units = new ArrayList<>();
         this.zombies = new ArrayList<>();
         this.map = new WarMap(scene);
-        this.ghost = new Ghost(0, 0);
 
-        root.getChildren().add(ghost.getSprite());
+        // root.getChildren().add(ghost.getSprite());
+        root.getChildren().add(this.map.getSprite());
         stage.setScene(scene);
         stage.show();
 
@@ -60,7 +59,7 @@ public class App extends Application {
     }
 
     public void update(){
-        ghost.update(eventHandler);
+        // ghost.update(eventHandler);
     }
 
     public static double getWidth(){
