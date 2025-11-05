@@ -10,6 +10,10 @@ import javafx.stage.Stage;
 import javafx.scene.layout.Pane;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import javafx.util.Duration;
 
 public class App extends Application {
@@ -19,11 +23,22 @@ public class App extends Application {
     private Ghost ghost;
     private EventHandler eventHandler;
 
+    private Base playerBase;
+    private Base enemyBase;
+    private List<Soldier> units;
+    private List<Zombie> zombies;
+    private WarMap map;
+
     @Override
     public void start(Stage stage) throws IOException {
         root = new Pane();
         scene = new Scene(root, 640, 480);
         eventHandler = new EventHandler(scene);
+        playerBase = new Base(0, (int)scene.getHeight());
+        enemyBase = new Base(0, 0);
+        this.units = new ArrayList<>();
+        this.zombies = new ArrayList<>();
+        this.map = new WarMap();
         this.ghost = new Ghost(0, 0);
 
         root.getChildren().add(ghost.sprite);
