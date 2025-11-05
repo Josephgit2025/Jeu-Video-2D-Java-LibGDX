@@ -16,7 +16,6 @@ public class Ghost extends Unit{
         return speed;
     }
 
-    @Override
     public void update(EventHandler event){
         if (event.isPressed(KeyCode.W) || event.isPressed(KeyCode.UP)){
             moveUp();
@@ -35,30 +34,24 @@ public class Ghost extends Unit{
     private void moveUp(){
         if (this.getPosY() - speed < 0){
             this.setSpritePosY(0);
-            System.out.println("PosY = " + this.getPosY());
         } else{
             this.setSpritePosY(this.getPosY() - speed);
-            System.out.println("PosY = " + this.getPosY());
         }
     }
 
     private void moveDown(){
         if (this.getPosY() + speed > App.getHeight()){
             this.setSpritePosY((int)App.getHeight());
-            System.out.println("PosY = " + this.getPosY());
         } else{
             this.setSpritePosY(this.getPosY() + speed);
-            System.out.println("PosY = " + this.getPosY());
         }
     }
 
     private void moveLeft(){
         if (this.getPosX() - speed < 0){
             this.setSpritePosX(0);
-            System.out.println("PosX = " + this.getPosX());
         } else{
             this.setSpritePosX(this.getPosX() - speed);
-            System.out.println("PosX = " + this.getPosX());
 
         }
     }
@@ -66,11 +59,9 @@ public class Ghost extends Unit{
     private void moveRight(){
         if (this.getPosX() + speed > App.getWidth()){
             this.setSpritePosX((int)App.getWidth());
-            System.out.println("PosX = " + this.getPosX());
 
         } else{
             this.setSpritePosX(this.getPosX() + speed);
-            System.out.println("PosX = " + this.getPosX());
 
         }
     }
