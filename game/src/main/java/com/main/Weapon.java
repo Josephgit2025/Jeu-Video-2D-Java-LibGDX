@@ -7,16 +7,21 @@ public abstract class Weapon {
     protected int munitions;
     protected int maxMunition;
     
-    protected Weapon(int damage, int range, int as, int munitions, int maxMun){
+    protected Weapon(int damage, int range, int as, int maxMun){
         this.damage = damage;
         this.range = range;
         this.attackSpeed = as;
-        this.munitions = munitions;
         this.maxMunition = maxMun;
+        this.munitions = maxMun;
     }
 
     protected void reload(){
         this.munitions = this.maxMunition;
+    }
+
+    protected void attack(){
+        if (this.munitions > 0)
+            this.munitions--;
     }
 
     public int getDamage() {
