@@ -1,4 +1,4 @@
-package com.main;
+package com.main.entities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +37,10 @@ public abstract class Unit {
 
     public int getPosY() {
         return posY;
+    }
+
+    public ImageView getSprite() {
+        return sprite;
     }
 
     public void setSpritePosX(int posX){

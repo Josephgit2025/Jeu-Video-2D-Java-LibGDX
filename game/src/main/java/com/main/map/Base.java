@@ -1,4 +1,10 @@
-package com.main;
+package com.main.map;
+
+import com.main.utils.Position;
+import com.main.entities.Unit;
+import com.main.entities.units.Tank;
+import com.main.entities.units.Melee;
+import com.main.entities.units.Sniper;
 
 public class Base {
     private int health = 1000;
