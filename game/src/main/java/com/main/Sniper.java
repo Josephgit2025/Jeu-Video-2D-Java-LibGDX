@@ -10,3 +10,4 @@ public class Sniper extends Soldier{
         this.attackSpeed = 3;
     }
 }
+ 
