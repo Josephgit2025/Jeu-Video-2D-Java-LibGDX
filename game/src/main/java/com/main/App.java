@@ -34,7 +34,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         root = new Pane();
-        scene = new Scene(root, 640, 480);
+        scene = new Scene(root, 1920, 1080);
         eventHandler = new EventHandler(scene);
         playerBase = new Base(0, (int)scene.getHeight());
         enemyBase = new Base(0, 0);
