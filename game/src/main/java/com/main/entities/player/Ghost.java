@@ -1,7 +1,8 @@
-package com.main;
+package com.main.entities.player;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import com.main.entities.Unit;
+import com.main.EventHandler;
+import com.main.App;
 import javafx.scene.input.KeyCode;
 
 public class Ghost extends Unit{
