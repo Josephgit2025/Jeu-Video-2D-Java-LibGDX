@@ -4,7 +4,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 
-public class Ghost extends Entity{
+public class Ghost extends Unit{
     private int speed = 10;
 
     public Ghost(int posX, int posY){

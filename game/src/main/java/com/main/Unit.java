@@ -3,16 +3,24 @@ package com.main;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-public abstract class Entity {
+public abstract class Unit {
     protected int posX;
     protected int posY;
     protected Image spriteSheet;
     protected ImageView sprite;
+    protected int health;
+    protected int attackDamage;
+    protected int attackSpeed;
+    protected int speed;
+    protected Unit target;
+    protected List<Effect> modifiers = new ArrayList<>();
+    protected int range;
 
-    public Entity(String filePath, int posX, int posY){
+    public Unit(String filePath, int posX, int posY){
         this.posX = posX;
         this.posY = posY;
         this.spriteSheet = new Image(getClass().getResourceAsStream(filePath));
@@ -31,8 +39,6 @@ public abstract class Entity {
         return posY;
     }
 
-    abstract public void update(EventHandler event);
-
     public void setSpritePosX(int posX){
         this.sprite.setTranslateX(posX);
         this.posX = posX;
@@ -41,5 +47,13 @@ public abstract class Entity {
     public void setSpritePosY(int posY){
         this.sprite.setTranslateY(posY);
         this.posY = posY;
+    }
+
+    public void attack() {
+        // Implement attack logic here 
+    }
+
+    public void specialAbility() {
+        // Implement special ability logic here
     }
 }
