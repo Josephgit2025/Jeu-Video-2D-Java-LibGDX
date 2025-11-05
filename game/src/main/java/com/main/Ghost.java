@@ -16,7 +16,7 @@ public class Ghost extends Unit{
         return speed;
     }
 
-    @Override
+
     public void update(EventHandler event){
         if (event.isPressed(KeyCode.W) || event.isPressed(KeyCode.UP)){
             moveUp();
