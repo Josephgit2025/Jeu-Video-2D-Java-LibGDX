@@ -4,8 +4,8 @@ import com.main.entities.Unit;
 
 public class Zombie extends Unit {
 
-    public Zombie (int posX, int posY) {
-        super("/com/main/assets/Zombie.png", posX, posY);
+    public Zombie (String filePath, int posX, int posY) {
+        super(filePath, posX, posY);
         this.health = 100;
         this.attackDamage = 15;
         this.speed = 2;
