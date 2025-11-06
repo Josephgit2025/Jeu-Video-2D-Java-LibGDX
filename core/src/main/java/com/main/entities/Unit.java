@@ -20,14 +20,13 @@ public abstract class Unit {
     // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la classe Effect si nécessaire
     protected int range;
     protected int attackCooldown = 0;
+    protected Texture texture;
+    protected float width, height;
 
     public Unit(String filePath, float posX, float posY){
         this.posX = posX;
         this.posY = posY;
         this.texture = new Texture(filePath);
-        this.sprite = new Sprite(texture);
-        this.sprite.setSize(160, 120);
-        this.sprite.setPosition(posX, posY);
     }
 
     public float getPosX() {
