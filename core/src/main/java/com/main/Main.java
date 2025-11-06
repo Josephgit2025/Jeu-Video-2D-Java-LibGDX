@@ -3,6 +3,7 @@ package com.main;
 import com.badlogic.gdx.Game;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+// Main gere les ecrans, GameScreen gere le jeu
 public class Main extends Game {
     private GameScreen gameScreen;
 
