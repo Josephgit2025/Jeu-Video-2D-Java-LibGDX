@@ -23,7 +23,7 @@ public class Hero extends Unit {
    
 
     public Hero(int posX, int posY) {
-        super("/com/main/assets/Hero.png", posX, posY);
+        super("/com/main/assets/hero/down1.png", posX, posY);
         this.health = 500;
         this.weapon = new Machette();
         this.speed = 3;
