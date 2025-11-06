@@ -38,7 +38,7 @@ public class Base {
             case "Sniper":
                 return new Sniper(0,0);
             default:
-                return null;
+                return null; 
         }
     }   
 }
