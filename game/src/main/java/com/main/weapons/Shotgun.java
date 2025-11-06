@@ -1,4 +1,4 @@
-package com.main;
+package com.main.weapons;
 
 public class Shotgun extends Weapon{
     public Shotgun(){

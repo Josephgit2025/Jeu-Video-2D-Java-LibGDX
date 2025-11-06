@@ -16,7 +16,6 @@ public class EventHandler {
 
     public void pollEvents(Scene scene){
         scene.setOnKeyPressed(event -> {
-            System.out.println(event.getCode());
             pressedKeys.add(event.getCode());
             handleKeyPressed(event.getCode());
         });
@@ -36,7 +35,9 @@ public class EventHandler {
 
     public Set<KeyCode> getPressedKeys(){
         return new HashSet<>(pressedKeys);
-    }    public void setSpritePosX(int posX){
+    }
+    
+    public void setSpritePosX(int posX){
         
     }
 }

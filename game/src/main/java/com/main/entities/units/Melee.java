@@ -1,7 +1,6 @@
-package com.main;
+package com.main.entities.units;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Melee extends Soldier {
     

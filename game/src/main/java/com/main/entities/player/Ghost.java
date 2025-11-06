@@ -1,20 +1,22 @@
-package com.main;
+package com.main.entities.player;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import com.main.entities.Unit;
+import com.main.EventHandler;
+import com.main.App;
+import javafx.scene.input.KeyCode;
 
 public class Ghost extends Unit{
     private int speed = 10;
 
     public Ghost(int posX, int posY){
-        super("/com/main/assets/units/ghost.png", posX, posY);
+        super("/com/main/assets/ghost.png", posX, posY);
+        
     }
 
     public int getSpeed() {
         return speed;
     }
+
 
     public void update(EventHandler event){
         if (event.isPressed(KeyCode.W) || event.isPressed(KeyCode.UP)){

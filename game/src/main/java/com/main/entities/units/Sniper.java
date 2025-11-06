@@ -1,4 +1,4 @@
-package com.main;
+package com.main.entities.units;
 
 public class Sniper extends Soldier{
 
@@ -10,3 +10,4 @@ public class Sniper extends Soldier{
         this.attackSpeed = 3;
     }
 }
+ 

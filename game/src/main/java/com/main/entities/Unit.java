@@ -1,4 +1,4 @@
-package com.main;
+package com.main.entities;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,10 @@ public abstract class Unit {
         return posY;
     }
 
+    public ImageView getSprite() {
+        return sprite;
+    }
+
     public void setSpritePosX(int posX){
         this.sprite.setTranslateX(posX);
         this.posX = posX;
@@ -57,3 +61,4 @@ public abstract class Unit {
         // Implement special ability logic here
     }
 }
+ 
