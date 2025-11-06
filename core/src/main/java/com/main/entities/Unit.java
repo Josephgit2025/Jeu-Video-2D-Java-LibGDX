@@ -54,7 +54,7 @@ public abstract class Unit {
      * Dessine le sprite de l'unité
      */
     public void render(SpriteBatch batch) {
-        sprite.draw(batch);
+        batch.draw(this.texture, posX, posY);
     }
     
     /**
@@ -165,4 +165,5 @@ public abstract class Unit {
     public void specialAbility() {
         // Implement special ability logic here
     }
+    
 }

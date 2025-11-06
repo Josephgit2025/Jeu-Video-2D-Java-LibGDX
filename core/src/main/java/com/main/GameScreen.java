@@ -7,8 +7,9 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.main.map.Base;
 import com.main.map.WarMap;
-
+import com.main.entities.Unit;
 import com.main.entities.player.Hero;
 
 public class GameScreen implements Screen {
@@ -19,6 +20,8 @@ public class GameScreen implements Screen {
     private WarMap map;
     private OrthographicCamera camera;
     private Viewport viewport;
+    private Base enemyBase;
+    private Base playerBase;
 
     public GameScreen(Main game) {
         this.game = game;
@@ -29,6 +32,8 @@ public class GameScreen implements Screen {
         // ✅ Créer le héros au centre de l'écran
         hero = new Hero(400, 300);
         map = new WarMap();
+        this.enemyBase = new Base(800, 300);
+        this.playerBase = new Base(0, 300);
     }
 
     @Override
@@ -51,18 +56,23 @@ public class GameScreen implements Screen {
         
         // ✅ Dessiner le héros au lieu de l'image fixe
         hero.render(batch);
-        
         batch.end();
     }
 
     private void update(float delta) {
         // ✅ Mettre à jour le héros
-        // hero.update(delta);
+        hero.update(delta);
         
         // Ici tu peux ajouter d'autres logiques :
         // - Ennemis
         // - Collision detection
         // - Game logic
+        Unit tmp = enemyBase.spawnUnit(delta);
+        if (tmp != null){
+            batch.begin();
+            tmp.render(batch);
+            batch.end();
+        }
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
 
@@ -89,7 +99,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-        image.dispose();
         map.dispose();
     }
 }
