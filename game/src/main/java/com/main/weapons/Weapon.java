@@ -15,11 +15,11 @@ public abstract class Weapon {
         this.munitions = maxMun;
     }
 
-    protected void reload(){
+    public void reload(){
         this.munitions = this.maxMunition;
     }
 
-    protected void attack(){
+    public void attack(){
         if (this.munitions > 0)
             this.munitions--;
     }

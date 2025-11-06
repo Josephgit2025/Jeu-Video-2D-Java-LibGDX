@@ -8,6 +8,7 @@ public class Sniper extends Soldier{
         this.attackDamage = 40;
         this.speed = 4;
         this.attackSpeed = 3;
+        this.range = 400;
     }
 }
  
