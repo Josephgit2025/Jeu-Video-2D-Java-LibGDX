@@ -2,17 +2,11 @@ package com.main.entities.player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 
 import com.main.entities.Unit;
-import com.main.entities.player.*;
 import java.util.List;
 import java.util.ArrayList;
 import com.main.weapons.*;
-import com.main.EventHandler;
-import com.main.App;
 
 
 public class Hero extends Unit {
@@ -26,66 +20,88 @@ public class Hero extends Unit {
     protected Weapon weapon;
    
 
-    public Hero(int posX, int posY) {
-        super("/com/main/assets/hero/down1.png", posX, posY);
+    public Hero(float posX, float posY) {
+        super("hero/down1.png", posX, posY);
         this.health = 500;
         this.weapon = new Machette();
         this.speed = 3;
         this.attackSpeed = 1;
     }
 
-    public int getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 
-    public void update(EventHandler event){
-        if (event.isPressed(KeyCode.W) || event.isPressed(KeyCode.UP)){
-            moveUp();
+    /**
+     * Met à jour le Hero (déplacements avec LibGDX)
+     */
+    public void update(float delta) {
+        // Déplacement avec les touches WASD ou flèches
+        if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            moveUp(delta);
         }
-        if (event.isPressed(KeyCode.S) || event.isPressed(KeyCode.DOWN)){
-            moveDown();
+        if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            moveDown(delta);
         }
-        if (event.isPressed(KeyCode.D) || event.isPressed(KeyCode.RIGHT)){
-            moveRight();
+        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+            moveRight(delta);
         }
-        if (event.isPressed(KeyCode.A) || event.isPressed(KeyCode.LEFT)){
-            moveLeft();
+        if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+            moveLeft(delta);
         }
     }
 
-    private void moveUp() {
-        if (this.getPosY() - speed < 0) {
+    private void moveUp(float delta) {
+        float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
+        if (newY + 120 > Gdx.graphics.getHeight()) {
+            this.setSpritePosY(Gdx.graphics.getHeight() - 120);
+        } else {
+            this.setSpritePosY(newY);
+        }
+    }
+
+    private void moveDown(float delta) {
+        float newY = this.getPosY() - speed * delta * 60;
+        if (newY < 0) {
             this.setSpritePosY(0);
         } else {
-            this.setSpritePosY(this.getPosY() - speed);
-        }
-
-    }
-
-    private void moveDown() {
-        if (this.getPosY() + speed + 120 > App.getHeight()) {
-            this.setSpritePosY((int) App.getHeight() - 120);
-        } else {
-            this.setSpritePosY(this.getPosY() + speed);
+            this.setSpritePosY(newY);
         }
     }
 
-    private void moveLeft() {
-        if (this.getPosX() - speed < 0) {
+    private void moveLeft(float delta) {
+        float newX = this.getPosX() - speed * delta * 60;
+        if (newX < 0) {
             this.setSpritePosX(0);
         } else {
-            this.setSpritePosX(this.getPosX() - speed);
+            this.setSpritePosX(newX);
         }
-
     }
 
-    private void moveRight() {
-        if (this.getPosX() + speed + 160 > App.getWidth()) {
-            this.setSpritePosX((int) App.getWidth() - 160);
+    private void moveRight(float delta) {
+        float newX = this.getPosX() + speed * delta * 60;
+        if (newX + 160 > Gdx.graphics.getWidth()) {
+            this.setSpritePosX(Gdx.graphics.getWidth() - 160);
         } else {
-            this.setSpritePosX(this.getPosX() + speed);
+            this.setSpritePosX(newX);
         }
+    }
 
+    @Override
+    public void attack() {
+        if (target == null || target.isDead()) {
+            return;
+        }
+        if (attackCooldown <= 0 && weapon != null) {
+            if (weapon.getMunitions() > 0) {
+                weapon.attack(); // Décrémente les munitions
+                int totalDamage = weapon.getDamage(); // Seulement l'arme
+                target.takeDamage(totalDamage);
+                attackCooldown = weapon.getAttackSpeed();
+            } else {
+                weapon.reload();
+            }
+        }
     }
 
 
