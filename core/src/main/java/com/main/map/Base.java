@@ -2,12 +2,15 @@ package com.main.map;
 
 import com.main.utils.Position;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import com.main.entities.Unit;
 import com.main.entities.units.Tank;
 import com.main.entities.units.Melee;
 import com.main.entities.units.Sniper;
+import com.main.GameScreen;
 
 enum Type{
     MELEE,
@@ -20,10 +23,14 @@ public class Base {
     private Position position;
     private int attackPower = 50;
     private float lastSpawn;
+    private List<Unit> units;
+    private Random random;
 
     public Base(int posX, int posY){
         this.position = new Position(posX, posY);
         lastSpawn = 0.0f;
+        this.units = new ArrayList<>();
+        random = new Random();
     }
 
     public int getHealth() {
@@ -40,24 +47,49 @@ public class Base {
         this.health -= damage;
     }
 
-    public Unit spawnUnit(float delta){
+    public void addUnit(Unit unit){
+        if (unit != null){
+            this.units.add(unit);
+        }
+    }
+
+    public List<Unit> getUnits(){
+        return this.units;
+    }
+
+    public Unit spawnUnit(GameScreen screen, float delta){
         if (lastSpawn >= 5.0f){
-            Type type = Type.values()[new Random().nextInt(Type.values().length)];
+            Type type = Type.values()[random.nextInt(Type.values().length)];
             switch (type){
                 case TANK:
                     lastSpawn = 0.0f;
-                    return new Tank(400,200);
+                    System.out.println("Tank spawned");
+                    return new Tank(0, random.nextInt(screen.getMapHeight()));
                 case MELEE:
                     lastSpawn = 0.0f;
-                    return new Melee(400, 200);
+                    System.out.println("melee spawned");
+                    return new Melee(0, random.nextInt(screen.getMapHeight()));
                 case SNIPER:
                     lastSpawn = 0.0f;
-                    return new Sniper(400,200);
+                    System.out.println("sniper spawned");
+                    return new Sniper(0,random.nextInt(screen.getMapHeight()));
                 default:
                     return null; 
             }
         }
         lastSpawn += delta;
         return null;
-    }   
+    }
+
+    public void updateUnits(float delta){
+        for (Unit elem : units){
+            if (elem.getLastMove() >= 1.0f){
+                elem.move();
+                elem.setLastMove(0);
+            }
+            else{
+                elem.setLastMove(elem.getLastMove() + delta);
+            }
+        }
+    }
 }

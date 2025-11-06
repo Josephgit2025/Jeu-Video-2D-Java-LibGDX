@@ -21,11 +21,15 @@ public abstract class Unit {
     protected int attackCooldown = 0;
     protected Texture texture;
     protected float width, height;
+    private float lastMove = 0.0f;
 
     public Unit(String filePath, float posX, float posY){
         this.posX = posX;
         this.posY = posY;
         this.texture = new Texture(filePath);
+        this.sprite = new Sprite(texture);
+        this.sprite.setSize(160, 120);
+        this.sprite.setPosition(posX, posY);
     }
 
     public float getPosX() {
@@ -38,6 +42,18 @@ public abstract class Unit {
 
     public Sprite getSprite() {
         return sprite;
+    }
+
+    public float getLastMove(){
+        return this.lastMove;
+    }
+
+    public float getSpeed(){
+        return this.speed;
+    }
+
+    public void setLastMove(float num){
+        this.lastMove = num;
     }
 
     public void setSpritePosX(float posX){
@@ -165,5 +181,6 @@ public abstract class Unit {
     public void specialAbility() {
         // Implement special ability logic here
     }
-    
+
+    abstract public void move();
 }

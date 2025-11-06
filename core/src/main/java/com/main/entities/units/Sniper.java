@@ -6,7 +6,7 @@ public class Sniper extends Soldier{
         super("zombie/women/Walk3.png", posX, posY);
         this.health = 150;
         this.attackDamage = 40;
-        this.speed = 4;
+        this.speed = 30;
         this.attackSpeed = 3;
         this.range = 400;
     }

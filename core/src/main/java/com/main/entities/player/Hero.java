@@ -24,7 +24,7 @@ public class Hero extends Unit {
         super("hero/left1.png", posX, posY);
         this.health = 500;
         this.weapon = new Machette();
-        this.speed = 3;
+        this.speed = 8;
         this.attackSpeed = 1;
     }
 
@@ -34,27 +34,30 @@ public class Hero extends Unit {
 
     /**
      * Met à jour le Hero (déplacements avec LibGDX)
+     * @param delta Le temps écoulé depuis la dernière frame
+     * @param mapWidth Largeur de la map en pixels
+     * @param mapHeight Hauteur de la map en pixels
      */
-    public void update(float delta) {
+    public void update(float delta, float mapWidth, float mapHeight) {
         // Déplacement avec les touches WASD ou flèches
         if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            moveUp(delta);
+            moveUp(delta, mapHeight);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             moveDown(delta);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            moveRight(delta);
+            moveRight(delta, mapWidth);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             moveLeft(delta);
         }
     }
 
-    private void moveUp(float delta) {
+    private void moveUp(float delta, float mapHeight) {
         float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
-        if (newY + 120 > Gdx.graphics.getHeight()) {
-            this.setSpritePosY(Gdx.graphics.getHeight() - 120);
+        if (newY + 120 > mapHeight) {
+            this.setSpritePosY(mapHeight - 120);
         } else {
             this.setSpritePosY(newY);
         }
@@ -78,10 +81,10 @@ public class Hero extends Unit {
         }
     }
 
-    private void moveRight(float delta) {
+    private void moveRight(float delta, float mapWidth) {
         float newX = this.getPosX() + speed * delta * 60;
-        if (newX + 160 > Gdx.graphics.getWidth()) {
-            this.setSpritePosX(Gdx.graphics.getWidth() - 160);
+        if (newX + 160 > mapWidth) {
+            this.setSpritePosX(mapWidth - 160);
         } else {
             this.setSpritePosX(newX);
         }
@@ -106,4 +109,6 @@ public class Hero extends Unit {
     public void render(SpriteBatch batch){
         batch.draw(this.texture, this.posX, this.posY);
     }
+
+    public void move(){}
 }

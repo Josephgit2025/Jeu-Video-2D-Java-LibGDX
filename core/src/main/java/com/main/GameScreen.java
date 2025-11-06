@@ -15,6 +15,7 @@ import com.main.entities.player.Hero;
 public class GameScreen implements Screen {
     private SpriteBatch batch;
     private Texture image;
+    
     private Main game;
     private Hero hero;
     private WarMap map;
@@ -22,17 +23,21 @@ public class GameScreen implements Screen {
     private Viewport viewport;
     private Base enemyBase;
     private Base playerBase;
-
+    private int mapWidth;
+    private int mapHeight;
+    
     public GameScreen(Main game) {
         this.game = game;
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
-        viewport = new FitViewport(800,600, camera);
+        viewport = new FitViewport(1000,700, camera);
         
         // ✅ Créer le héros au centre de l'écran
-        hero = new Hero(400, 300);
         map = new WarMap();
-        this.enemyBase = new Base(800, 300);
+        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2);
+        this.mapWidth = map.getMapWidthInPixels();
+        this.mapHeight = map.getMapHeightInPixels();
+        this.enemyBase = new Base(this.mapWidth, 300);
         this.playerBase = new Base(0, 300);
     }
 
@@ -40,7 +45,7 @@ public class GameScreen implements Screen {
     public void show() {
         // Appelé quand l'écran devient actif
     }
-
+    
     @Override
     public void render(float delta) {
         // Logique de jeu
@@ -56,23 +61,25 @@ public class GameScreen implements Screen {
         
         // ✅ Dessiner le héros au lieu de l'image fixe
         hero.render(batch);
+        for (Unit elem : playerBase.getUnits()){
+            elem.render(batch);
+        }
         batch.end();
     }
 
     private void update(float delta) {
-        // ✅ Mettre à jour le héros
-        hero.update(delta);
+        // ✅ Mettre à jour le héros avec les limites de la map
+        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
         
         // Ici tu peux ajouter d'autres logiques :
         // - Ennemis
         // - Collision detection
         // - Game logic
-        Unit tmp = enemyBase.spawnUnit(delta);
+        Unit tmp = playerBase.spawnUnit(this, delta);
         if (tmp != null){
-            batch.begin();
-            tmp.render(batch);
-            batch.end();
+            playerBase.addUnit(tmp);;
         }
+        playerBase.updateUnits(delta);
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
 
@@ -80,12 +87,12 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height);
     }
-
+    
     @Override
     public void pause() {
         // Jeu en pause
     }
-
+    
     @Override
     public void resume() {
         // Reprendre le jeu
@@ -100,5 +107,48 @@ public class GameScreen implements Screen {
     public void dispose() {
         batch.dispose();
         map.dispose();
+    }
+    public SpriteBatch getBatch() {
+        return batch;
+    }
+    
+    public Texture getImage() {
+        return image;
+    }
+    
+    public Main getGame() {
+        return game;
+    }
+    
+    public Hero getHero() {
+        return hero;
+    }
+    
+    public WarMap getMap() {
+        return map;
+    }
+    
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
+    
+    public Viewport getViewport() {
+        return viewport;
+    }
+    
+    public Base getEnemyBase() {
+        return enemyBase;
+    }
+    
+    public Base getPlayerBase() {
+        return playerBase;
+    }
+    
+    public int getMapWidth() {
+        return mapWidth;
+    }
+    
+    public int getMapHeight() {
+        return mapHeight;
     }
 }
