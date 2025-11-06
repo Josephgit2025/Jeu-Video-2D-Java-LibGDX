@@ -1,6 +1,6 @@
 package com.main;
 
-import com.main.entities.player.Ghost;
+import com.main.entities.player.Hero;
 import com.main.entities.units.Soldier;
 import com.main.entities.enemies.Zombie;
 import com.main.map.Base;
@@ -23,6 +23,7 @@ public class App extends Application {
 
     private static Scene scene;
     private Pane root;
+    private Hero hero;
     private EventHandler eventHandler;
 
     private Base playerBase;
@@ -41,9 +42,10 @@ public class App extends Application {
         this.units = new ArrayList<>();
         this.zombies = new ArrayList<>();
         this.map = new WarMap(scene);
+        this.hero = new Hero(0, 0);
 
-        // root.getChildren().add(ghost.getSprite());
         root.getChildren().add(this.map.getSprite());
+        root.getChildren().add(hero.getSprite());
         stage.setScene(scene);
         stage.show();
 
@@ -59,14 +61,14 @@ public class App extends Application {
     }
 
     public void update(){
-        // ghost.update(eventHandler);
+        hero.update(eventHandler);
     }
 
     public static double getWidth(){
-        return scene.getWindow().getWidth();
+        return scene.getWidth();
     }
 
     public static double getHeight(){
-        return scene.getWindow().getHeight();
+        return scene.getHeight();
     }
 }
