@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public abstract class Unit {
     protected float posX;
     protected float posY;
-    protected Texture texture;
     protected Sprite sprite;
     protected int health;
     protected int attackDamage;
