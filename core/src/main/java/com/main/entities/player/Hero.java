@@ -21,7 +21,7 @@ public class Hero extends Unit {
    
 
     public Hero(float posX, float posY) {
-        super("units/hero/down1.png", posX, posY);
+        super("hero/left1.png", posX, posY);
         this.health = 500;
         this.weapon = new Machette();
         this.speed = 8;
@@ -110,5 +110,5 @@ public class Hero extends Unit {
         batch.draw(this.texture, this.posX, this.posY);
     }
 
-
+    public void move(){}
 }

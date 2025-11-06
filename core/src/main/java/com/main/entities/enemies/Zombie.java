@@ -13,4 +13,7 @@ public class Zombie extends Unit {
         this.range = 100;
     }
 
+    public void move(){
+        this.setSpritePosX(this.posX - this.speed);
+    }
 }
