@@ -10,6 +10,7 @@ public class Melee extends Soldier {
         this.attackDamage = 20;
         this.speed = 5;
         this.attackSpeed = 2;
+        this.range = 80;
         this.modifiers = new ArrayList<>();
     }
 

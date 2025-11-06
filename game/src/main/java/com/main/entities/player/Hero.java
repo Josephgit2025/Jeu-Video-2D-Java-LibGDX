@@ -1,4 +1,5 @@
 package com.main.entities.player;
+
 import com.main.EventHandler;
 import com.main.entities.Unit;
 import com.main.entities.player.*;
@@ -18,9 +19,8 @@ public class Hero extends Unit {
     protected List<Ability> abilities = new ArrayList<>();
     protected int strength;
     protected int dexterity;
-    protected int agility; 
+    protected int agility;
     protected Weapon weapon;
-   
 
     public Hero(int posX, int posY) {
         super("/com/main/assets/hero/down1.png", posX, posY);
@@ -28,23 +28,24 @@ public class Hero extends Unit {
         this.weapon = new Machette();
         this.speed = 3;
         this.attackSpeed = 1;
+        this.attackDamage = 0;
     }
 
     public int getSpeed() {
         return speed;
     }
 
-    public void update(EventHandler event){
-        if (event.isPressed(KeyCode.W) || event.isPressed(KeyCode.UP)){
+    public void update(EventHandler event) {
+        if (event.isPressed(KeyCode.W) || event.isPressed(KeyCode.UP)) {
             moveUp();
         }
-        if (event.isPressed(KeyCode.S) || event.isPressed(KeyCode.DOWN)){
+        if (event.isPressed(KeyCode.S) || event.isPressed(KeyCode.DOWN)) {
             moveDown();
         }
-        if (event.isPressed(KeyCode.D) || event.isPressed(KeyCode.RIGHT)){
+        if (event.isPressed(KeyCode.D) || event.isPressed(KeyCode.RIGHT)) {
             moveRight();
         }
-        if (event.isPressed(KeyCode.A) || event.isPressed(KeyCode.LEFT)){
+        if (event.isPressed(KeyCode.A) || event.isPressed(KeyCode.LEFT)) {
             moveLeft();
         }
     }
@@ -81,9 +82,23 @@ public class Hero extends Unit {
         } else {
             this.setSpritePosX(this.getPosX() + speed);
         }
-
     }
 
+    @Override
+    public void attack() {
+        if (target == null || target.isDead()) {
+            return;
+        }
+        if (attackCooldown <= 0 && weapon != null) {
+            if (weapon.getMunitions() > 0) {
+                weapon.attack(); // Décrémente les munitions
+                int totalDamage = weapon.getDamage(); // Seulement l'arme
+                target.takeDamage(totalDamage);
+                attackCooldown = weapon.getAttackSpeed();
+            } else {
+                weapon.reload();
+            }
+        }
+    }
 
 }
- 
