@@ -56,8 +56,8 @@ public class GameScreen implements Screen {
     }
 
     private void update(float delta) {
-        // ✅ Mettre à jour le héros
-        // hero.update(delta);
+        // ✅ Mettre à jour le héros avec les limites de la map
+        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
         
         // Ici tu peux ajouter d'autres logiques :
         // - Ennemis

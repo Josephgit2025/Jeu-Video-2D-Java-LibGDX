@@ -26,6 +26,9 @@ public abstract class Unit {
         this.posX = posX;
         this.posY = posY;
         this.texture = new Texture(filePath);
+        this.sprite = new Sprite(texture);
+        this.sprite.setSize(160, 120);
+        this.sprite.setPosition(posX, posY);
     }
 
     public float getPosX() {

@@ -50,6 +50,14 @@ public class WarMap {
         }
     }
 
+    public int getMapWidthInPixels() {
+        return mapWidth * tileWidth;
+    }
+
+    public int getMapHeightInPixels() {
+        return mapHeight * tileHeight;
+    }
+
     public int getMapHeight() {
         return this.mapHeight;
     }
