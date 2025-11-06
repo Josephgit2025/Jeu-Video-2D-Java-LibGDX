@@ -65,10 +65,10 @@ public class App extends Application {
     }
 
     public static double getWidth(){
-        return scene.getWindow().getWidth();
+        return scene.getWidth();
     }
 
     public static double getHeight(){
-        return scene.getWindow().getHeight();
+        return scene.getHeight();
     }
 }

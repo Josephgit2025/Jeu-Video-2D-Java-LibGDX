@@ -59,8 +59,8 @@ public class Hero extends Unit {
     }
 
     private void moveDown() {
-        if (this.getPosY() + speed > App.getHeight()) {
-            this.setSpritePosY((int) App.getHeight());
+        if (this.getPosY() + speed + 120 > App.getHeight()) {
+            this.setSpritePosY((int) App.getHeight() - 120);
         } else {
             this.setSpritePosY(this.getPosY() + speed);
         }
@@ -76,8 +76,8 @@ public class Hero extends Unit {
     }
 
     private void moveRight() {
-        if (this.getPosX() + speed > App.getWidth()) {
-            this.setSpritePosX((int) App.getWidth());
+        if (this.getPosX() + speed + 160 > App.getWidth()) {
+            this.setSpritePosX((int) App.getWidth() - 160);
         } else {
             this.setSpritePosX(this.getPosX() + speed);
         }
