@@ -11,8 +11,6 @@ import com.main.entities.player.*;
 import java.util.List;
 import java.util.ArrayList;
 import com.main.weapons.*;
-import com.main.EventHandler;
-import com.main.App;
 
 
 public class Hero extends Unit {
@@ -27,7 +25,7 @@ public class Hero extends Unit {
    
 
     public Hero(int posX, int posY) {
-        super("/com/main/assets/hero/down1.png", posX, posY);
+        super("units/hero/down1.png", posX, posY);
         this.health = 500;
         this.weapon = new Machette();
         this.speed = 3;
@@ -38,55 +36,60 @@ public class Hero extends Unit {
         return speed;
     }
 
-    public void update(EventHandler event){
-        if (event.isPressed(KeyCode.W) || event.isPressed(KeyCode.UP)){
-            moveUp();
-        }
-        if (event.isPressed(KeyCode.S) || event.isPressed(KeyCode.DOWN)){
-            moveDown();
-        }
-        if (event.isPressed(KeyCode.D) || event.isPressed(KeyCode.RIGHT)){
-            moveRight();
-        }
-        if (event.isPressed(KeyCode.A) || event.isPressed(KeyCode.LEFT)){
-            moveLeft();
-        }
+    public void render(SpriteBatch batch){
+        batch.draw(this.texture, this.posX, this.posY);
     }
 
-    private void moveUp() {
-        if (this.getPosY() - speed < 0) {
-            this.setSpritePosY(0);
-        } else {
-            this.setSpritePosY(this.getPosY() - speed);
-        }
 
-    }
+    // public void update(EventHandler event){
+    //     if (event.isPressed(KeyCode.W) || event.isPressed(KeyCode.UP)){
+    //         moveUp();
+    //     }
+    //     if (event.isPressed(KeyCode.S) || event.isPressed(KeyCode.DOWN)){
+    //         moveDown();
+    //     }
+    //     if (event.isPressed(KeyCode.D) || event.isPressed(KeyCode.RIGHT)){
+    //         moveRight();
+    //     }
+    //     if (event.isPressed(KeyCode.A) || event.isPressed(KeyCode.LEFT)){
+    //         moveLeft();
+    //     }
+    // }
 
-    private void moveDown() {
-        if (this.getPosY() + speed + 120 > App.getHeight()) {
-            this.setSpritePosY((int) App.getHeight() - 120);
-        } else {
-            this.setSpritePosY(this.getPosY() + speed);
-        }
-    }
+    // private void moveUp() {
+    //     if (this.getPosY() - speed < 0) {
+    //         this.setSpritePosY(0);
+    //     } else {
+    //         this.setSpritePosY(this.getPosY() - speed);
+    //     }
 
-    private void moveLeft() {
-        if (this.getPosX() - speed < 0) {
-            this.setSpritePosX(0);
-        } else {
-            this.setSpritePosX(this.getPosX() - speed);
-        }
+    // }
 
-    }
+    // private void moveDown() {
+    //     if (this.getPosY() + speed + 120 > App.getHeight()) {
+    //         this.setSpritePosY((int) App.getHeight() - 120);
+    //     } else {
+    //         this.setSpritePosY(this.getPosY() + speed);
+    //     }
+    // }
 
-    private void moveRight() {
-        if (this.getPosX() + speed + 160 > App.getWidth()) {
-            this.setSpritePosX((int) App.getWidth() - 160);
-        } else {
-            this.setSpritePosX(this.getPosX() + speed);
-        }
+    // private void moveLeft() {
+    //     if (this.getPosX() - speed < 0) {
+    //         this.setSpritePosX(0);
+    //     } else {
+    //         this.setSpritePosX(this.getPosX() - speed);
+    //     }
 
-    }
+    // }
+
+    // private void moveRight() {
+    //     if (this.getPosX() + speed + 160 > App.getWidth()) {
+    //         this.setSpritePosX((int) App.getWidth() - 160);
+    //     } else {
+    //         this.setSpritePosX(this.getPosX() + speed);
+    //     }
+
+    // }
 
 
 }

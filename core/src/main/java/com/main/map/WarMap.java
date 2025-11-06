@@ -4,45 +4,70 @@ import java.util.List;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import java.util.ArrayList;
 
+
 public class WarMap {
-    private double height;
-    private double width;
+    private int mapHeight;
+    private int mapWidth;
+    private int tileWidth;
+    private int tileHeight;
     private List<Obstacle> obstacles;
-    private SpriteBatch batch;
-    private Texture sprite;
+    private TiledMap tiledMap;
+    private OrthogonalTiledMapRenderer renderer;
+    private TmxMapLoader mapLoader;
 
-    public WarMap(Scene scene){
-        this.height = scene.getHeight();
-        this.width = scene.getWidth();
+    public WarMap(){
         this.obstacles = new ArrayList<>();
-        this.spriteSheet = new Image(getClass().getResourceAsStream("/com/main/map/map.png"));
-        this.sprite = new ImageView(this.spriteSheet);
-        this.sprite.setFitHeight(scene.getHeight());
-        this.sprite.setFitWidth(scene.getWidth());
-        this.sprite.setTranslateX(0);
-        this.sprite.setTranslateY(0);
+        loadTmxMap();
+        render();
     }
 
-    public double getHeight() {
-        return height;
+    private void loadTmxMap(){
+        mapLoader = new TmxMapLoader();
+        tiledMap = mapLoader.load("map/map.tmx");
+
+        renderer = new OrthogonalTiledMapRenderer(tiledMap);
+        this.mapHeight = tiledMap.getProperties().get("height", Integer.class);
+        this.mapWidth = tiledMap.getProperties().get("width", Integer.class);
+        this.tileHeight = tiledMap.getProperties().get("tileheight", Integer.class);
+        this.tileWidth = tiledMap.getProperties().get("tilewidth", Integer.class);
     }
 
-    public double getWidth() {
-        return width;
+    public void render(){
+        if (renderer != null){
+            renderer.render();
+        }
+    }
+
+     public void setView(com.badlogic.gdx.graphics.OrthographicCamera camera) {
+        if (renderer != null) {
+            renderer.setView(camera);
+        }
+    }
+
+    public int getMapHeight() {
+        return this.mapHeight;
+    }
+
+    public int getMapWidth() {
+        return this.mapWidth;
     }
 
     public List<Obstacle> getObstacles() {
         return obstacles;
     }
 
-    public Image getSpriteSheet() {
-        return spriteSheet;
-    }
-
-    public ImageView getSprite() {
-        return sprite;
+    public void dispose(){
+        if (tiledMap != null){
+            tiledMap.dispose();
+        }
+        if (renderer != null){
+            renderer.dispose();
+        }
     }
 }
