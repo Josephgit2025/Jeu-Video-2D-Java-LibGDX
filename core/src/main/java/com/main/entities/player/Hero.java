@@ -29,12 +29,12 @@ public class Hero extends Unit {
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
     private float stateTime = 0f;
     private boolean moving = false;
-    private Direction direction = Direction.DOWN; 
+    private Direction direction = Direction.DOWN;
     private List<Texture> loadedTextures = new ArrayList<>();
     private final float FRAME_DURATION = 0.08f;
     private final float FRAME_DURATIONW = 0.15f;
+
     public Hero(float posX, float posY) {
-<<<<<<< HEAD
         super("units/hero/down1n.png", posX, posY);
 
         TextureRegion[] rightFrames = loadFrames("units/hero/right%d.png", 8);
@@ -55,9 +55,6 @@ public class Hero extends Unit {
                 3);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
-=======
-        super("hero/left1.png", posX, posY);
->>>>>>> master
         this.health = 500;
         this.weapon = new Machette();
         this.speed = 8;
@@ -111,7 +108,7 @@ public class Hero extends Unit {
     }
 
     public void moveUp(float delta, float mapHeight) {
-        float newY = this.getPosY() + speed * delta * 60; 
+        float newY = this.getPosY() + speed * delta * 60;
         if (newY + 120 > mapHeight) {
             this.setSpritePosY(mapHeight - 120);
         } else {
@@ -153,8 +150,8 @@ public class Hero extends Unit {
         }
         if (attackCooldown <= 0 && weapon != null) {
             if (weapon.getMunitions() > 0) {
-                weapon.attack(); 
-                int totalDamage = weapon.getDamage(); 
+                weapon.attack();
+                int totalDamage = weapon.getDamage();
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
             } else {
@@ -182,8 +179,7 @@ public class Hero extends Unit {
         batch.draw(currentFrame, this.posX, this.posY);
     }
 
-<<<<<<< HEAD
-=======
-    public void move(){}
->>>>>>> master
+    public void move() {
+    }
+
 }

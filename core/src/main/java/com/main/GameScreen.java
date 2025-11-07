@@ -9,58 +9,43 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.main.map.Base;
 import com.main.map.WarMap;
-<<<<<<< HEAD
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-=======
-import com.main.entities.Unit;
->>>>>>> master
 import com.main.entities.player.Hero;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
     private Texture image;
-    
+
     private Main game;
     private Hero hero;
     private WarMap map;
     private OrthographicCamera camera;
     private Viewport viewport;
-<<<<<<< HEAD
     private boolean moving;
     private Direction direction;
-    
+    private Base enemyBase;
+    private Base playerBase;
+    private int mapWidth;
+    private int mapHeight;
 
     private enum Direction {
         UP, DOWN, LEFT, RIGHT
     }
 
-=======
-    private Base enemyBase;
-    private Base playerBase;
-    private int mapWidth;
-    private int mapHeight;
-    
->>>>>>> master
     public GameScreen(Main game) {
         this.game = game;
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
-<<<<<<< HEAD
         viewport = new FitViewport(800, 600, camera);
 
-    viewport.update(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight(), true);
+        viewport.update(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight(), true);
 
         hero = new Hero(400, 300);
-=======
-        viewport = new FitViewport(1000,700, camera);
-        
-        // ✅ Créer le héros au centre de l'écran
->>>>>>> master
         map = new WarMap();
         hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2);
         this.mapWidth = map.getMapWidthInPixels();
@@ -72,7 +57,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
     }
-    
+
     @Override
     public void render(float delta) {
         update(delta);
@@ -111,44 +96,23 @@ public class GameScreen implements Screen {
         batch.begin();
 
         hero.render(batch);
-<<<<<<< HEAD
-
-=======
-        for (Unit elem : playerBase.getUnits()){
-            elem.render(batch);
-        }
->>>>>>> master
         batch.end();
     }
 
     private void update(float delta) {
         hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
-<<<<<<< HEAD
-=======
-        
-        // Ici tu peux ajouter d'autres logiques :
-        // - Ennemis
-        // - Collision detection
-        // - Game logic
-        Unit tmp = playerBase.spawnUnit(this, delta);
-        if (tmp != null){
-            playerBase.addUnit(tmp);;
-        }
-        playerBase.updateUnits(delta);
-        camera.position.set(hero.getPosX(), hero.getPosY(), 0);
->>>>>>> master
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
     }
-    
+
     @Override
     public void pause() {
         // Jeu en pause
     }
-    
+
     @Override
     public void resume() {
         // Reprendre le jeu
@@ -162,54 +126,54 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         batch.dispose();
-<<<<<<< HEAD
-        if (image != null) image.dispose();
-        if (hero != null) hero.dispose();
-        if (map != null) map.dispose();
-=======
-        map.dispose();
->>>>>>> master
+        if (image != null)
+            image.dispose();
+        if (hero != null)
+            hero.dispose();
+        if (map != null)
+            map.dispose();
     }
+
     public SpriteBatch getBatch() {
         return batch;
     }
-    
+
     public Texture getImage() {
         return image;
     }
-    
+
     public Main getGame() {
         return game;
     }
-    
+
     public Hero getHero() {
         return hero;
     }
-    
+
     public WarMap getMap() {
         return map;
     }
-    
+
     public OrthographicCamera getCamera() {
         return camera;
     }
-    
+
     public Viewport getViewport() {
         return viewport;
     }
-    
+
     public Base getEnemyBase() {
         return enemyBase;
     }
-    
+
     public Base getPlayerBase() {
         return playerBase;
     }
-    
+
     public int getMapWidth() {
         return mapWidth;
     }
-    
+
     public int getMapHeight() {
         return mapHeight;
     }

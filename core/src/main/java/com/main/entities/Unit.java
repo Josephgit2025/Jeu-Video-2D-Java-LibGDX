@@ -71,10 +71,10 @@ public abstract class Unit {
     }
 
     // public void updateImg( String motion){
-    //     this.texture = new Texture(motion);
-    //     this.sprite = new Sprite(texture);
-    //     this.sprite.setSize(160, 120);
-    //     this.sprite.setPosition(posX, posY);
+    // this.texture = new Texture(motion);
+    // this.sprite = new Sprite(texture);
+    // this.sprite.setSize(160, 120);
+    // this.sprite.setPosition(posX, posY);
     // }
 
     /**
@@ -180,4 +180,12 @@ public abstract class Unit {
     }
 
     abstract public void move();
+
+    public float getLastMove() {
+        return this.lastMove;
+    }
+
+    public void setLastMove(float num) {
+        this.lastMove = num;
+    }
 }
