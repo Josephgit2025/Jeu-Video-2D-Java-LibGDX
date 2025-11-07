@@ -190,7 +190,10 @@ public class Hero extends Unit {
         batch.draw(currentFrame, this.posX, this.posY);
     }
 
-    public void move() {
+    @Override
+    public void move(float delta) {
+        // Hero movement is handled via specific methods (moveUp/moveDown/etc.)
+        // This default implementation does nothing.
     }
 
 }

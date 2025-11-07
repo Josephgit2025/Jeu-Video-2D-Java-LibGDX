@@ -91,6 +91,9 @@ public class GameScreen implements Screen {
         for (Unit elem : enemyBase.getUnits()){
             elem.render(batch);
         }
+        // for (Zombie elem : playerBase.getZombie()){
+        //     elem.render(batch);
+        // }
 
         hero.render(batch);
         batch.end();
@@ -104,10 +107,15 @@ public class GameScreen implements Screen {
         // - Collision detection
         // - Game logic
         Unit tmp = enemyBase.spawnUnit(this, delta);
+        // Zombie tmp1 = playerBase.spawnZombie(this, delta);
         if (tmp != null){
             enemyBase.addUnit(tmp);
         }
+        // else if (tmp1 != null){
+        //     playerBase.addZombie(tmp1);
+        // }
         enemyBase.updateUnits(delta);
+        // playerBase.updateZombie(delta);
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
 

@@ -8,7 +8,9 @@ public class Soldier extends Unit {
         super(filePath, posX, posY);
     }
 
-    public void move(){
-        this.setSpritePosX(this.posX + this.speed);
+    @Override
+    public void move(float delta){
+        // move to the right by default
+        this.setSpritePosX(this.posX + this.speed * delta);
     }
 }
