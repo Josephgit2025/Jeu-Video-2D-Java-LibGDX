@@ -9,7 +9,7 @@ public class Obstacle {
     private Position position;
 
 
-    public Obstacle(String filePath, int height, int width, Position position){
+    public Obstacle(int height, int width, Position position){
         this.height = height;
         this.width = width;
         this.position = position;

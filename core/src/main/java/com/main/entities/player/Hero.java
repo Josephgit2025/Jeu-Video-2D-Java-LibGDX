@@ -1,12 +1,15 @@
 package com.main.entities.player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.main.entities.Unit;
-import java.util.List;
-import java.util.ArrayList;
-import com.main.weapons.*;
+import com.main.map.WarMap;
+import com.main.weapons.Machette;
+import com.main.weapons.Weapon;
 
 
 public class Hero extends Unit {
@@ -18,14 +21,16 @@ public class Hero extends Unit {
     protected int dexterity;
     protected int agility; 
     protected Weapon weapon;
+    private WarMap map;
    
 
-    public Hero(float posX, float posY) {
+    public Hero(float posX, float posY, WarMap map) {
         super("hero/left1.png", posX, posY);
         this.health = 500;
         this.weapon = new Machette();
         this.speed = 8;
         this.attackSpeed = 1;
+        this.map = map;
     }
 
     public float getSpeed() {
@@ -56,37 +61,45 @@ public class Hero extends Unit {
 
     private void moveUp(float delta, float mapHeight) {
         float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
-        if (newY + 120 > mapHeight) {
-            this.setSpritePosY(mapHeight - 120);
-        } else {
-            this.setSpritePosY(newY);
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)){
+            if (newY + 120 > mapHeight) {
+                this.setSpritePosY(mapHeight - 120);
+            } else {
+                this.setSpritePosY(newY);
+            }
         }
     }
 
     private void moveDown(float delta) {
         float newY = this.getPosY() - speed * delta * 60;
-        if (newY < 0) {
-            this.setSpritePosY(0);
-        } else {
-            this.setSpritePosY(newY);
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
+            if (newY < 0) {
+                this.posY = 0;
+            } else {
+                this.posY = newY;
+            }
         }
     }
 
     private void moveLeft(float delta) {
         float newX = this.getPosX() - speed * delta * 60;
-        if (newX < 0) {
-            this.setSpritePosX(0);
-        } else {
-            this.setSpritePosX(newX);
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+            if (newX < 0) {
+                this.posX = 0;
+            } else {
+                this.posX = newX;
+            }
         }
     }
 
     private void moveRight(float delta, float mapWidth) {
         float newX = this.getPosX() + speed * delta * 60;
-        if (newX + 160 > mapWidth) {
-            this.setSpritePosX(mapWidth - 160);
-        } else {
-            this.setSpritePosX(newX);
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+            if (newX + 160 > mapWidth) {
+                this.posX = mapWidth - 160;
+            } else {
+                this.posX = newX;
+            }
         }
     }
 

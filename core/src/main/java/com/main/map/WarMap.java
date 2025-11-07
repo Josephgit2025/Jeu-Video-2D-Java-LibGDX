@@ -1,14 +1,12 @@
 package com.main.map;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-
-import java.util.ArrayList;
 
 
 public class WarMap {
@@ -18,6 +16,7 @@ public class WarMap {
     private int tileHeight;
     private List<Obstacle> obstacles;
     private TiledMap tiledMap;
+    private TiledMapTileLayer collisionLayer;
     private OrthogonalTiledMapRenderer renderer;
     private TmxMapLoader mapLoader;
 
@@ -36,6 +35,7 @@ public class WarMap {
         this.mapWidth = tiledMap.getProperties().get("width", Integer.class);
         this.tileHeight = tiledMap.getProperties().get("tileheight", Integer.class);
         this.tileWidth = tiledMap.getProperties().get("tilewidth", Integer.class);
+        collisionLayer = (TiledMapTileLayer) tiledMap.getLayers().get("collision");
     }
 
     public void render(){
@@ -44,10 +44,27 @@ public class WarMap {
         }
     }
 
-     public void setView(com.badlogic.gdx.graphics.OrthographicCamera camera) {
+    public boolean isCollision(float posX, float posY){
+        if (collisionLayer == null)
+            return false;
+        int tileX = (int) (posX / tileWidth);
+        int tileY = (int) (posY / tileWidth);
+        TiledMapTileLayer.Cell cell = collisionLayer.getCell(tileX, tileY);
+        return cell != null && cell.getTile() != null;
+    }
+
+    public boolean isCollisionRect(float posX, float posY, float width, float height){
+        return isCollision(posX, posY) || isCollision(posX + width, posY) || isCollision(posX, posY + height) || isCollision(posX + width, posY + height);
+    }
+
+    public void setView(com.badlogic.gdx.graphics.OrthographicCamera camera) {
         if (renderer != null) {
             renderer.setView(camera);
         }
+    }
+
+    public TiledMap getMap(){
+        return this.tiledMap;
     }
 
     public int getMapWidthInPixels() {

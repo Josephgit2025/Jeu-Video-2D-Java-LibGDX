@@ -1,16 +1,16 @@
 package com.main;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.main.map.Base;
-import com.main.map.WarMap;
 import com.main.entities.Unit;
 import com.main.entities.player.Hero;
+import com.main.map.Base;
+import com.main.map.WarMap;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -34,7 +34,7 @@ public class GameScreen implements Screen {
         
         // ✅ Créer le héros au centre de l'écran
         map = new WarMap();
-        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2);
+        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.mapWidth = map.getMapWidthInPixels();
         this.mapHeight = map.getMapHeightInPixels();
         this.enemyBase = new Base(this.mapWidth, 300);
@@ -75,11 +75,11 @@ public class GameScreen implements Screen {
         // - Ennemis
         // - Collision detection
         // - Game logic
-        Unit tmp = playerBase.spawnUnit(this, delta);
+        Unit tmp = enemyBase.spawnUnit(this, delta);
         if (tmp != null){
-            playerBase.addUnit(tmp);;
+            enemyBase.addUnit(tmp);
         }
-        playerBase.updateUnits(delta);
+        enemyBase.updateUnits(delta);
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
 
