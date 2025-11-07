@@ -88,6 +88,9 @@ public class GameScreen implements Screen {
         map.render();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+        for (Unit elem : enemyBase.getUnits()){
+            elem.render(batch);
+        }
 
         hero.render(batch);
         batch.end();
