@@ -6,7 +6,6 @@ import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.main.effects.Effect;
 
 public abstract class Unit {
     protected float posX;
@@ -30,8 +29,10 @@ public abstract class Unit {
         this.posY = posY;
         this.texture = new Texture(filePath);
         this.sprite = new Sprite(texture);
-        this.sprite.setSize(160, 120);
         this.sprite.setPosition(posX, posY);
+        this.sprite.setSize(35, 50);
+        this.width = 35;
+        this.height = 50;
     }
 
     public float getPosX() {

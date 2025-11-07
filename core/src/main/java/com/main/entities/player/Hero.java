@@ -112,9 +112,9 @@ public class Hero extends Unit {
 
     private void moveUp(float delta, float mapHeight) {
         float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
-        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)){
-            if (newY + 120 > mapHeight) {
-                this.setSpritePosY(mapHeight - 120);
+        if (!map.isCollisionRect(this.posX, newY + this.height)){
+            if (newY + this.height > mapHeight) {
+                this.setSpritePosY(mapHeight - this.height);
             } else {
                 this.setSpritePosY(newY);
             }
@@ -123,7 +123,7 @@ public class Hero extends Unit {
 
     public void moveDown(float delta) {
         float newY = this.getPosY() - speed * delta * 60;
-        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
+        if (!map.isCollisionRect(this.posX, newY)) {
             if (newY < 0) {
                 this.posY = 0;
             } else {
@@ -134,7 +134,7 @@ public class Hero extends Unit {
 
     public void moveLeft(float delta) {
         float newX = this.getPosX() - speed * delta * 60;
-        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+        if (!map.isCollisionRect(newX + this.width, this.posY)) {
             if (newX < 0) {
                 this.posX = 0;
             } else {
@@ -145,9 +145,9 @@ public class Hero extends Unit {
 
     public void moveRight(float delta, float mapWidth) {
         float newX = this.getPosX() + speed * delta * 60;
-        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
-            if (newX + 160 > mapWidth) {
-                this.posX = mapWidth - 160;
+        if (!map.isCollisionRect(newX + this.width, this.posY)) {
+            if (newX + this.width > mapWidth) {
+                this.posX = mapWidth - this.width;
             } else {
                 this.posX = newX;
             }

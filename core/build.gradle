@@ -1,11 +1,64 @@
+plugins {
+    id 'jacoco'
+}
+
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
+
+jacoco {
+    toolVersion = "0.8.11" // Version de JaCoCo
+}
 
 dependencies {
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
   api "com.github.tommyettinger:libgdx-utils:$utilsVersion"
 
+  testImplementation 'junit:junit:4.13.2'
+  testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+  testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
 }
+
+test {
+    useJUnit()
+    finalizedBy jacocoTestReport // Générer le rapport après les tests
+}
+
+// ✅ Configurer le rapport JaCoCo
+jacocoTestReport {
+    dependsOn test // Les tests doivent être exécutés avant le rapport
+    
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+        
+        // Définir où sauvegarder les rapports
+        html.outputLocation = layout.buildDirectory.dir('reports/jacoco')
+    }
+    
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                // ✅ Exclure les classes générées/non testables
+                '**/Main.class',
+                '**/GameScreen.class', // Optionnel : exclure les screens
+            ])
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.6 // 60% de couverture minimum
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestCoverageVerification
