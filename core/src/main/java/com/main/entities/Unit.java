@@ -16,13 +16,14 @@ public abstract class Unit {
     protected int attackSpeed;
     protected float speed;
     protected Unit target;
-    // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la classe Effect si nécessaire
+    // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la
+    // classe Effect si nécessaire
     protected int range;
     protected int attackCooldown = 0;
     protected Texture texture;
     protected float width, height;
 
-    public Unit(String filePath, float posX, float posY){
+    public Unit(String filePath, float posX, float posY) {
         this.posX = posX;
         this.posY = posY;
         this.texture = new Texture(filePath);
@@ -43,29 +44,36 @@ public abstract class Unit {
         return sprite;
     }
 
-    public void setSpritePosX(float posX){
+    public void setSpritePosX(float posX) {
         this.sprite.setX(posX);
         this.posX = posX;
     }
 
-    public void setSpritePosY(float posY){
+    public void setSpritePosY(float posY) {
         this.sprite.setY(posY);
         this.posY = posY;
     }
-    
+
     /**
      * Dessine le sprite de l'unité
      */
     public void render(SpriteBatch batch) {
         sprite.draw(batch);
     }
-    
+
     /**
      * Libère les ressources (texture)
      */
     public void dispose() {
         texture.dispose();
     }
+
+    // public void updateImg( String motion){
+    //     this.texture = new Texture(motion);
+    //     this.sprite = new Sprite(texture);
+    //     this.sprite.setSize(160, 120);
+    //     this.sprite.setPosition(posX, posY);
+    // }
 
     /**
      * Calcule la distance entre cette unité et une autre
