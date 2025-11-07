@@ -7,15 +7,21 @@ import java.util.List;
 import java.util.Random;
 
 import com.main.entities.Unit;
+import com.main.entities.enemies.CZombie;
+import com.main.entities.enemies.FZombie;
+import com.main.entities.enemies.WZombie;
 import com.main.entities.units.Tank;
 import com.main.entities.units.Melee;
 import com.main.entities.units.Sniper;
 import com.main.GameScreen;
 
-enum Type{
+enum Type {
     MELEE,
     TANK,
-    SNIPER
+    SNIPER,
+    WOMAN,
+    CRAWL,
+    FAST,
 }
 
 public class Base {
@@ -26,7 +32,7 @@ public class Base {
     private List<Unit> units;
     private Random random;
 
-    public Base(int posX, int posY){
+    public Base(int posX, int posY) {
         this.position = new Position(posX, posY);
         lastSpawn = 0.0f;
         this.units = new ArrayList<>();
@@ -36,35 +42,37 @@ public class Base {
     public int getHealth() {
         return health;
     }
+
     public Position getPosition() {
         return position;
     }
+
     public int getAttackPower() {
         return attackPower;
     }
 
-    public void takeDamage(int damage){
+    public void takeDamage(int damage) {
         this.health -= damage;
     }
 
-    public void addUnit(Unit unit){
-        if (unit != null){
+    public void addUnit(Unit unit) {
+        if (unit != null) {
             this.units.add(unit);
         }
     }
 
-    public List<Unit> getUnits(){
+    public List<Unit> getUnits() {
         return this.units;
     }
 
-    public Unit spawnUnit(GameScreen screen, float delta){
-        if (lastSpawn >= 5.0f){
+    public Unit spawnUnit(GameScreen screen, float delta) {
+        if (lastSpawn >= 5.0f) {
             Type type = Type.values()[random.nextInt(Type.values().length)];
-            switch (type){
+            switch (type) {
                 case TANK:
                     lastSpawn = 0.0f;
                     System.out.println("Tank spawned");
-                    return new Tank(0, random.nextInt(screen.getMapHeight()));
+                    return new Tank(1000, random.nextInt(screen.getMapHeight()));
                 case MELEE:
                     lastSpawn = 0.0f;
                     System.out.println("melee spawned");
@@ -72,24 +80,76 @@ public class Base {
                 case SNIPER:
                     lastSpawn = 0.0f;
                     System.out.println("sniper spawned");
-                    return new Sniper(0,random.nextInt(screen.getMapHeight()));
+                    return new Sniper(0, random.nextInt(screen.getMapHeight()));
+                case WOMAN:
+                    lastSpawn = 0.0f;
+                    System.out.println("Zombie women");
+                    return new WZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
+                case CRAWL:
+                    lastSpawn = 0.0f;
+                    System.out.println("Zombie crawler");
+                    return new CZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
+                case FAST:
+                    lastSpawn = 0.0f;
+                    System.out.println("Zombie fast");
+                    return new FZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
                 default:
-                    return null; 
+                    return null;
             }
         }
         lastSpawn += delta;
         return null;
     }
 
-    public void updateUnits(float delta){
-        for (Unit elem : units){
-            if (elem.getLastMove() >= 1.0f){
-                elem.move();
-                elem.setLastMove(0);
-            }
-            else{
-                elem.setLastMove(elem.getLastMove() + delta);
-            }
+    public void updateUnits(float delta) {
+        for (Unit elem : units) {
+            // Continuous movement: update each unit every frame using delta
+            elem.move(delta);
         }
     }
+
+    // public void addZombie(Zombie zombie){
+    // if (zombie != null){
+    // this.zombies.add(zombie);
+    // }
+    // }
+
+    // public List<Zombie> getZombie(){
+    // return this.zombies;
+    // }
+
+    // public Unit spawnZombie(GameScreen screen, float delta) {
+    //     if (lastSpawn >= 5.0f) {
+    //         Type type = Type.values()[random.nextInt(Type.values().length)];
+    //         switch (type) {
+    //             case WOMAN:
+    //                 lastSpawn = 0.0f;
+    //                 System.out.println("Zombie women");
+    //                 return new Tank(getMapWidth(), random.nextInt(screen.getMapHeight()));
+    //             case CRAWL:
+    //                 lastSpawn = 0.0f;
+    //                 System.out.println("Zombie crawler");
+    //                 return new Melee(getMapWidth(), random.nextInt(screen.getMapHeight()));
+    //             case FAST:
+    //                 lastSpawn = 0.0f;
+    //                 System.out.println("Zombie fast");
+    //                 return new Sniper(getMapWidth(), random.nextInt(screen.getMapHeight()));
+    //             default:
+    //                 return null;
+    //         }
+    //     }
+    //     lastSpawn += delta;
+    //     return null;
+    // }
+
+    // public void updateZombie(float delta) {
+    //     for (Zombie elem : zombies) {
+    //         if (elem.getLastMove() >= 1.0f) {
+    //             elem.move();
+    //             elem.setLastMove(0);
+    //         } else {
+    //             elem.setLastMove(elem.getLastMove() + delta);
+    //         }
+    //     }
+    // }
 }

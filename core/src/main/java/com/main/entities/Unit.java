@@ -22,7 +22,7 @@ public abstract class Unit {
     protected int attackCooldown = 0;
     protected Texture texture;
     protected float width, height;
-    private float lastMove = 0.0f;
+    
 
     public Unit(String filePath, float posX, float posY) {
         this.posX = posX;
@@ -70,6 +70,7 @@ public abstract class Unit {
     public void dispose() {
         texture.dispose();
     }
+
 
     /**
      * Calcule la distance entre cette unité et une autre
@@ -173,13 +174,12 @@ public abstract class Unit {
         // Implement special ability logic here
     }
 
-    abstract public void move();
-
-    public float getLastMove() {
-        return this.lastMove;
-    }
-
-    public void setLastMove(float num) {
-        this.lastMove = num;
+    /**
+     * Move the unit for this frame. Implementations should use delta time
+     * (seconds) and the unit's speed (pixels/second) to update position.
+     */
+    public void move(float delta) {
+        // Default: move to the right. Subclasses should override.
+        this.setSpritePosX(this.posX + this.speed * delta);
     }
 }
