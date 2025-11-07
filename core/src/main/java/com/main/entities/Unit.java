@@ -6,6 +6,7 @@ import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.main.effects.Effect;
 
 public abstract class Unit {
     protected float posX;
@@ -16,7 +17,7 @@ public abstract class Unit {
     protected int attackSpeed;
     protected float speed;
     protected Unit target;
-    // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la classe Effect si nécessaire
+    protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la classe Effect si nécessaire
     protected int range;
     protected int attackCooldown = 0;
     protected Texture texture;
@@ -165,7 +166,7 @@ public abstract class Unit {
      * Vérifie si l'unité est morte
      */
     public boolean isDead() {
-        return this.health <= 0;
+        return this.health <= 0;loat posX, float posY
     }
 
     public void attack() {

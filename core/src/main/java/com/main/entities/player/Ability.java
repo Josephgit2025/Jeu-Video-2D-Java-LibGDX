@@ -1,5 +1,7 @@
 package com.main.entities.player;
 
+import com.main.effects.Effect;
+
 /**
  * Représente une capacité spéciale du héros
  */
@@ -7,14 +9,14 @@ public class Ability {
     protected String name;
     protected String description;
     protected int cooldown;
-    protected int damage;
+    protected Effect effect;
     protected int currentCooldown;
 
-    public Ability(String name, String description, int cooldown, int damage) {
+    public Ability(String name, String description, int cooldown, Effect effect) {
         this.name = name;
         this.description = description;
         this.cooldown = cooldown;
-        this.damage = damage;
+        this.effect = effect;
         this.currentCooldown = 0;
     }
 
@@ -30,8 +32,8 @@ public class Ability {
         return cooldown;
     }
 
-    public int getDamage() {
-        return damage;
+    public Effect getEffect() {
+        return effect;
     }
 
     public int getCurrentCooldown() {
