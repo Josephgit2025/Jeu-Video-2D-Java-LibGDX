@@ -166,7 +166,7 @@ public abstract class Unit {
      * Vérifie si l'unité est morte
      */
     public boolean isDead() {
-        return this.health <= 0;loat posX, float posY
+        return this.health <= 0;
     }
 
     public void attack() {
