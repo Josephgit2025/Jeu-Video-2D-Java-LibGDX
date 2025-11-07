@@ -6,6 +6,7 @@ import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.main.effects.Effect;
 
 public abstract class Unit {
     protected float posX;
@@ -22,6 +23,7 @@ public abstract class Unit {
     protected int attackCooldown = 0;
     protected Texture texture;
     protected float width, height;
+    private float lastMove = 0.0f;
 
     public Unit(String filePath, float posX, float posY) {
         this.posX = posX;
@@ -58,7 +60,7 @@ public abstract class Unit {
      * Dessine le sprite de l'unité
      */
     public void render(SpriteBatch batch) {
-        sprite.draw(batch);
+        batch.draw(this.texture, posX, posY);
     }
 
     /**
@@ -176,4 +178,6 @@ public abstract class Unit {
     public void specialAbility() {
         // Implement special ability logic here
     }
+
+    abstract public void move();
 }

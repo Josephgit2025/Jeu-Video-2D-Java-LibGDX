@@ -34,6 +34,7 @@ public class Hero extends Unit {
     private final float FRAME_DURATION = 0.08f;
     private final float FRAME_DURATIONW = 0.15f;
     public Hero(float posX, float posY) {
+<<<<<<< HEAD
         super("units/hero/down1n.png", posX, posY);
 
         TextureRegion[] rightFrames = loadFrames("units/hero/right%d.png", 8);
@@ -54,6 +55,9 @@ public class Hero extends Unit {
                 3);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
+=======
+        super("hero/left1.png", posX, posY);
+>>>>>>> master
         this.health = 500;
         this.weapon = new Machette();
         this.speed = 8;
@@ -178,4 +182,8 @@ public class Hero extends Unit {
         batch.draw(currentFrame, this.posX, this.posY);
     }
 
+<<<<<<< HEAD
+=======
+    public void move(){}
+>>>>>>> master
 }
