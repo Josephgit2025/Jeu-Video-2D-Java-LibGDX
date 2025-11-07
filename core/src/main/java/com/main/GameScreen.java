@@ -1,21 +1,16 @@
 package com.main;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.main.entities.Unit;
+import com.main.entities.player.Hero;
 import com.main.map.Base;
 import com.main.map.WarMap;
-
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
-import com.main.entities.player.Hero;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -45,9 +40,8 @@ public class GameScreen implements Screen {
 
         viewport.update(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight(), true);
 
-        hero = new Hero(400, 300);
         map = new WarMap();
-        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2);
+        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.mapWidth = map.getMapWidthInPixels();
         this.mapHeight = map.getMapHeightInPixels();
         this.enemyBase = new Base(this.mapWidth, 300);
@@ -94,6 +88,9 @@ public class GameScreen implements Screen {
         map.render();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+        for (Unit elem : enemyBase.getUnits()){
+            elem.render(batch);
+        }
 
         hero.render(batch);
         batch.end();
@@ -101,6 +98,17 @@ public class GameScreen implements Screen {
 
     private void update(float delta) {
         hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
+        
+        // Ici tu peux ajouter d'autres logiques :
+        // - Ennemis
+        // - Collision detection
+        // - Game logic
+        Unit tmp = enemyBase.spawnUnit(this, delta);
+        if (tmp != null){
+            enemyBase.addUnit(tmp);
+        }
+        enemyBase.updateUnits(delta);
+        camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
 
     @Override

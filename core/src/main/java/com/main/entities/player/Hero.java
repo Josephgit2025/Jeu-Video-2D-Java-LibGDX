@@ -1,16 +1,18 @@
 package com.main.entities.player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.main.entities.Unit;
-import java.util.List;
-import java.util.ArrayList;
-import com.main.weapons.*;
-
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.entities.Unit;
+import com.main.map.WarMap;
+import com.main.weapons.Machette;
+import com.main.weapons.Weapon;
 
 public class Hero extends Unit {
 
@@ -25,7 +27,7 @@ public class Hero extends Unit {
     protected int dexterity;
     protected int agility;
     protected Weapon weapon;
-
+    private WarMap map;
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
     private float stateTime = 0f;
     private boolean moving = false;
@@ -34,7 +36,7 @@ public class Hero extends Unit {
     private final float FRAME_DURATION = 0.08f;
     private final float FRAME_DURATIONW = 0.15f;
 
-    public Hero(float posX, float posY) {
+    public Hero(float posX, float posY, WarMap map) {
         super("units/hero/down1n.png", posX, posY);
 
         TextureRegion[] rightFrames = loadFrames("units/hero/right%d.png", 8);
@@ -59,6 +61,7 @@ public class Hero extends Unit {
         this.weapon = new Machette();
         this.speed = 8;
         this.attackSpeed = 1;
+        this.map = map;
     }
 
     private TextureRegion[] loadFrames(String pattern, int count) {
@@ -107,39 +110,47 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveUp(float delta, float mapHeight) {
-        float newY = this.getPosY() + speed * delta * 60;
-        if (newY + 120 > mapHeight) {
-            this.setSpritePosY(mapHeight - 120);
-        } else {
-            this.setSpritePosY(newY);
+    private void moveUp(float delta, float mapHeight) {
+        float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)){
+            if (newY + 120 > mapHeight) {
+                this.setSpritePosY(mapHeight - 120);
+            } else {
+                this.setSpritePosY(newY);
+            }
         }
     }
 
     public void moveDown(float delta) {
         float newY = this.getPosY() - speed * delta * 60;
-        if (newY < 0) {
-            this.setSpritePosY(0);
-        } else {
-            this.setSpritePosY(newY);
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
+            if (newY < 0) {
+                this.posY = 0;
+            } else {
+                this.posY = newY;
+            }
         }
     }
 
     public void moveLeft(float delta) {
         float newX = this.getPosX() - speed * delta * 60;
-        if (newX < 0) {
-            this.setSpritePosX(0);
-        } else {
-            this.setSpritePosX(newX);
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+            if (newX < 0) {
+                this.posX = 0;
+            } else {
+                this.posX = newX;
+            }
         }
     }
 
     public void moveRight(float delta, float mapWidth) {
         float newX = this.getPosX() + speed * delta * 60;
-        if (newX + 160 > mapWidth) {
-            this.setSpritePosX(mapWidth - 160);
-        } else {
-            this.setSpritePosX(newX);
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+            if (newX + 160 > mapWidth) {
+                this.posX = mapWidth - 160;
+            } else {
+                this.posX = newX;
+            }
         }
     }
 
