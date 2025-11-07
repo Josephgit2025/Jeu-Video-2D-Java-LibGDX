@@ -53,8 +53,8 @@ public class WarMap {
         return cell != null && cell.getTile() != null;
     }
 
-    public boolean isCollisionRect(float posX, float posY, float width, float height){
-        return isCollision(posX, posY) || isCollision(posX + width, posY) || isCollision(posX, posY + height) || isCollision(posX + width, posY + height);
+    public boolean isCollisionRect(float posX, float posY){
+        return isCollision(posX, posY);
     }
 
     public void setView(com.badlogic.gdx.graphics.OrthographicCamera camera) {
