@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="34">
+ <tileset firstgid="1" source="../tilesets/Background_Dark-Green_TileSet.tsx"/>
+ <tileset firstgid="409" source="../tilesets/Buildings_dark_TileSet.tsx"/>
+ <tileset firstgid="578" source="../tilesets/Garbage_TileSet.tsx"/>
+ <tileset firstgid="610" source="../tilesets/Wire-Fence_TileSet.tsx"/>
+ <tileset firstgid="625" source="../tilesets/Brick-Wall_TileSet.tsx"/>
+ <tileset firstgid="643" source="../tilesets/Iron-Fence_TileSet.tsx"/>
+ <tileset firstgid="655" source="../tilesets/Car_1_Overgrown_Dark-Green_Gray.tsx"/>
+ <tileset firstgid="657" source="../tilesets/Street-Light_1_Side.tsx"/>
+ <tileset firstgid="658" source="../tilesets/Street-Light_5_Up_Overgrown_Dark-Green.tsx"/>
+ <layer id="1" name="FOND" width="30" height="20" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJxjY2BgYBvFo3gUj+JRPGB40yBwwygexaOYuhgAqZwOvQ==
+  </data>
+ </layer>
+ <layer id="4" name="BASE" width="30" height="20" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJzF1DEOgCAUA1DxAu4eXmVV4uIkLiYuugOLl/ETYWcgbZPOLz80aNVQMomrCfaoOPYrnpHOYDeajuiuYNcRXS8d1L+xrsW4Pu1qAe8ru6fUSi+gm9/3lj4V3b7QRYa5ZwN2o7mnPR3ge7MZCP9kqLzjknjCrTEbya39V5TmA/ifLlE=
+  </data>
+ </layer>
+ <layer id="5" name="BASEZOMBI_SOL" width="30" height="20" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJzFlVEKwkAMRLcerRWUVonu2q5UPIeX8jj96mHEBCbQC3QyMN+PyU6yKfFUDyndYLb6IG4O4s5BXFHmk8w9BfXKuGf1QOS2ynoj66/hca3HD/WonnbOaxk79RG2+a6a9bozNyNfAdM7dSe8r+3ra8P94J0Zsrt8Aferc16IvfJ7YblZXEHWnpx3RlbZzJqpCn4JuJOCjrHk/673miXf44p7+QfYhh0S
+  </data>
+ </layer>
+ <layer id="6" name="BASEZOMBI" width="30" height="20" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJztlTEKgDAQBM9rfYfY+wF/YwQj+DB/Y2z8hdqLd3DCdTayaRzYUoZ1E0KEJTDRVYClvxdGB/ZG8fWSAezVng9o7y6+Q3KCvdozSVaQN7pdZ3MjCLatejdzo70pQ9/KnS0Euu8omdzZQuDvbsm4faN11ei/rvn9my/R3i3j7q/3NpIlgzcHz876Lt3cqSdh
+  </data>
+ </layer>
+ <layer id="7" name="ROUTE" width="30" height="20" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJzNlU0OgkAMhQuuXOlW3XED8XpKjJ5BE7mBfxtuYDSKR3ChJ3CjiaxtwxBqQwjMjMaXfIEZmL52gAJgTzvkihyRu8W4/+7r1fQ1zVG3Xhu+3o98l8hWcYPv1+siDUhr3CMHxUvDV8bNYkuNkAgJIH+mVOtTkWh6UtyuImA5uOzaSR0vSNMBeKi5GOlp+g4hrYfHj8V4jvjw+Q7TeMxy1dGMxSZaTn7us/u4L6kDed02FCITZCrmpW9f5UV5RxVjV3kHQ+Etfbnk3pj4kmjPi3xt9GTeDyRrMO8VXHyd7AecjRhTr6j7Lyjzlf0gY1Uwl2j6yjVlz22BDJwcE9XxPUPxN2VDZd9HprZBrW8+CHlw
+  </data>
+ </layer>
+ <layer id="9" name="OBJET" width="30" height="20" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFgwW0MEHwKGBgmDQaDqNgFIyCAQYTKSyH2pkgeBSMTAAAkkkDRg==
+  </data>
+ </layer>
+ <objectgroup id="11" name="collision">
+  <object id="6" x="93.5" y="247.5" width="11" height="11"/>
+  <object id="7" x="256" y="87.5" width="10.5" height="10.5"/>
+  <object id="17" x="-0.181818" y="0.363636" width="15.2727" height="15.8182"/>
+  <object id="18" x="-0.181818" y="16.3636" width="31.6364" height="15.6364"/>
+  <object id="21" x="0.5" y="32.5" width="47.5" height="239"/>
+  <object id="22" x="33" y="113" width="46" height="61.5"/>
+  <object id="23" x="1.5" y="240.5" width="30.5" height="79"/>
+  <object id="26" x="452.5" y="1" width="26" height="319"/>
+  <object id="27" x="422" y="80.5" width="58" height="174.5"/>
+  <object id="28" x="406.5" y="145" width="16" height="110"/>
+  <object id="29" x="439.5" y="255" width="11.5" height="64.5"/>
+  <object id="30" x="352.5" y="241.5" width="30.5" height="11.5"/>
+  <object id="31" x="145" y="49.5" width="29.5" height="12"/>
+ </objectgroup>
+ <layer id="8" name="TROU" width="30" height="20" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJxjYBi8QJgMPfxALADEgiTo6QDiTjLsQgbqQKwBxJok6FkAxAtxmccINIuRsBn2QOwAxI4k2IsPhAPtjCTC3lEwCogFDqPpaRSMglFABiCnDTCYAAB47AUm
+  </data>
+ </layer>
+</map>
