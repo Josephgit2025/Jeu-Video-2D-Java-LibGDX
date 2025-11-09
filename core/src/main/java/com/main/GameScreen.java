@@ -36,7 +36,8 @@ public class GameScreen implements Screen {
         this.game = game;
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
-        viewport = new FitViewport(800, 600, camera);
+        // Viewport plus petit pour zoom sur le héros (600x450 au lieu de 800x600)
+        viewport = new FitViewport(600, 450, camera);
 
         viewport.update(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight(), true);
 
