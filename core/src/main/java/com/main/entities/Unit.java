@@ -56,14 +56,6 @@ public abstract class Unit {
         return posY;
     }
 
-    public float getWidth() {
-        return width;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
     public Sprite getSprite() {
         return sprite;
     }

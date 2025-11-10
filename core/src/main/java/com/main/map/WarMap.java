@@ -154,10 +154,6 @@ public class WarMap {
         return this.mapWidth;
     }
 
-    public List<Obstacle> getObstacles() {
-        return obstacles;
-    }
-
     public List<Rectangle> getCollisionRects() {
         return collisionRects;
     }

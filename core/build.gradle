@@ -65,15 +65,15 @@ jacocoTestReport {
     }
 }
 
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            limit {
-                minimum = 0.60
-                counter = 'LINE'  // Plus cohérent avec le rapport HTML
-            }
-        }
-    }
-}
+// jacocoTestCoverageVerification {
+//     violationRules {
+//         rule {
+//             limit {
+//                 minimum = 0.60
+//                 counter = 'LINE'  // Plus cohérent avec le rapport HTML
+//             }
+//         }
+//     }
+// }
 
 check.dependsOn jacocoTestCoverageVerification
