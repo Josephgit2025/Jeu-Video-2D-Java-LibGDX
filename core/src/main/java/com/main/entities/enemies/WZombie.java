@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.entities.Unit;
 
 
 public class WZombie extends Zombie {
@@ -20,12 +21,11 @@ public class WZombie extends Zombie {
     public WZombie(int posX, int posY) {
         super("zombie/women/Walk1.png", posX, posY);
         this.health = 200;
-        this.speed = 80;
+        this.speed = 130;
         this.attackDamage = 10;
         this.attackSpeed = 2;
         this.range = 3;
 
-    // Use %d for integer substitution in String.format
     TextureRegion[] leftFrames = loadFrames("zombie/women/Walk%d.png", 7);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);

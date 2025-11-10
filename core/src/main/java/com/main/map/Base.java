@@ -71,15 +71,15 @@ public class Base {
                 case TANK:
                     lastSpawn = 0.0f;
                     System.out.println("Tank spawned");
-                    return new Tank("zombie/women/Walk1.png", 1000, random.nextInt(screen.getMapHeight()));
+                    return new Tank(0, random.nextInt(screen.getMapHeight()));
                 case MELEE:
                     lastSpawn = 0.0f;
                     System.out.println("melee spawned");
-                    return new Melee("zombie/women/Walk2.png", 0, random.nextInt(screen.getMapHeight()));
+                    return new Melee(0, random.nextInt(screen.getMapHeight()));
                 case SNIPER:
                     lastSpawn = 0.0f;
                     System.out.println("sniper spawned");
-                    return new Sniper("zombie/women/Walk3.png", 0, random.nextInt(screen.getMapHeight()));
+                    return new Sniper(0, random.nextInt(screen.getMapHeight()));
                 case WOMAN:
                     lastSpawn = 0.0f;
                     System.out.println("Zombie women");
@@ -102,53 +102,7 @@ public class Base {
 
     public void updateUnits(float delta) {
         for (Unit elem : units) {
-            // Continuous movement: update each unit every frame using delta
             elem.move(delta);
         }
     }
-
-    // public void addZombie(Zombie zombie){
-    // if (zombie != null){
-    // this.zombies.add(zombie);
-    // }
-    // }
-
-    // public List<Zombie> getZombie(){
-    // return this.zombies;
-    // }
-
-    // public Unit spawnZombie(GameScreen screen, float delta) {
-    //     if (lastSpawn >= 5.0f) {
-    //         Type type = Type.values()[random.nextInt(Type.values().length)];
-    //         switch (type) {
-    //             case WOMAN:
-    //                 lastSpawn = 0.0f;
-    //                 System.out.println("Zombie women");
-    //                 return new Tank(getMapWidth(), random.nextInt(screen.getMapHeight()));
-    //             case CRAWL:
-    //                 lastSpawn = 0.0f;
-    //                 System.out.println("Zombie crawler");
-    //                 return new Melee(getMapWidth(), random.nextInt(screen.getMapHeight()));
-    //             case FAST:
-    //                 lastSpawn = 0.0f;
-    //                 System.out.println("Zombie fast");
-    //                 return new Sniper(getMapWidth(), random.nextInt(screen.getMapHeight()));
-    //             default:
-    //                 return null;
-    //         }
-    //     }
-    //     lastSpawn += delta;
-    //     return null;
-    // }
-
-    // public void updateZombie(float delta) {
-    //     for (Zombie elem : zombies) {
-    //         if (elem.getLastMove() >= 1.0f) {
-    //             elem.move();
-    //             elem.setLastMove(0);
-    //         } else {
-    //             elem.setLastMove(elem.getLastMove() + delta);
-    //         }
-    //     }
-    // }
 }
