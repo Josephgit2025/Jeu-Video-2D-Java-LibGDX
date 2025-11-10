@@ -69,7 +69,8 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.6 // 60% de couverture minimum
+                minimum = 0.60
+                counter = 'LINE'  // Plus cohérent avec le rapport HTML
             }
         }
     }

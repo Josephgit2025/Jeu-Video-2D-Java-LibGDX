@@ -3,20 +3,11 @@ package com.main.entities.enemies;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.main.entities.player.Ability;
-import com.main.map.WarMap;
-import com.main.weapons.Weapon;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.main.entities.Unit;
-import com.main.map.WarMap;
-import com.main.weapons.Machette;
-import com.main.weapons.Weapon;
 
 
 public class WZombie extends Zombie {
