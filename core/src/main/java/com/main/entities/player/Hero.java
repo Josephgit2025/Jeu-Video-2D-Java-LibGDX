@@ -110,9 +110,9 @@ public class Hero extends Unit {
         }
     }
 
-    private void moveUp(float delta, float mapHeight) {
+    public void moveUp(float delta, float mapHeight) {
         float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
-        if (!map.isCollisionRect(this.posX, newY + this.height)){
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)){
             if (newY + this.height > mapHeight) {
                 this.setSpritePosY(mapHeight - this.height);
             } else {
@@ -123,34 +123,40 @@ public class Hero extends Unit {
 
     public void moveDown(float delta) {
         float newY = this.getPosY() - speed * delta * 60;
-        if (!map.isCollisionRect(this.posX, newY)) {
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
             if (newY < 0) {
-                this.posY = 0;
+                this.setSpritePosY(0);
             } else {
-                this.posY = newY;
+                this.setSpritePosY(newY);
             }
         }
     }
 
     public void moveLeft(float delta) {
         float newX = this.getPosX() - speed * delta * 60;
-        if (!map.isCollisionRect(newX + this.width, this.posY)) {
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
             if (newX < 0) {
-                this.posX = 0;
+                this.setSpritePosX(0);
             } else {
-                this.posX = newX;
+                this.setSpritePosX(newX);
             }
         }
     }
 
     public void moveRight(float delta, float mapWidth) {
         float newX = this.getPosX() + speed * delta * 60;
-        if (!map.isCollisionRect(newX + this.width, this.posY)) {
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
             if (newX + this.width > mapWidth) {
-                this.posX = mapWidth - this.width;
+                this.setSpritePosX(mapWidth - this.width);
             } else {
-                this.posX = newX;
+                this.setSpritePosX(newX);
             }
+        }
+    }
+
+    public void setWeapon(Weapon weapon){
+        if (weapon != null){
+            this.weapon = weapon;
         }
     }
 
@@ -160,7 +166,7 @@ public class Hero extends Unit {
             return;
         }
         if (attackCooldown <= 0 && weapon != null) {
-            if (weapon.getMunitions() > 0) {
+            if (weapon.getMunitions() > 0 || weapon.getMaxMunitions() == -1) {
                 weapon.attack();
                 int totalDamage = weapon.getDamage();
                 target.takeDamage(totalDamage);
@@ -187,7 +193,16 @@ public class Hero extends Unit {
                 currentFrame = walkDown.getKeyFrame(stateTime, true);
                 break;
         }
-        batch.draw(currentFrame, this.posX, this.posY);
+        
+        // Dessiner le sprite plus grand visuellement (90x90) mais hitbox reste 32x48
+        float visualWidth = 90;
+        float visualHeight = 90;
+        
+        // Centrer horizontalement et aligner les pieds du sprite avec le bas de la hitbox
+        float offsetX = (this.width - visualWidth) / 2;
+        float offsetY = 0; // Aligner le bas du sprite avec le bas de la hitbox (pieds alignés)
+        
+        batch.draw(currentFrame, this.posX + offsetX, this.posY + offsetY, visualWidth, visualHeight);
     }
 
     @Override

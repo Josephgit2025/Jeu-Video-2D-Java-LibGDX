@@ -1,19 +1,18 @@
 package com.main.map;
 
-import com.main.utils.Position;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.main.GameScreen;
 import com.main.entities.Unit;
 import com.main.entities.enemies.CZombie;
 import com.main.entities.enemies.FZombie;
 import com.main.entities.enemies.WZombie;
-import com.main.entities.units.Tank;
 import com.main.entities.units.Melee;
 import com.main.entities.units.Sniper;
-import com.main.GameScreen;
+import com.main.entities.units.Tank;
+import com.main.utils.Position;
 
 enum Type {
     MELEE,
@@ -76,11 +75,11 @@ public class Base {
                 case MELEE:
                     lastSpawn = 0.0f;
                     System.out.println("melee spawned");
-                    return new Melee(0, random.nextInt(screen.getMapHeight()));
+                    return new Melee("zombie/women/Walk2.png", 0, random.nextInt(screen.getMapHeight()));
                 case SNIPER:
                     lastSpawn = 0.0f;
                     System.out.println("sniper spawned");
-                    return new Sniper(0, random.nextInt(screen.getMapHeight()));
+                    return new Sniper("zombie/women/Walk3.png", 0, random.nextInt(screen.getMapHeight()));
                 case WOMAN:
                     lastSpawn = 0.0f;
                     System.out.println("Zombie women");
