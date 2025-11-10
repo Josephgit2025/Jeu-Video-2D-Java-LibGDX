@@ -1,8 +1,5 @@
 package com.main.map;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -14,14 +11,12 @@ public class WarMap {
     private int mapWidth;
     private int tileWidth;
     private int tileHeight;
-    private List<Obstacle> obstacles;
     private TiledMap tiledMap;
     private TiledMapTileLayer collisionLayer;
     private OrthogonalTiledMapRenderer renderer;
     private TmxMapLoader mapLoader;
 
     public WarMap(){
-        this.obstacles = new ArrayList<>();
         loadTmxMap();
         render();
     }
@@ -81,10 +76,6 @@ public class WarMap {
 
     public int getMapWidth() {
         return this.mapWidth;
-    }
-
-    public List<Obstacle> getObstacles() {
-        return obstacles;
     }
 
     public void dispose(){

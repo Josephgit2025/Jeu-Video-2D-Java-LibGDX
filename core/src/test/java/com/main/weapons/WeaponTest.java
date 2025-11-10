@@ -1,65 +1,118 @@
 package com.main.weapons;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Test;
 
 public class WeaponTest {
-    
-    @Test
-    public void testMachetteCreation() {
-        Machette machette = new Machette();
-        
-        assertNotNull("Machette should not be null", machette);
-        assertTrue("Machette damage should be positive", machette.getDamage() > 0);
+
+    // Classe concrète pour tester la classe abstraite Weapon
+    private class TestWeapon extends Weapon {
+        public TestWeapon(int damage, int range, int as, int maxMun) {
+            super(damage, range, as, maxMun);
+        }
     }
-    
-    @Test
-    public void testPistolCreation() {
-        Pistol pistol = new Pistol();
-        
-        assertNotNull("Pistol should not be null", pistol);
-        assertTrue("Pistol damage should be positive", pistol.getDamage() > 0);
+
+    private TestWeapon weapon;
+
+    @Before
+    public void setUp() {
+        weapon = new TestWeapon(50, 200, 10, 30);
     }
-    
+
     @Test
-    public void testAssaultRifleCreation() {
-        AssaultRifle ar = new AssaultRifle();
-        
-        assertNotNull("AssaultRifle should not be null", ar);
-        assertTrue("AssaultRifle damage should be positive", ar.getDamage() > 0);
+    public void testConstructor() {
+        assertNotNull(weapon);
+        assertEquals(50, weapon.getDamage());
+        assertEquals(200, weapon.getRange());
+        assertEquals(10, weapon.getAttackSpeed());
+        assertEquals(30, weapon.getMaxMunitions());
+        assertEquals(30, weapon.getMunitions());
     }
-    
+
     @Test
-    public void testShotgunCreation() {
-        Shotgun shotgun = new Shotgun();
-        
-        assertNotNull("Shotgun should not be null", shotgun);
-        assertTrue("Shotgun damage should be positive", shotgun.getDamage() > 0);
+    public void testGetDamage() {
+        assertEquals(50, weapon.getDamage());
     }
-    
+
     @Test
-    public void testSMGCreation() {
-        SMG smg = new SMG();
-        
-        assertNotNull("SMG should not be null", smg);
-        assertTrue("SMG damage should be positive", smg.getDamage() > 0);
+    public void testGetRange() {
+        assertEquals(200, weapon.getRange());
     }
-    
+
     @Test
-    public void testSniperRifleCreation() {
-        SniperRifle sniper = new SniperRifle();
-        
-        assertNotNull("SniperRifle should not be null", sniper);
-        assertTrue("SniperRifle damage should be positive", sniper.getDamage() > 0);
+    public void testGetAttackSpeed() {
+        assertEquals(10, weapon.getAttackSpeed());
     }
-    
+
     @Test
-    public void testSniperRifleHasHigherDamageThanPistol() {
-        SniperRifle sniper = new SniperRifle();
-        Pistol pistol = new Pistol();
+    public void testGetMunitions() {
+        assertEquals(30, weapon.getMunitions());
+    }
+
+    @Test
+    public void testGetMaxMunitions() {
+        assertEquals(30, weapon.getMaxMunitions());
+    }
+
+    @Test
+    public void testAttack() {
+        assertEquals(30, weapon.getMunitions());
+        weapon.attack();
+        assertEquals(29, weapon.getMunitions());
+    }
+
+    @Test
+    public void testAttackMultipleTimes() {
+        weapon.attack();
+        weapon.attack();
+        weapon.attack();
+        assertEquals(27, weapon.getMunitions());
+    }
+
+    @Test
+    public void testAttackUntilEmpty() {
+        for (int i = 0; i < 30; i++) {
+            weapon.attack();
+        }
+        assertEquals(0, weapon.getMunitions());
+    }
+
+    @Test
+    public void testAttackWhenEmpty() {
+        for (int i = 0; i < 30; i++) {
+            weapon.attack();
+        }
+        weapon.attack();
+        assertEquals(0, weapon.getMunitions());
+    }
+
+    @Test
+    public void testReload() {
+        weapon.attack();
+        weapon.attack();
+        assertEquals(28, weapon.getMunitions());
         
-        assertTrue("SniperRifle should have higher damage than Pistol", 
-                   sniper.getDamage() > pistol.getDamage());
+        weapon.reload();
+        assertEquals(30, weapon.getMunitions());
+    }
+
+    @Test
+    public void testReloadWhenEmpty() {
+        for (int i = 0; i < 30; i++) {
+            weapon.attack();
+        }
+        assertEquals(0, weapon.getMunitions());
+        
+        weapon.reload();
+        assertEquals(30, weapon.getMunitions());
+    }
+
+    @Test
+    public void testReloadWhenFull() {
+        assertEquals(30, weapon.getMunitions());
+        weapon.reload();
+        assertEquals(30, weapon.getMunitions());
     }
 }

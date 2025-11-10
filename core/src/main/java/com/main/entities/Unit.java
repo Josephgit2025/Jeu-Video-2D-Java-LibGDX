@@ -27,10 +27,12 @@ public abstract class Unit {
     public Unit(String filePath, float posX, float posY) {
         this.posX = posX;
         this.posY = posY;
-        this.texture = new Texture(filePath);
-        this.sprite = new Sprite(texture);
-        this.sprite.setPosition(posX, posY);
-        this.sprite.setSize(35, 50);
+        if (filePath != null){
+            this.texture = new Texture(filePath);
+            this.sprite = new Sprite(texture);
+            this.sprite.setPosition(posX, posY);
+            this.sprite.setSize(35, 50);
+        }
         this.width = 35;
         this.height = 50;
     }

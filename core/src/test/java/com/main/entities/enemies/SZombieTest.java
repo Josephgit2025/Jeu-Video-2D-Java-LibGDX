@@ -1,47 +1,79 @@
 package com.main.entities.enemies;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.graphics.GL20;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class SZombieTest {
-    
-    private static HeadlessApplication application;
-    
-    @BeforeClass
-    public static void init() {
-        application = new HeadlessApplication(new ApplicationAdapter() {});
-        Gdx.gl = mock(GL20.class);
-        Gdx.gl20 = mock(GL20.class);
-    }
-    
-    @AfterClass
-    public static void cleanup() {
-        if (application != null) {
-            application.exit();
+
+    private TestSZombie szombie;
+
+    // Classe pour tester sans charger de texture
+    private class TestSZombie extends SZombie {
+        public TestSZombie(int posX, int posY) {
+            super(null, posX, posY);
+            this.texture = mock(Texture.class);
+            this.sprite = mock(Sprite.class);
         }
     }
-    
-    @Test
-    public void testSZombieCreation() {
-        SZombie szombie = new SZombie(100, 200);
-        
-        assertNotNull("SZombie should not be null", szombie);
-        assertEquals(100.0f, szombie.getPosX(), 0.01f);
-        assertEquals(200.0f, szombie.getPosY(), 0.01f);
+
+    @Before
+    public void setUp() {
+        szombie = new TestSZombie(100, 200);
     }
-    
+
     @Test
-    public void testSZombieHasHealth() {
-        SZombie szombie = new SZombie(100, 200);
+    public void testConstructor() {
+        assertNotNull(szombie);
+        assertEquals(100, szombie.getPosX(), 0.01f);
+        assertEquals(200, szombie.getPosY(), 0.01f);
+    }
+
+    @Test
+    public void testInitialHealth() {
+        assertFalse(szombie.isDead());
+    }
+
+    @Test
+    public void testMove() {
+        float initialX = szombie.getPosX();
+        szombie.move();
+        assertEquals(initialX - 2, szombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveMultipleTimes() {
+        float initialX = szombie.getPosX();
+        szombie.move();
+        szombie.move();
+        szombie.move();
+        assertEquals(initialX - 6, szombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testTakeDamage() {
+        szombie.takeDamage(100);
+        assertFalse(szombie.isDead());
         
-        assertTrue("SZombie should have positive health", szombie.getHealth() > 0);
+        szombie.takeDamage(100);
+        assertTrue(szombie.isDead());
+    }
+
+    @Test
+    public void testTakeDamageExact() {
+        szombie.takeDamage(200);
+        assertTrue(szombie.isDead());
+    }
+
+    @Test
+    public void testGetSprite() {
+        assertNotNull(szombie.getSprite());
     }
 }

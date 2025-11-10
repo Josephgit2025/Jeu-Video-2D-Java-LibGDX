@@ -5,3 +5,6 @@ compile:
 
 run:
 	./gradlew lwjgl3:run
+
+test:
+	./gradlew test jacocoTestReport
