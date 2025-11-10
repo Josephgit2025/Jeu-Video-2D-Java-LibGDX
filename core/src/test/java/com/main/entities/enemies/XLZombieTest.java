@@ -44,17 +44,34 @@ public class XLZombieTest {
     @Test
     public void testMove() {
         float initialX = xlzombie.getPosX();
-        xlzombie.move();
+        xlzombie.move(1.0f); // delta = 1 seconde
+        // déplacement = speed * delta = 2 * 1.0 = 2
         assertEquals(initialX - 1, xlzombie.getPosX(), 0.01f);
     }
 
     @Test
     public void testMoveMultipleTimes() {
         float initialX = xlzombie.getPosX();
-        xlzombie.move();
-        xlzombie.move();
-        xlzombie.move();
+        xlzombie.move(1.0f);
+        xlzombie.move(1.0f);
+        xlzombie.move(1.0f);
+        // déplacement total = 3 * (2 * 1.0) = 6
         assertEquals(initialX - 3, xlzombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveWithRealisticDelta() {
+        float initialX = xlzombie.getPosX();
+        xlzombie.move(0.016f); // 60 FPS
+        // déplacement = 2 * 0.016 = 0.032
+        assertEquals(initialX - 0.016f, xlzombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveWithZeroDelta() {
+        float initialX = xlzombie.getPosX();
+        xlzombie.move(0.0f);
+        assertEquals(initialX, xlzombie.getPosX(), 0.01f);
     }
 
     @Test

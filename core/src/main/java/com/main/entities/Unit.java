@@ -24,6 +24,7 @@ public abstract class Unit {
     protected float width, height;
     
 
+    
     public Unit(String filePath, float posX, float posY) {
         this.posX = posX;
         this.posY = posY;
@@ -41,12 +42,56 @@ public abstract class Unit {
         return posX;
     }
 
+    public float getSpeed() {
+        return speed;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
     public float getPosY() {
         return posY;
     }
 
     public Sprite getSprite() {
         return sprite;
+    }
+
+    public int getHealth(){
+        return this.health;
+    }
+
+    public int getAttackDamage() {
+        return attackDamage;
+    }
+
+    public int getAttackSpeed() {
+        return attackSpeed;
+    }
+
+    public Unit getTarget() {
+        return target;
+    }
+
+    public int getRange() {
+        return range;
+    }
+
+    public int getAttackCooldown() {
+        return attackCooldown;
+    }
+
+    public Texture getTexture() {
+        return texture;
+    }
+
+    public void setCooldown(int cd){
+        this.attackCooldown = cd;
     }
 
     public void setSpritePosX(float posX) {
@@ -124,6 +169,12 @@ public abstract class Unit {
             this.target = findClosestEnemy(inRange);
         } else {
             this.target = null;
+        }
+    }
+
+    public void setTarget(Unit target){
+        if (target != null){
+            this.target = target;
         }
     }
 

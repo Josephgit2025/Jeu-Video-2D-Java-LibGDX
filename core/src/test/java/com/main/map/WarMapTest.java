@@ -84,7 +84,7 @@ public class WarMapTest {
     @Test
     public void testIsCollisionRect() {
         if (warMap != null) {
-            boolean collision = warMap.isCollisionRect(0, 0);
+            boolean collision = warMap.isCollisionRect(0, 0, 10, 10);
             // Le résultat dépend de la carte chargée
             assertTrue(collision || !collision);
         }

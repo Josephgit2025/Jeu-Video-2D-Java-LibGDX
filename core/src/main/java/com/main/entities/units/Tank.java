@@ -2,8 +2,8 @@ package com.main.entities.units;
 
 public class Tank extends Soldier {
     
-    public Tank (float posX, float posY) {
-        super("zombie/women/Walk1.png", posX, posY);
+    public Tank (String filePath, float posX, float posY) {
+        super(filePath, posX, posY);
         this.health = 500;
         this.attackDamage = 30;
         this.speed = 15;

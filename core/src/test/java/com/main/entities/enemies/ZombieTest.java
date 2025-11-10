@@ -21,6 +21,11 @@ public class ZombieTest {
             super(null, posX, posY);
             this.texture = mock(Texture.class);
             this.sprite = mock(Sprite.class);
+            this.health = 100;  // ← OBLIGATOIRE car Zombie ne l'initialise pas
+            this.speed = 2;
+            this.attackDamage = 10;
+            this.attackSpeed = 2;
+            this.range = 50;
         }
     }
 
@@ -44,17 +49,34 @@ public class ZombieTest {
     @Test
     public void testMove() {
         float initialX = zombie.getPosX();
-        zombie.move();
+        zombie.move(1.0f); // delta = 1 seconde
+        // déplacement = speed * delta = 2 * 1.0 = 2
         assertEquals(initialX - 2, zombie.getPosX(), 0.01f);
     }
 
     @Test
     public void testMoveMultipleTimes() {
         float initialX = zombie.getPosX();
-        zombie.move();
-        zombie.move();
-        zombie.move();
+        zombie.move(1.0f);
+        zombie.move(1.0f);
+        zombie.move(1.0f);
+        // déplacement total = 3 * (2 * 1.0) = 6
         assertEquals(initialX - 6, zombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveWithRealisticDelta() {
+        float initialX = zombie.getPosX();
+        zombie.move(0.016f); // 60 FPS
+        // déplacement = 2 * 0.016 = 0.032
+        assertEquals(initialX - 0.032f, zombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveWithZeroDelta() {
+        float initialX = zombie.getPosX();
+        zombie.move(0.0f);
+        assertEquals(initialX, zombie.getPosX(), 0.01f);
     }
 
     @Test
@@ -63,6 +85,12 @@ public class ZombieTest {
         assertFalse(zombie.isDead());
         
         zombie.takeDamage(50);
+        assertTrue(zombie.isDead());
+    }
+
+    @Test
+    public void testTakeDamageExact() {
+        zombie.takeDamage(100);
         assertTrue(zombie.isDead());
     }
 

@@ -154,13 +154,19 @@ public class Hero extends Unit {
         }
     }
 
+    public void setWeapon(Weapon weapon){
+        if (weapon != null){
+            this.weapon = weapon;
+        }
+    }
+
     @Override
     public void attack() {
         if (target == null || target.isDead()) {
             return;
         }
         if (attackCooldown <= 0 && weapon != null) {
-            if (weapon.getMunitions() > 0) {
+            if (weapon.getMunitions() > 0 || weapon.getMaxMunitions() == -1) {
                 weapon.attack();
                 int totalDamage = weapon.getDamage();
                 target.takeDamage(totalDamage);
