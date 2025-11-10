@@ -97,21 +97,11 @@ public class GameScreen implements Screen {
 
     private void update(float delta) {
         hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
-        
-        // Ici tu peux ajouter d'autres logiques :
-        // - Ennemis
-        // - Collision detection
-        // - Game logic
         Unit tmp = enemyBase.spawnUnit(this, delta);
-        // Zombie tmp1 = playerBase.spawnZombie(this, delta);
         if (tmp != null){
             enemyBase.addUnit(tmp);
         }
-        // else if (tmp1 != null){
-        //     playerBase.addZombie(tmp1);
-        // }
         enemyBase.updateUnits(delta);
-        // playerBase.updateZombie(delta);
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
 
