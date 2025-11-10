@@ -28,14 +28,12 @@ public abstract class Unit {
     public Unit(String filePath, float posX, float posY) {
         this.posX = posX;
         this.posY = posY;
-        if (filePath != null){
-            this.texture = new Texture(filePath);
-            this.sprite = new Sprite(texture);
-            this.sprite.setPosition(posX, posY);
-            this.sprite.setSize(35, 50);
-        }
-        this.width = 35;
-        this.height = 50;
+        this.texture = new Texture(filePath);
+        this.sprite = new Sprite(texture);
+        this.sprite.setPosition(posX, posY);
+        this.sprite.setSize(32, 48); // Taille visuelle
+        this.width = 32;  // Hitbox correspond à la largeur
+        this.height = 48; // Hitbox complète
     }
 
     public float getPosX() {
@@ -56,6 +54,14 @@ public abstract class Unit {
 
     public float getPosY() {
         return posY;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public float getHeight() {
+        return height;
     }
 
     public Sprite getSprite() {

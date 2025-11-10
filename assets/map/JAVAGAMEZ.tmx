@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="12" nextobjectid="34">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="45" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="15" nextobjectid="100">
  <tileset firstgid="1" source="../tilesets/Background_Dark-Green_TileSet.tsx"/>
  <tileset firstgid="409" source="../tilesets/Buildings_dark_TileSet.tsx"/>
  <tileset firstgid="578" source="../tilesets/Garbage_TileSet.tsx"/>
@@ -9,54 +9,96 @@
  <tileset firstgid="655" source="../tilesets/Car_1_Overgrown_Dark-Green_Gray.tsx"/>
  <tileset firstgid="657" source="../tilesets/Street-Light_1_Side.tsx"/>
  <tileset firstgid="658" source="../tilesets/Street-Light_5_Up_Overgrown_Dark-Green.tsx"/>
- <layer id="1" name="FOND" width="30" height="20" locked="1">
+ <layer id="1" name="FOND" width="45" height="20" locked="1">
   <data encoding="base64" compression="zlib">
-   eJxjY2BgYBvFo3gUj+JRPGB40yBwwygexaOYuhgAqZwOvQ==
+   eJzt0DEKACAMA8BM/f9bfKFTF6FDEU2jDWTOEQNgIvWwHW2uWTWz4s+KZnezDa/+vIbtyXqrm6Oc3h2f/Ry5WQY18+7fbEeb67XNd80TXHAUew==
   </data>
  </layer>
- <layer id="4" name="BASE" width="30" height="20" locked="1">
+ <layer id="4" name="BASE" width="45" height="20" locked="1">
   <data encoding="base64" compression="zlib">
-   eJzF1DEOgCAUA1DxAu4eXmVV4uIkLiYuugOLl/ETYWcgbZPOLz80aNVQMomrCfaoOPYrnpHOYDeajuiuYNcRXS8d1L+xrsW4Pu1qAe8ru6fUSi+gm9/3lj4V3b7QRYa5ZwN2o7mnPR3ge7MZCP9kqLzjknjCrTEbya39V5TmA/ifLlE=
+   eJzV1bEOQDAUBVD1A3Yfj640FpNaJBb2Pouf8RrtYDJ4Kvcmd+WkcUurDC4NmzWYu1Z47oOthtsCmb3XgZp7ILMDNRO3Utcei/xv0XMobLAD2mI0z1zLXUDM8XteuZuguZR71C0EukFEs0lsdi/fNYbtTUDnHL07kNkEr+R98XUI7Ix9BkCz9H8kRU6UVy5R
   </data>
  </layer>
- <layer id="5" name="BASEZOMBI_SOL" width="30" height="20" locked="1">
+ <layer id="7" name="ROUTE" width="45" height="20" locked="1">
   <data encoding="base64" compression="zlib">
-   eJzFlVEKwkAMRLcerRWUVonu2q5UPIeX8jj96mHEBCbQC3QyMN+PyU6yKfFUDyndYLb6IG4O4s5BXFHmk8w9BfXKuGf1QOS2ynoj66/hca3HD/WonnbOaxk79RG2+a6a9bozNyNfAdM7dSe8r+3ra8P94J0Zsrt8Aferc16IvfJ7YblZXEHWnpx3RlbZzJqpCn4JuJOCjrHk/673miXf44p7+QfYhh0S
+   eJzVlk1KxEAQRr9EEFzp1nHnDWzPpwQ9wyjODfzbeINBMfEILvQEbhSctVWkii6LECK23eMHj0kyk+RVdSc9QLosiRfikXhLeN2/zH923kc+59/ep0SfUzhzj9fd+ZK4FV6x3n2uiQ30vb0nHoRPlHsGa+Plc0TcEceIc5h7/CGsMjl6p5nAXrVBv2vl85nYqoB3OdYRewWcG/R9tG6d2z8jAr6/K4Kc6+v0DI1disyNF7Ndxe1gfmedObtSn9aotIjjcJ7Bn7MgTohTd9w7H6CviWu2Y6W+ndlvE/hPedYXzts724QR5sZfa7H+SgpnDs+TIeep52/Kp62hQXS3YzGbeE2OXSs810i/juicCrLdTHS29/RrheXG7fM6kvN/kY139muFcjVwbIX8zv5+Y/P0gjisIqXyE+cnDL/3SmfsHabZKdTjL/y7j4E=
   </data>
  </layer>
- <layer id="6" name="BASEZOMBI" width="30" height="20" locked="1">
+ <layer id="5" name="BASEZOMBI_SOL" width="45" height="20">
   <data encoding="base64" compression="zlib">
-   eJztlTEKgDAQBM9rfYfY+wF/YwQj+DB/Y2z8hdqLd3DCdTayaRzYUoZ1E0KEJTDRVYClvxdGB/ZG8fWSAezVng9o7y6+Q3KCvdozSVaQN7pdZ3MjCLatejdzo70pQ9/KnS0Euu8omdzZQuDvbsm4faN11ei/rvn9my/R3i3j7q/3NpIlgzcHz876Lt3cqSdh
+   eJzVllEKwjAMhrMdbQqTOaluSmXiObyAx/E4PnkaE/YH9jKtPqzJD4GytfTjJ0lD5EOxJNojPKlxyNw5ZB4WYr7P3DH3/ZMCnzlnZP51T71gDX7jSfVbmDccWwPMKXsq/n+Fx5WTGpR+ceQ4lePaqsTPFccaITnxKoh2hpk7+NqDV+vvYJhZJP34MmG+Ia+tS+aMFswPzo1nkZsoTfqWiN8emAM8bhz5PMDjMMkPL4pg7zPV4D/zUQ2vWwd9Q6Rzs/YPD9I+HfGGvwEhxiEJ
   </data>
  </layer>
- <layer id="7" name="ROUTE" width="30" height="20" locked="1">
-  <data encoding="base64" compression="zlib">
-   eJzNlU0OgkAMhQuuXOlW3XED8XpKjJ5BE7mBfxtuYDSKR3ChJ3CjiaxtwxBqQwjMjMaXfIEZmL52gAJgTzvkihyRu8W4/+7r1fQ1zVG3Xhu+3o98l8hWcYPv1+siDUhr3CMHxUvDV8bNYkuNkAgJIH+mVOtTkWh6UtyuImA5uOzaSR0vSNMBeKi5GOlp+g4hrYfHj8V4jvjw+Q7TeMxy1dGMxSZaTn7us/u4L6kDed02FCITZCrmpW9f5UV5RxVjV3kHQ+Etfbnk3pj4kmjPi3xt9GTeDyRrMO8VXHyd7AecjRhTr6j7Lyjzlf0gY1Uwl2j6yjVlz22BDJwcE9XxPUPxN2VDZd9HprZBrW8+CHlw
-  </data>
- </layer>
- <layer id="9" name="OBJET" width="30" height="20" locked="1">
-  <data encoding="base64" compression="zlib">
-   eJxjYBgFgwW0MEHwKGBgmDQaDqNgFIyCAQYTKSyH2pkgeBSMTAAAkkkDRg==
-  </data>
- </layer>
- <objectgroup id="11" name="collision">
-  <object id="6" x="93.5" y="247.5" width="11" height="11"/>
-  <object id="7" x="256" y="87.5" width="10.5" height="10.5"/>
-  <object id="17" x="-0.181818" y="0.363636" width="15.2727" height="15.8182"/>
-  <object id="18" x="-0.181818" y="16.3636" width="31.6364" height="15.6364"/>
-  <object id="21" x="0.5" y="32.5" width="47.5" height="239"/>
-  <object id="22" x="33" y="113" width="46" height="61.5"/>
-  <object id="23" x="1.5" y="240.5" width="30.5" height="79"/>
-  <object id="26" x="452.5" y="1" width="26" height="319"/>
-  <object id="27" x="422" y="80.5" width="58" height="174.5"/>
-  <object id="28" x="406.5" y="145" width="16" height="110"/>
-  <object id="29" x="439.5" y="255" width="11.5" height="64.5"/>
-  <object id="30" x="352.5" y="241.5" width="30.5" height="11.5"/>
-  <object id="31" x="145" y="49.5" width="29.5" height="12"/>
+ <objectgroup id="14" name="collision" locked="1">
+  <object id="36" gid="417" x="0" y="16" width="16" height="16"/>
+  <object id="37" gid="417" x="16.3333" y="32" width="16" height="16"/>
+  <object id="38" gid="417" x="32.3333" y="47.6667" width="16" height="16"/>
+  <object id="39" gid="443" x="32" y="240.333" width="16" height="16"/>
+  <object id="40" gid="430" x="32.3333" y="112" width="16" height="16"/>
+  <object id="41" gid="430" x="32.6667" y="95.6667" width="16" height="16"/>
+  <object id="42" gid="426" x="32.6667" y="63.3333" width="16" height="16"/>
+  <object id="43" gid="426" x="32.3333" y="79.3333" width="16" height="16"/>
+  <object id="44" gid="426" x="64.3333" y="144" width="16" height="16"/>
+  <object id="45" gid="430" x="32" y="176" width="16" height="16"/>
+  <object id="46" gid="430" x="31.6667" y="191.667" width="16" height="16"/>
+  <object id="47" gid="430" x="31.6667" y="207.667" width="16" height="16"/>
+  <object id="48" gid="430" x="32" y="224" width="16" height="16"/>
+  <object id="49" gid="442" x="15" y="239.667" width="16" height="16"/>
+  <object id="50" gid="441" x="0.333333" y="240.333" width="16" height="16"/>
+  <object id="51" gid="451" x="64.3333" y="160" width="16" height="16"/>
+  <object id="52" gid="442" x="47.6667" y="160" width="16" height="16"/>
+  <object id="53" gid="457" x="64" y="176" width="16" height="16"/>
+  <object id="54" gid="456" x="48" y="176" width="16" height="16"/>
+  <object id="55" gid="470" x="32" y="256.667" width="16" height="16"/>
+  <object id="56" gid="457" x="31.6667" y="272" width="16" height="16"/>
+  <object id="57" gid="457" x="16.3333" y="319.667" width="16" height="16"/>
+  <object id="58" gid="470" x="15.6667" y="288" width="16" height="16"/>
+  <object id="59" gid="470" x="16" y="304.333" width="16" height="16"/>
+  <object id="61" gid="527" x="63.6667" y="128.333" width="16" height="16"/>
+  <object id="62" gid="415" x="48.6667" y="128" width="16" height="16"/>
+  <object id="64" gid="614" x="688.727" y="16.3636" width="16" height="16"/>
+  <object id="65" gid="614" x="688.727" y="32.1818" width="16" height="16"/>
+  <object id="66" gid="614" x="688.909" y="48.1818" width="16" height="16"/>
+  <object id="67" gid="614" x="689.091" y="64.3636" width="16" height="16"/>
+  <object id="68" gid="614" x="689.091" y="80.1818" width="16" height="16"/>
+  <object id="69" gid="620" x="656" y="96.1818" width="16" height="16"/>
+  <object id="70" gid="616" x="671.818" y="96" width="16" height="16"/>
+  <object id="71" gid="619" x="687.818" y="95.6364" width="16" height="16"/>
+  <object id="72" gid="615" x="655.455" y="112.364" width="16" height="16"/>
+  <object id="73" gid="615" x="655.273" y="128.364" width="16" height="16"/>
+  <object id="74" gid="615" x="655.636" y="144.545" width="16" height="16"/>
+  <object id="75" gid="619" x="655.636" y="160.727" width="16" height="16"/>
+  <object id="76" gid="620" x="640" y="160.182" width="16" height="16"/>
+  <object id="77" gid="615" x="640.182" y="176" width="16" height="16"/>
+  <object id="78" gid="615" x="640" y="192.182" width="16" height="16"/>
+  <object id="79" gid="615" x="639.818" y="208.182" width="16" height="16"/>
+  <object id="80" gid="620" x="639.818" y="223.818" width="16" height="16"/>
+  <object id="81" gid="620" x="640.182" y="255.818" width="16" height="16"/>
+  <object id="82" gid="615" x="639.636" y="240" width="16" height="16"/>
+  <object id="83" gid="624" x="656.545" y="255.818" width="16" height="16"/>
+  <object id="84" gid="624" x="672.182" y="255.818" width="16" height="16"/>
+  <object id="85" gid="615" x="671.091" y="272.364" width="16" height="16"/>
+  <object id="86" gid="615" x="671.455" y="287.273" width="16" height="16"/>
+  <object id="87" gid="615" x="672" y="303.273" width="16" height="16"/>
+  <object id="88" gid="620" x="671.818" y="320" width="16" height="16"/>
+  <object id="91" gid="647" x="506" y="117.333" width="16" height="16"/>
+  <object id="92" gid="647" x="532" y="100.667" width="16" height="16"/>
+  <object id="93" gid="647" x="532.667" y="128" width="16" height="16"/>
+  <object id="94" gid="647" x="462" y="282" width="16" height="16"/>
+  <object id="95" gid="647" x="386.667" y="84.6667" width="16" height="16"/>
+  <object id="96" gid="647" x="387.333" y="98" width="16" height="16"/>
+  <object id="97" gid="647" x="386.667" y="112" width="16" height="16"/>
+  <object id="98" gid="647" x="385.333" y="125.333" width="16" height="16"/>
+  <object id="99" gid="647" x="479.333" y="84.6667" width="16" height="16"/>
  </objectgroup>
- <layer id="8" name="TROU" width="30" height="20" locked="1">
+ <layer id="8" name="TROU" width="45" height="20" locked="1">
   <data encoding="base64" compression="zlib">
-   eJxjYBi8QJgMPfxALADEgiTo6QDiTjLsQgbqQKwBxJok6FkAxAtxmccINIuRsBn2QOwAxI4k2IsPhAPtjCTC3lEwCogFDqPpaRSMglFABiCnDTCYAAB47AUm
+   eJzt1sEJgDAQRNFNBSoWoVZhrELsSLvQTp0GgiG7J/kP/jFhLoGY/dPYcKZTvRqCt5Sc6nLeMalZLf45VW71lLYk7Ujfd6wqqy1qlMOuvUfFZgDxMm8PABCo5f8PsxexzAUm
+  </data>
+ </layer>
+ <layer id="6" name="BASEZOMBI" width="45" height="20" locked="1">
+  <data encoding="base64" compression="zlib">
+   eJztljEKhDAURGPAynPI9h7KCBthD+ZZbNTGY2it+AcTSCc27h/wwWAVeAyToDE8OGvMnv3b4h6v8zMwOtdEzl5cG8mXyBn9Rpicc8kiviuRM/odJROBs0923AVv7biwZTjPwVs7qfNI1nMp3y0776F2sOdW8kvuoXbSt7mwHHv2oWME+/jY6zNaQN89yfscgXMlGcic2Yi7xv/dAUERJxA=
   </data>
  </layer>
 </map>
