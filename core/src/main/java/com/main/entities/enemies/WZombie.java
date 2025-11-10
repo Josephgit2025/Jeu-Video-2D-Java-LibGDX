@@ -29,7 +29,7 @@ public class WZombie extends Zombie {
     public WZombie(int posX, int posY) {
         super("zombie/women/Walk1.png", posX, posY);
         this.health = 200;
-        this.speed = 80;
+        this.speed = 130;
         this.attackDamage = 10;
         this.attackSpeed = 2;
         this.range = 3;

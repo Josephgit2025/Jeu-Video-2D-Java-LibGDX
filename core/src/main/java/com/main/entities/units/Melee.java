@@ -3,7 +3,7 @@ package com.main.entities.units;
 public class Melee extends Soldier {
     
     public Melee (float posX, float posY) {
-        super("zombie/women/Walk2.png", posX, posY);
+        super("Melee/Walk1.png", posX, posY);
         this.health = 200;
         this.attackDamage = 20;
         this.speed = 45;
