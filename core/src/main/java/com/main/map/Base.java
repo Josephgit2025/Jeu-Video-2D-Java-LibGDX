@@ -75,11 +75,11 @@ public class Base {
                 case MELEE:
                     lastSpawn = 0.0f;
                     System.out.println("melee spawned");
-                    return new Melee("zombie/women/Walk2.png", 0, random.nextInt(screen.getMapHeight()));
+                    return new Melee(0, random.nextInt(screen.getMapHeight()));
                 case SNIPER:
                     lastSpawn = 0.0f;
                     System.out.println("sniper spawned");
-                    return new Sniper("zombie/women/Walk3.png", 0, random.nextInt(screen.getMapHeight()));
+                    return new Sniper(0, random.nextInt(screen.getMapHeight()));
                 case WOMAN:
                     lastSpawn = 0.0f;
                     System.out.println("Zombie women");
