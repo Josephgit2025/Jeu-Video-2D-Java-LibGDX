@@ -110,7 +110,7 @@ public class Hero extends Unit {
         }
     }
 
-    private void moveUp(float delta, float mapHeight) {
+    public void moveUp(float delta, float mapHeight) {
         float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
         if (!map.isCollisionRect(this.posX, newY, this.width, this.height)){
             if (newY + this.height > mapHeight) {

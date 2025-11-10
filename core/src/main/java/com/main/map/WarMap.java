@@ -18,14 +18,12 @@ public class WarMap {
     private int tileWidth;
     private int tileHeight;
     private float scale = 2.0f; // Scale factor pour agrandir la map
-    private List<Obstacle> obstacles;
     private List<Rectangle> collisionRects;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer renderer;
     private TmxMapLoader mapLoader;
 
     public WarMap(){
-        this.obstacles = new ArrayList<>();
         this.collisionRects = new ArrayList<>();
         loadTmxMap();
         render();
@@ -118,10 +116,6 @@ public class WarMap {
 
     public int getMapWidth() {
         return this.mapWidth;
-    }
-
-    public List<Obstacle> getObstacles() {
-        return obstacles;
     }
 
     public void dispose(){
