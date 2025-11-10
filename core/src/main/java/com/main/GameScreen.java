@@ -91,10 +91,6 @@ public class GameScreen implements Screen {
         for (Unit elem : enemyBase.getUnits()){
             elem.render(batch);
         }
-        // for (Zombie elem : playerBase.getZombie()){
-        //     elem.render(batch);
-        // }
-
         hero.render(batch);
         batch.end();
     }
