@@ -28,10 +28,20 @@ public abstract class Unit {
     public Unit(String filePath, float posX, float posY) {
         this.posX = posX;
         this.posY = posY;
-        this.texture = new Texture(filePath);
-        this.sprite = new Sprite(texture);
-        this.sprite.setPosition(posX, posY);
-        this.sprite.setSize(32, 48); // Taille visuelle
+        
+        // Gérer le cas null pour les tests
+        if (filePath != null) {
+            this.texture = new Texture(filePath);
+            this.sprite = new Sprite(texture);
+        } else {
+            this.texture = null;
+            this.sprite = null;
+        }
+        
+        if (this.sprite != null) {
+            this.sprite.setPosition(posX, posY);
+            this.sprite.setSize(32, 48); // Taille visuelle
+        }
         this.width = 32;  // Hitbox correspond à la largeur
         this.height = 48; // Hitbox complète
     }
