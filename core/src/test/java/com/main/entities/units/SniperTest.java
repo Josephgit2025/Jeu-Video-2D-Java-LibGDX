@@ -6,14 +6,26 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.Mockito.mock;
+
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class SniperTest {
 
     private Sniper sniper;
 
+    private class TestSniper extends Sniper {
+        public TestSniper(int posX, int posY) {
+            super(null, posX, posY);
+            this.texture = mock(Texture.class);
+            this.sprite = mock(Sprite.class);
+        }
+    }
+
     @Before
     public void setUp() {
-        sniper = new Sniper(100, 200);
+        sniper = new TestSniper(100, 200);
     }
 
     @Test
@@ -26,17 +38,34 @@ public class SniperTest {
     @Test
     public void testMove() {
         float initialX = sniper.getPosX();
-        sniper.move();
+        sniper.move(1.0f); // delta = 1 seconde
+        // déplacement = speed * delta = 30 * 1.0 = 30
         assertEquals(initialX + 30, sniper.getPosX(), 0.01f);
     }
 
     @Test
     public void testMoveMultipleTimes() {
         float initialX = sniper.getPosX();
-        sniper.move();
-        sniper.move();
-        sniper.move();
+        sniper.move(1.0f);
+        sniper.move(1.0f);
+        sniper.move(1.0f);
+        // déplacement total = 3 * (30 * 1.0) = 90
         assertEquals(initialX + 90, sniper.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveWithRealisticDelta() {
+        float initialX = sniper.getPosX();
+        sniper.move(0.016f); // 60 FPS
+        // déplacement = 30 * 0.016 = 0.48
+        assertEquals(initialX + 0.48f, sniper.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveWithZeroDelta() {
+        float initialX = sniper.getPosX();
+        sniper.move(0.0f);
+        assertEquals(initialX, sniper.getPosX(), 0.01f);
     }
 
     @Test

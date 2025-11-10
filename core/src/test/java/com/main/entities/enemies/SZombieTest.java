@@ -44,17 +44,34 @@ public class SZombieTest {
     @Test
     public void testMove() {
         float initialX = szombie.getPosX();
-        szombie.move();
+        szombie.move(1.0f); // delta = 1 seconde
+        // déplacement = speed * delta = 2 * 1.0 = 2
         assertEquals(initialX - 2, szombie.getPosX(), 0.01f);
     }
 
     @Test
     public void testMoveMultipleTimes() {
         float initialX = szombie.getPosX();
-        szombie.move();
-        szombie.move();
-        szombie.move();
+        szombie.move(1.0f);
+        szombie.move(1.0f);
+        szombie.move(1.0f);
+        // déplacement total = 3 * (2 * 1.0) = 6
         assertEquals(initialX - 6, szombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveWithRealisticDelta() {
+        float initialX = szombie.getPosX();
+        szombie.move(0.016f); // 60 FPS
+        // déplacement = 2 * 0.016 = 0.032
+        assertEquals(initialX - 0.032f, szombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testMoveWithZeroDelta() {
+        float initialX = szombie.getPosX();
+        szombie.move(0.0f);
+        assertEquals(initialX, szombie.getPosX(), 0.01f);
     }
 
     @Test

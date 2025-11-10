@@ -2,8 +2,8 @@ package com.main.entities.units;
 
 public class Melee extends Soldier {
     
-    public Melee (float posX, float posY) {
-        super("zombie/women/Walk2.png", posX, posY);
+    public Melee (String filePath, float posX, float posY) {
+        super(filePath, posX, posY);
         this.health = 200;
         this.attackDamage = 20;
         this.speed = 45;

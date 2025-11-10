@@ -1,23 +1,31 @@
 package com.main.screens;
 
-import com.badlogic.gdx.*;
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.viewport.*;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.main.GameScreen;
 import com.main.Main;
 
 public class TitleScreen implements Screen {
 
-    private final Main game;
-    private SpriteBatch batch;
-    private OrthographicCamera camera;
-    private Viewport viewport;
-    private BitmapFont font;
-    private Texture background;
-    private Texture titleLogo;      // logo ajouté
+    protected Main game;
+    protected SpriteBatch batch;
+    protected OrthographicCamera camera;
+    protected Viewport viewport;
+    protected BitmapFont font;
+    protected Texture background;
+    protected Texture titleLogo;      // logo ajouté
 
     private static final float WORLD_WIDTH = 800f;
     private static final float WORLD_HEIGHT = 480f;

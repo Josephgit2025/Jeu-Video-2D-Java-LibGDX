@@ -17,6 +17,10 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:5.8.0'
     testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
     testImplementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+
+
+
 
     if(enableGraalNative == 'true') {
         implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
@@ -31,7 +35,8 @@ test {
 sourceSets {
     test {
         resources {
-            srcDir '../assets'
+            // Pointe vers le dossier assets à la racine du projet
+            srcDir file("${project.rootDir}/assets")
         }
     }
 }
@@ -64,7 +69,8 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.6 // 60% de couverture minimum
+                minimum = 0.60
+                counter = 'LINE'  // Plus cohérent avec le rapport HTML
             }
         }
     }

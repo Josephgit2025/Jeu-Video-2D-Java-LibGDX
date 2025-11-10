@@ -34,7 +34,16 @@ public class WarMap {
 
         // Scale factor pour agrandir la map (2 = 2x plus grand)
         float scale = 2.0f;
-        renderer = new OrthogonalTiledMapRenderer(tiledMap, scale);
+        
+        // Essayer de créer le renderer (peut échouer en mode test headless)
+        try {
+            renderer = new OrthogonalTiledMapRenderer(tiledMap, scale);
+        } catch (Exception e) {
+            // En mode test headless, le renderer ne peut pas être créé (shaders manquants)
+            System.err.println("Warning: Could not create renderer (headless mode?): " + e.getMessage());
+            renderer = null;
+        }
+        
         this.mapHeight = tiledMap.getProperties().get("height", Integer.class);
         this.mapWidth = tiledMap.getProperties().get("width", Integer.class);
         this.tileHeight = tiledMap.getProperties().get("tileheight", Integer.class);
