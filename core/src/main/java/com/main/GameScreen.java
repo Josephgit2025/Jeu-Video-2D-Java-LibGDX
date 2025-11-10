@@ -4,6 +4,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -15,6 +17,7 @@ import com.main.map.WarMap;
 public class GameScreen implements Screen {
     private SpriteBatch batch;
     private Texture image;
+    private ShapeRenderer shapeRenderer; // Pour debug des collisions
 
     private Main game;
     private Hero hero;
@@ -35,6 +38,7 @@ public class GameScreen implements Screen {
     public GameScreen(Main game) {
         this.game = game;
         batch = new SpriteBatch();
+        shapeRenderer = new ShapeRenderer(); // Pour debug
         camera = new OrthographicCamera();
         // Viewport plus petit pour zoom sur le héros (600x450 au lieu de 800x600)
         viewport = new FitViewport(600, 450, camera);
@@ -98,6 +102,22 @@ public class GameScreen implements Screen {
 
         hero.render(batch);
         batch.end();
+        
+        // DEBUG: Dessiner les rectangles de collision (décommenter pour debug)
+        /*
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(1, 0, 0, 1); // Rouge
+        for (Rectangle rect : map.getCollisionRects()) {
+            shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
+        }
+        
+        // DEBUG: Dessiner le rectangle du héro en vert
+        shapeRenderer.setColor(0, 1, 0, 1); // Vert
+        shapeRenderer.rect(hero.getPosX(), hero.getPosY(), hero.getWidth(), hero.getHeight());
+        
+        shapeRenderer.end();
+        */
     }
 
     private void update(float delta) {

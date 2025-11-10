@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -46,23 +45,51 @@ public class WarMap {
     }
 
     private void loadCollisionObjects() {
-        MapObjects objects = tiledMap.getLayers().get("collision").getObjects();
+        // Récupérer le layer d'objets de collision
+        String[] possibleNames = {"collision", "colision", "Calque d'Objets 1", "COLLISION"};
         
-        for (MapObject object : objects) {
-            if (object instanceof RectangleMapObject) {
-                Rectangle rect = ((RectangleMapObject) object).getRectangle();
-                // Scaler et inverser Y pour correspondre au système LibGDX
-                // Tiled: Y croît vers le bas, LibGDX: Y croît vers le haut
-                float mapHeightPixels = mapHeight * tileHeight;
-                Rectangle scaledRect = new Rectangle(
-                    rect.x * scale,
-                    (mapHeightPixels - rect.y - rect.height) * scale, // Inverser Y
-                    rect.width * scale,
-                    rect.height * scale
-                );
-                collisionRects.add(scaledRect);
+        for (String layerName : possibleNames) {
+            if (tiledMap.getLayers().get(layerName) != null) {
+                System.out.println("Found collision layer: " + layerName);
+                
+                // Parcourir tous les objets du layer
+                for (MapObject object : tiledMap.getLayers().get(layerName).getObjects()) {
+                    
+                    // Récupérer les propriétés de l'objet
+                    float x = object.getProperties().get("x", Float.class);
+                    float y = object.getProperties().get("y", Float.class);
+                    float width = object.getProperties().get("width", Float.class);
+                    float height = object.getProperties().get("height", Float.class);
+                    
+                    // Ne pas modifier Y - les coordonnées de Tiled semblent déjà correctes pour LibGDX
+                    
+                    // DEBUG: Afficher les premières collisions
+                    if (collisionRects.size() < 3) {
+                        System.out.println("Collision object: x=" + x + ", y=" + y + ", width=" + width + ", height=" + height);
+                        System.out.println("Scaled: x=" + (x*scale) + ", y=" + (y*scale) + ", w=" + (width*scale) + ", h=" + (height*scale));
+                    }
+                    
+                    // Appliquer le scale aux rectangles
+                    Rectangle scaledRect = new Rectangle(
+                        x * scale,
+                        y * scale,
+                        width * scale,
+                        height * scale
+                    );
+                    
+                    collisionRects.add(scaledRect);
+                }
+                
+                System.out.println("Loaded " + collisionRects.size() + " collision objects");
+                System.out.println("Map dimensions: " + mapWidth + "x" + mapHeight + " tiles");
+                System.out.println("Tile size: " + tileWidth + "x" + tileHeight + " pixels");
+                System.out.println("Scale factor: " + scale);
+                System.out.println("Map size in pixels (scaled): " + (mapWidth*tileWidth*scale) + "x" + (mapHeight*tileHeight*scale));
+                return;
             }
         }
+        
+        System.out.println("Warning: No collision layer found!");
     }
 
     public void render(){
@@ -116,6 +143,14 @@ public class WarMap {
 
     public int getMapWidth() {
         return this.mapWidth;
+    }
+
+    public List<Obstacle> getObstacles() {
+        return obstacles;
+    }
+
+    public List<Rectangle> getCollisionRects() {
+        return collisionRects;
     }
 
     public void dispose(){
