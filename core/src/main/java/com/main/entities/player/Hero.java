@@ -41,23 +41,23 @@ public class Hero extends Unit {
     private final float FRAME_DURATIONW = 0.12f;
 
     public Hero(float posX, float posY, WarMap map) {
-        super("sold/down1.png", posX, posY);
+        super("sold/Down1.png", posX, posY);
 
-        TextureRegion[] rightFrames = loadFrames("sold/right%d.png", 8);
+        TextureRegion[] rightFrames = loadFrames("sold/RIght%d.png", 8);
         walkRight = new Animation<>(FRAME_DURATION, rightFrames);
         walkRight.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] leftFrames = loadFrames("sold/left%d.png",
+        TextureRegion[] leftFrames = loadFrames("sold/Left%d.png",
                 8);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] upFrames = loadFrames("sold/up%d.png",
+        TextureRegion[] upFrames = loadFrames("sold/Up%d.png",
                 8);
         walkUp = new Animation<>(FRAME_DURATIONW, upFrames);
         walkUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] downFrames = loadFrames("sold/down%d.png",
+        TextureRegion[] downFrames = loadFrames("sold/Down%d.png",
                 8);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);

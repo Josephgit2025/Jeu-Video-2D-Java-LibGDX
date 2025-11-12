@@ -34,11 +34,9 @@ public class GameScreen implements Screen {
     private Base playerBase;
     private int mapWidth;
     private int mapHeight;
-<<<<<<< HEAD
+
     private hud hudDisplay;
-=======
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
->>>>>>> master
 
     private enum Direction {
         UP, DOWN, LEFT, RIGHT
@@ -60,6 +58,7 @@ public class GameScreen implements Screen {
         this.mapHeight = map.getMapHeightInPixels();
         this.enemyBase = new Base(this.mapWidth, 300, false); // false = spawn zombies
         this.playerBase = new Base(0, 300, true); // true = spawn soldiers
+        this.hudDisplay = new hud();
     }
 
     @Override
@@ -167,7 +166,7 @@ public class GameScreen implements Screen {
             showRanges = !showRanges;
             System.out.println("Range display: " + (showRanges ? "ON" : "OFF"));
         }
-        enemyBase.updateUnits(delta);
+
         
         // vérifier collision entre héros et ennemis
         checkHeroEnemyCollisions(delta);
