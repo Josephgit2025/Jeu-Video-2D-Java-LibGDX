@@ -6,6 +6,8 @@ import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+import com.main.map.Base;
 
 public abstract class Unit {
     
@@ -24,6 +26,7 @@ public abstract class Unit {
     protected float attackSpeed; // Time in seconds between attacks
     protected float speed;
     protected Unit target;
+    protected Base targetBase; // Reference to enemy base
     // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la
     // classe Effect si nécessaire
     protected int range;
@@ -35,6 +38,7 @@ public abstract class Unit {
     protected UnitState currentState = UnitState.WALKING;
     protected float attackAnimationTimer = 0f; // Tracks attack animation progress
     protected static final float ATTACK_ANIMATION_DURATION = 0.5f; // Duration of attack animation
+    protected static final int BASE_ATTACK_RANGE = 100; // Range to attack base
     
 
     
@@ -139,6 +143,26 @@ public abstract class Unit {
         texture.dispose();
     }
 
+    /**
+     * Vérifie si un mouvement vers newX causerait une collision avec la hitbox de la base ennemie
+     */
+    protected boolean wouldCollideWithBase(float newX) {
+        if (targetBase == null || targetBase.getCollisionBox() == null) {
+            return false;
+        }
+        
+        // Créer un rectangle temporaire pour la nouvelle position
+        Rectangle unitRect = new Rectangle(newX, this.posY, this.width, this.height);
+        
+        // Vérifier la collision avec la hitbox de la base
+        boolean collides = unitRect.overlaps(targetBase.getCollisionBox());
+        
+        if (collides) {
+            System.out.println(this.getClass().getSimpleName() + " BLOCKED by " + targetBase.getName() + " hitbox!");
+        }
+        
+        return collides;
+    }
 
     /**
      * Calcule la distance entre cette unité et une autre
@@ -183,6 +207,7 @@ public abstract class Unit {
 
     /**
      * Sélectionne automatiquement la cible la plus proche
+     * Si aucune unité ennemie n'est disponible, cible la base ennemie
      */
     public void selectTarget(List<Unit> enemies) {
         List<Unit> inRange = detectEnemiesInRange(enemies);
@@ -196,9 +221,20 @@ public abstract class Unit {
             }
             this.target = newTarget;
         } else {
+            // No enemy units available, target enemy base if set
             this.target = null;
         }
-    }    public void setTarget(Unit target){
+    }
+    
+    public void setTargetBase(Base enemyBase) {
+        this.targetBase = enemyBase;
+    }
+    
+    public Base getTargetBase() {
+        return targetBase;
+    }
+    
+    public void setTarget(Unit target){
         if (target != null){
             this.target = target;
         }
@@ -243,25 +279,96 @@ public abstract class Unit {
     }
 
     public void attack() {
-        if (target == null || target.isDead()) {
-            currentState = UnitState.WALKING;
-            return; // Pas de cible valide
+        // Priority 1: Attack unit target if available
+        if (target != null && !target.isDead()) {
+            double distance = calculateDistance(target);
+            if (distance <= this.range && attackCooldown <= 0) {
+                System.out.println(this.getClass().getSimpleName() + " attacks " + target.getClass().getSimpleName() + 
+                                 " (HP: " + target.getHealth() + " -> " + (target.getHealth() - attackDamage) + ")");
+                target.takeDamage(attackDamage);
+                attackCooldown = attackSpeed;
+                currentState = UnitState.ATTACKING;
+                attackAnimationTimer = ATTACK_ANIMATION_DURATION;
+                return;
+            }
         }
-        // Vérifie la portée
-        double distance = calculateDistance(target);
-        if (distance > this.range) {
-            currentState = UnitState.WALKING;
-            return; // Cible hors de portée
+        
+        // Priority 2: Attack enemy base if in range and no units to fight
+        if (targetBase != null && target == null) {
+            double distanceToBase = calculateDistanceToBase();
+            if (distanceToBase <= BASE_ATTACK_RANGE && attackCooldown <= 0) {
+                System.out.println(this.getClass().getSimpleName() + " attacks enemy BASE" + 
+                                 " (HP: " + targetBase.getHealth() + " -> " + (targetBase.getHealth() - attackDamage) + ")");
+                targetBase.takeDamage(attackDamage);
+                attackCooldown = attackSpeed;
+                currentState = UnitState.ATTACKING;
+                attackAnimationTimer = ATTACK_ANIMATION_DURATION;
+                return;
+            }
         }
-        if (attackCooldown <= 0) {
-            System.out.println(this.getClass().getSimpleName() + " attacks " + target.getClass().getSimpleName() + 
-                             " (HP: " + target.getHealth() + " -> " + (target.getHealth() - attackDamage) + ")");
-            target.takeDamage(attackDamage);
-            attackCooldown = attackSpeed;
-            // Trigger attack animation
-            currentState = UnitState.ATTACKING;
-            attackAnimationTimer = ATTACK_ANIMATION_DURATION;
+        
+        // No valid target to attack
+        currentState = UnitState.WALKING;
+    }
+    
+    /**
+     * Calcule la distance entre cette unité et la base ennemie
+     */
+    protected double calculateDistanceToBase() {
+        if (targetBase == null) return Double.MAX_VALUE;
+        
+        float baseX = targetBase.getPosition().getPosX();
+        float baseY = targetBase.getPosition().getPosY();
+        
+        double deltaX = baseX - this.posX;
+        double deltaY = baseY - this.posY;
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    }
+    
+    /**
+     * Vérifie si l'unité doit s'arrêter (cible à portée ou base à portée)
+     * @return true si l'unité doit s'arrêter
+     */
+    protected boolean shouldStopMoving() {
+        // Stop if attacking
+        if (attackAnimationTimer > 0) {
+            return true;
         }
+        
+        // Stop if unit target in range
+        if (target != null && !target.isDead()) {
+            double distance = calculateDistance(target);
+            if (distance <= this.range) {
+                return true;
+            }
+        }
+        
+        // Stop if base target in range
+        if (target == null && targetBase != null) {
+            double distanceToBase = calculateDistanceToBase();
+            if (distanceToBase <= BASE_ATTACK_RANGE) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Calcule la nouvelle position X après mouvement, en tenant compte de la direction
+     * @param delta temps écoulé
+     * @param direction direction du mouvement (1 = droite, -1 = gauche)
+     * @return nouvelle position X, ou position actuelle si collision
+     */
+    protected float calculateNewPositionX(float delta, int direction) {
+        float newX = this.posX + (this.speed * delta * direction);
+        
+        // Check collision with enemy base hitbox
+        if (wouldCollideWithBase(newX)) {
+            return this.posX; // Stay in place
+        }
+        
+        return newX;
     }
 
     public void specialAbility() {
@@ -269,30 +376,30 @@ public abstract class Unit {
     }
 
     /**
-     * Move the unit for this frame. Implementations should use delta time
-     * (seconds) and the unit's speed (pixels/second) to update position.
+     * Move the unit for this frame. Default implementation moves right.
+     * Subclasses should override to provide specific movement behavior.
+     * @param delta Le temps écoulé depuis la dernière frame
      */
     public void move(float delta) {
         // Update attack animation timer
         if (attackAnimationTimer > 0) {
             attackAnimationTimer -= delta;
             if (attackAnimationTimer <= 0) {
-                currentState = UnitState.WALKING; // Animation finished
+                currentState = UnitState.WALKING;
             }
             return; // Don't move during attack animation
         }
         
-        if (target != null && !target.isDead()) {
-            double distance = calculateDistance(target);
-            if (distance <= this.range) {
-                currentState = UnitState.IDLE; // In range but not attacking yet
-                return;
-            }
+        // Check if should stop (target or base in range)
+        if (shouldStopMoving()) {
+            currentState = UnitState.IDLE;
+            return;
         }
         
-        // Moving towards target or enemy
+        // Default: move right (soldiers direction)
         currentState = UnitState.WALKING;
-        this.setSpritePosX(this.posX + this.speed * delta);
+        float newX = calculateNewPositionX(delta, 1);
+        this.setSpritePosX(newX);
     }
     
     /**
