@@ -82,28 +82,27 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Update health values
-     * @param currentHealth Current health
-     * @param maxHealth Maximum health
+     * Met à jour les valeurs de santé
+     * @param currentHealth Vie actuelle
+     * @param maxHealth Vie maximale
      */
     public void update(int currentHealth, int maxHealth) {
-        this.currentHealth = Math.max(0, currentHealth); // Ensure non-negative
-        this.maxHealth = Math.max(1, maxHealth); // Ensure at least 1 to avoid division by zero
+        this.currentHealth = Math.max(0, currentHealth);
+        this.maxHealth = Math.max(1, maxHealth);
     }
     
     /**
-     * Render the health bar
-     * @param shapeRenderer ShapeRenderer for drawing shapes
+     * @param shapeRenderer ShapeRenderer pour dessiner les formes
      */
     public void render(ShapeRenderer shapeRenderer) {
-        // Calculate health percentage
+        // Calculer le pourcentage de santé
         float healthPercentage = (float) currentHealth / maxHealth;
         float fillWidth = width * healthPercentage;
         
-        // Determine health bar color based on percentage
+        // Déterminer la couleur de la barre de santé en fonction du pourcentage
         Color fillColor = getHealthColor(healthPercentage);
         
-        // Begin shape rendering
+        // Commencer le rendu des formes
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         
         // Draw background
@@ -141,9 +140,8 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Get health color based on percentage
-     * @param percentage Health percentage (0.0 to 1.0)
-     * @return Color for the health bar
+     @param percentage 
+     @return 
      */
     private Color getHealthColor(float percentage) {
         if (percentage > 0.5f) {
