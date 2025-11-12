@@ -31,11 +31,11 @@ public class FZombie extends Zombie {
 
     public FZombie(int posX, int posY) {
         super("zombie/normal/Walk1.png", posX, posY);
-        this.health = 300;
+        this.health = 450; // Augmenté pour être plus résistant
         this.speed = 80;
-        this.attackDamage = 15;
-        this.attackSpeed = 1;
-        this.range = 150; // Portée courte pour zombie
+        this.attackDamage = 25;
+        this.attackSpeed = 0.8f; // 0.8 seconds between attacks (fast zombie)
+        this.range = 50; // Portée égale au Melee
         
         // Load walk animation
         TextureRegion[] leftFrames = loadFrames("zombie/normal/Walk%d.png", 10);
