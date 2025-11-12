@@ -1,5 +1,8 @@
 package com.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -132,7 +135,63 @@ public class GameScreen implements Screen {
             enemyBase.addUnit(tmp);
         }
         enemyBase.updateUnits(delta);
+        
+        // vérifier collision entre héros et ennemis
+        checkHeroEnemyCollisions(delta);
+        
+        // Remove dead enemies and give gold to hero
+        removeDeadEnemiesAndGiveGold();
+        
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
+    }
+    
+    /**
+     * vérifier collision entre héros et ennemis et appliquer des dégâts sur lui
+     */
+    private void checkHeroEnemyCollisions(float delta) {
+        for (Unit enemy : enemyBase.getUnits()) {
+            if (enemy.isDead()) continue;
+            
+            // Simple collision detection using bounding boxes
+            float heroX = hero.getPosX();
+            float heroY = hero.getPosY();
+            float enemyX = enemy.getPosX();
+            float enemyY = enemy.getPosY();
+            
+            // Calculate distance between hero and enemy
+            float dx = heroX - enemyX;
+            float dy = heroY - enemyY;
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+            
+            // If enemy is close enough to attack (within range)
+            if (distance < 50f) { // 50 pixels = attack range
+                // Enemy damages hero (1 damage per second, adjusted by delta time)
+                if (Math.random() < 0.02) { // 2% chance per frame to hit
+                    hero.takeDamage(5); // 5 damage per hit
+                    System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
+                }
+            }
+        }
+    }
+    
+    /**
+     * Remove dead enemies from the list and give gold to hero
+     */
+    private void removeDeadEnemiesAndGiveGold() {
+        List<Unit> enemiesToRemove = new ArrayList<>();
+        
+        for (Unit enemy : enemyBase.getUnits()) {
+            if (enemy.isDead()) {
+                // Give gold to hero when enemy dies
+                int goldReward = 10; // 10 gold per enemy killed
+                hero.addGold(goldReward);
+                System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
+                enemiesToRemove.add(enemy);
+            }
+        }
+        
+        // Remove dead enemies
+        enemyBase.getUnits().removeAll(enemiesToRemove);
     }
 
     @Override

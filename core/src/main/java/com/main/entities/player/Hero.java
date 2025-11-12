@@ -66,6 +66,9 @@ public class Hero extends Unit {
         this.speed = 8;
         this.attackSpeed = 1;
         this.map = map;
+        
+        // initialiser gold
+        this.gold = 50; // Start with 50 gold
     }
 
     private TextureRegion[] loadFrames(String pattern, int count) {

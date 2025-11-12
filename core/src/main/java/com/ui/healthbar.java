@@ -124,9 +124,9 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Render the health bar with text and optional heart icon
+     * Render the health bar with optional heart icon (without text)
      * @param shapeRenderer ShapeRenderer for drawing shapes
-     * @param batch SpriteBatch for drawing text and icon
+     * @param batch SpriteBatch for drawing icon
      */
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
         // Draw heart icon if available (aligned vertically with the bar)
@@ -136,14 +136,8 @@ public class healthbar implements Disposable {
             batch.end();
         }
         
-        // Render the bar
+        // Render the bar only (no text)
         render(shapeRenderer);
-        
-        // Render health text
-        batch.begin();
-        String healthText = currentHealth + " / " + maxHealth;
-        font.draw(batch, healthText, x + width + 10, y + height - 5);
-        batch.end();
     }
     
     /**
