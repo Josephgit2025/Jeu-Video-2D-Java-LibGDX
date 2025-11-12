@@ -60,7 +60,7 @@ public class BaseTest {
 
     @Before
     public void setUp() {
-        base = new Base(100, 200);
+        base = new Base(100, 200, true); // true for player base in tests
         mockScreen = mock(GameScreen.class);
         when(mockScreen.getMapWidth()).thenReturn(1920);
         when(mockScreen.getMapHeight()).thenReturn(1080);

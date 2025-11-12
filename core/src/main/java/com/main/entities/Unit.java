@@ -8,20 +8,33 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public abstract class Unit {
+    
+    // Unit states for animation control
+    public enum UnitState {
+        IDLE,      // Standing still
+        WALKING,   // Moving towards target
+        ATTACKING  // Playing attack animation
+    }
+    
     protected float posX;
     protected float posY;
     protected Sprite sprite;
     protected int health;
     protected int attackDamage;
-    protected int attackSpeed;
+    protected float attackSpeed; // Time in seconds between attacks
     protected float speed;
     protected Unit target;
     // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la
     // classe Effect si nécessaire
     protected int range;
-    protected int attackCooldown = 0;
+    protected float attackCooldown = 0f; // Current cooldown in seconds
     protected Texture texture;
     protected float width, height;
+    
+    // State management
+    protected UnitState currentState = UnitState.WALKING;
+    protected float attackAnimationTimer = 0f; // Tracks attack animation progress
+    protected static final float ATTACK_ANIMATION_DURATION = 0.5f; // Duration of attack animation
     
 
     
@@ -78,7 +91,7 @@ public abstract class Unit {
         return attackDamage;
     }
 
-    public int getAttackSpeed() {
+    public float getAttackSpeed() {
         return attackSpeed;
     }
 
@@ -90,7 +103,7 @@ public abstract class Unit {
         return range;
     }
 
-    public int getAttackCooldown() {
+    public float getAttackCooldown() {
         return attackCooldown;
     }
 
@@ -174,13 +187,18 @@ public abstract class Unit {
     public void selectTarget(List<Unit> enemies) {
         List<Unit> inRange = detectEnemiesInRange(enemies);
         if (!inRange.isEmpty()) {
-            this.target = findClosestEnemy(inRange);
+            Unit newTarget = findClosestEnemy(inRange);
+            if (this.target != newTarget && newTarget != null) {
+                System.out.println(this.getClass().getSimpleName() + " at (" + (int)posX + "," + (int)posY + 
+                                 ") targets " + newTarget.getClass().getSimpleName() + 
+                                 " at (" + (int)newTarget.getPosX() + "," + (int)newTarget.getPosY() + 
+                                 ") - distance: " + (int)calculateDistance(newTarget) + "/" + range);
+            }
+            this.target = newTarget;
         } else {
             this.target = null;
         }
-    }
-
-    public void setTarget(Unit target){
+    }    public void setTarget(Unit target){
         if (target != null){
             this.target = target;
         }
@@ -200,9 +218,12 @@ public abstract class Unit {
     /**
      * Met à jour le cooldown d'attaque
      */
-    public void updateCooldown() {
+    public void updateCooldown(float delta) {
         if (attackCooldown > 0) {
-            attackCooldown--;
+            attackCooldown -= delta; // Decrement by time in seconds
+            if (attackCooldown < 0) {
+                attackCooldown = 0;
+            }
         }
     }
 
@@ -210,8 +231,8 @@ public abstract class Unit {
      * Appelé quand l'unité meurt
      */
     protected void onDeath() {
-        // Logique de mort (animation, suppression, etc.)
-        // À personnaliser dans les sous-classes si nécessaire
+    // Animation ou effet visuel de mort à personnaliser ici
+    // Exemple : déclencher une animation, jouer un son, etc.
     }
 
     /**
@@ -223,11 +244,23 @@ public abstract class Unit {
 
     public void attack() {
         if (target == null || target.isDead()) {
+            currentState = UnitState.WALKING;
             return; // Pas de cible valide
         }
+        // Vérifie la portée
+        double distance = calculateDistance(target);
+        if (distance > this.range) {
+            currentState = UnitState.WALKING;
+            return; // Cible hors de portée
+        }
         if (attackCooldown <= 0) {
+            System.out.println(this.getClass().getSimpleName() + " attacks " + target.getClass().getSimpleName() + 
+                             " (HP: " + target.getHealth() + " -> " + (target.getHealth() - attackDamage) + ")");
             target.takeDamage(attackDamage);
             attackCooldown = attackSpeed;
+            // Trigger attack animation
+            currentState = UnitState.ATTACKING;
+            attackAnimationTimer = ATTACK_ANIMATION_DURATION;
         }
     }
 
@@ -240,7 +273,32 @@ public abstract class Unit {
      * (seconds) and the unit's speed (pixels/second) to update position.
      */
     public void move(float delta) {
-        // Default: move to the right. Subclasses should override.
+        // Update attack animation timer
+        if (attackAnimationTimer > 0) {
+            attackAnimationTimer -= delta;
+            if (attackAnimationTimer <= 0) {
+                currentState = UnitState.WALKING; // Animation finished
+            }
+            return; // Don't move during attack animation
+        }
+        
+        if (target != null && !target.isDead()) {
+            double distance = calculateDistance(target);
+            if (distance <= this.range) {
+                currentState = UnitState.IDLE; // In range but not attacking yet
+                return;
+            }
+        }
+        
+        // Moving towards target or enemy
+        currentState = UnitState.WALKING;
         this.setSpritePosX(this.posX + this.speed * delta);
+    }
+    
+    /**
+     * Get the current state of the unit (for animation purposes)
+     */
+    public UnitState getCurrentState() {
+        return currentState;
     }
 }

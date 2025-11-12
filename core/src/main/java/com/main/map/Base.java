@@ -28,14 +28,16 @@ public class Base {
     private Position position;
     private int attackPower = 50;
     private float lastSpawn;
-    private List<Unit> units;
+    private List<Unit> units; // Unités de cette base
     private Random random;
+    private boolean isPlayerBase; // true = spawn soldiers, false = spawn zombies
 
-    public Base(int posX, int posY) {
+    public Base(int posX, int posY, boolean isPlayerBase) {
         this.position = new Position(posX, posY);
         lastSpawn = 0.0f;
         this.units = new ArrayList<>();
         random = new Random();
+        this.isPlayerBase = isPlayerBase;
     }
 
     public int getHealth() {
@@ -66,43 +68,74 @@ public class Base {
 
     public Unit spawnUnit(GameScreen screen, float delta) {
         if (lastSpawn >= 5.0f) {
-            Type type = Type.values()[random.nextInt(Type.values().length)];
-            switch (type) {
-                case TANK:
-                    lastSpawn = 0.0f;
-                    System.out.println("Tank spawned");
-                    return new Tank(0, random.nextInt(screen.getMapHeight()));
-                case MELEE:
-                    lastSpawn = 0.0f;
-                    System.out.println("melee spawned");
-                    return new Melee(0, random.nextInt(screen.getMapHeight()));
-                case SNIPER:
-                    lastSpawn = 0.0f;
-                    System.out.println("sniper spawned");
-                    return new Sniper(0, random.nextInt(screen.getMapHeight()));
-                case WOMAN:
-                    lastSpawn = 0.0f;
-                    System.out.println("Zombie women");
-                    return new WZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
-                case CRAWL:
-                    lastSpawn = 0.0f;
-                    System.out.println("Zombie crawler");
-                    return new CZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
-                case FAST:
-                    lastSpawn = 0.0f;
-                    System.out.println("Zombie fast");
-                    return new FZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
-                default:
-                    return null;
+            lastSpawn = 0.0f;
+            
+            if (isPlayerBase) {
+                // Spawn soldiers (left side)
+                Type[] soldierTypes = {Type.TANK, Type.MELEE, Type.SNIPER};
+                Type type = soldierTypes[random.nextInt(soldierTypes.length)];
+                switch (type) {
+                    case TANK:
+                        System.out.println("Tank spawned");
+                        return new Tank(0, random.nextInt(screen.getMapHeight()));
+                    case MELEE:
+                        System.out.println("Melee spawned");
+                        return new Melee(0, random.nextInt(screen.getMapHeight()));
+                    case SNIPER:
+                        System.out.println("Sniper spawned");
+                        return new Sniper(0, random.nextInt(screen.getMapHeight()));
+                    default:
+                        return null;
+                }
+            } else {
+                // Spawn zombies (right side)
+                Type[] zombieTypes = {Type.WOMAN, Type.CRAWL, Type.FAST};
+                Type type = zombieTypes[random.nextInt(zombieTypes.length)];
+                switch (type) {
+                    case WOMAN:
+                        System.out.println("Zombie women spawned");
+                        return new WZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
+                    case CRAWL:
+                        System.out.println("Zombie crawler spawned");
+                        return new CZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
+                    case FAST:
+                        System.out.println("Zombie fast spawned");
+                        return new FZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
+                    default:
+                        return null;
+                }
             }
         }
         lastSpawn += delta;
         return null;
     }
 
-    public void updateUnits(float delta) {
-        for (Unit elem : units) {
-            elem.move(delta);
+    /**
+     * Met à jour toutes les unités de cette base
+     * @param delta Le temps écoulé
+     * @param enemies La liste des ennemis à attaquer
+     */
+    public void updateUnits(float delta, List<Unit> enemies) {
+        // Supprime les unités mortes
+        units.removeIf(Unit::isDead);
+
+        // Met à jour chaque unité
+        for (Unit unit : units) {
+            unit.move(delta);
+            
+            // Filtre uniquement les ennemis vivants
+            List<Unit> liveEnemies = new ArrayList<>();
+            if (enemies != null) {
+                for (Unit enemy : enemies) {
+                    if (!enemy.isDead()) {
+                        liveEnemies.add(enemy);
+                    }
+                }
+            }
+            
+            unit.selectTarget(liveEnemies);
+            unit.updateCooldown(delta);
+            unit.attack();
         }
     }
 }
