@@ -29,7 +29,7 @@ public class Hero extends Unit {
     protected Weapon weapon;
     private WarMap map;
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
-    private float stateTime = 0f;
+    // uses inherited stateTime from Unit
     private boolean moving = false;
     private Direction direction = Direction.DOWN;
     private List<Texture> loadedTextures = new ArrayList<>();
@@ -37,7 +37,7 @@ public class Hero extends Unit {
     private final float FRAME_DURATIONW = 0.12f;
 
     public Hero(float posX, float posY, WarMap map) {
-        super("sold/down1.png", posX, posY);
+        super("sold/Idle.png", posX, posY);
 
         TextureRegion[] rightFrames = loadFrames("sold/right%d.png", 8);
         walkRight = new Animation<>(FRAME_DURATION, rightFrames);

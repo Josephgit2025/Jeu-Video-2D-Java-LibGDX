@@ -24,7 +24,7 @@ public class FZombie extends Zombie {
     private Animation<TextureRegion> walkLeft;
     private Animation<TextureRegion> attackAnimation;
     private TextureRegion idleFrame;
-    private float stateTime = 0f;
+    // uses inherited stateTime from Unit
     private boolean moving = false;
     private List<Texture> loadedTextures = new ArrayList<>();
     private final float FRAME_DURATION = 0.2f;
@@ -67,11 +67,12 @@ public class FZombie extends Zombie {
             return;
         }
         
-        // Vérifie si une cible est à portée, si oui, ne bouge pas
+        // Vérifie si une cible est à portée, si oui, attaque (utilise Unit.attack() pour gérer cooldowns/timers)
         if (target != null && !target.isDead()) {
             double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
             if (distance <= this.range) {
-                currentState = UnitState.IDLE;
+                // Use the shared attack logic so damage, cooldown and attack animation timer are applied
+                attack();
                 this.stateTime += delta;
                 return;
             }
@@ -113,6 +114,11 @@ public class FZombie extends Zombie {
             frames[i] = new TextureRegion(tex);
         }
         return frames;
+    }
+
+    @Override
+    protected float getAttackAnimationDuration() {
+        return attackAnimation.getAnimationDuration();
     }
 
 }

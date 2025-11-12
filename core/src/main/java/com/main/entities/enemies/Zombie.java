@@ -12,5 +12,7 @@ public class Zombie extends Unit {
     public void move(float delta){
         // zombies move leftwards by default
         this.setSpritePosX(this.posX - this.speed * delta);
+        // advance shared animation timer so animations progress for simple zombies
+        this.stateTime += delta;
     }
 }
