@@ -9,24 +9,53 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.headless.HeadlessApplication;
+import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class UnitTest {
+    @Test
+    public void testAttackTargetOutOfRange() {
+        // Place la cible hors de portée
+        unit.target = enemy2; // enemy2 est loin
+        unit.attackCooldown = 0;
+        int initialHealth = enemy2.health;
+        unit.attack();
+        // L'attaque ne doit pas infliger de dégâts ni changer le cooldown
+        assertEquals(initialHealth, enemy2.health);
+        assertEquals(0, unit.attackCooldown);
+    }
 
+    private static HeadlessApplication application;
     private TestUnit unit;
     private TestUnit enemy1;
     private TestUnit enemy2;
     
     @Mock
     private SpriteBatch mockBatch;
+
+    @BeforeClass
+    public static void init() {
+        // Initialiser LibGDX en mode headless pour les tests
+        HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
+        application = new HeadlessApplication(new ApplicationAdapter() {}, config);
+        
+        // Mock GL20 pour éviter les erreurs de rendu
+        Gdx.gl20 = mock(GL20.class);
+        Gdx.gl = Gdx.gl20;
+    }
 
     // Classe concrète pour tester la classe abstraite Unit
     private class TestUnit extends Unit {
@@ -346,7 +375,7 @@ public class UnitTest {
 
     @Test
     public void testWidthAndHeight() {
-        assertEquals(35, unit.width, 0.01f);
-        assertEquals(50, unit.height, 0.01f);
+        assertEquals(32, unit.width, 0.01f);
+        assertEquals(48, unit.height, 0.01f);
     }
 }

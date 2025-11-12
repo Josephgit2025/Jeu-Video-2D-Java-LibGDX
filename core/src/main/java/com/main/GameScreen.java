@@ -30,6 +30,7 @@ public class GameScreen implements Screen {
     private Base playerBase;
     private int mapWidth;
     private int mapHeight;
+    private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
 
     private enum Direction {
         UP, DOWN, LEFT, RIGHT
@@ -49,8 +50,8 @@ public class GameScreen implements Screen {
         hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.mapWidth = map.getMapWidthInPixels();
         this.mapHeight = map.getMapHeightInPixels();
-        this.enemyBase = new Base(this.mapWidth, 300);
-        this.playerBase = new Base(0, 300);
+        this.enemyBase = new Base(this.mapWidth, 300, false); // false = spawn zombies
+        this.playerBase = new Base(0, 300, true); // true = spawn soldiers
     }
 
     @Override
@@ -93,11 +94,43 @@ public class GameScreen implements Screen {
         map.render();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+        // Render toutes les unités
         for (Unit elem : enemyBase.getUnits()){
+            elem.render(batch);
+        }
+        for (Unit elem : playerBase.getUnits()){
             elem.render(batch);
         }
         hero.render(batch);
         batch.end();
+        
+        // Draw range circles if enabled
+        if (showRanges) {
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            
+            // Draw player units ranges in green
+            shapeRenderer.setColor(0, 1, 0, 0.5f); // Green with transparency
+            for (Unit unit : playerBase.getUnits()) {
+                if (!unit.isDead()) {
+                    shapeRenderer.circle(unit.getPosX() + unit.getWidth()/2, 
+                                        unit.getPosY() + unit.getHeight()/2, 
+                                        unit.getRange());
+                }
+            }
+            
+            // Draw enemy units ranges in red
+            shapeRenderer.setColor(1, 0, 0, 0.5f); // Red with transparency
+            for (Unit unit : enemyBase.getUnits()) {
+                if (!unit.isDead()) {
+                    shapeRenderer.circle(unit.getPosX() + unit.getWidth()/2, 
+                                        unit.getPosY() + unit.getHeight()/2, 
+                                        unit.getRange());
+                }
+            }
+            
+            shapeRenderer.end();
+        }
         
         // DEBUG: Dessiner les rectangles de collision (décommenter pour debug)
         /*
@@ -117,12 +150,30 @@ public class GameScreen implements Screen {
     }
 
     private void update(float delta) {
-        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
-        Unit tmp = enemyBase.spawnUnit(this, delta);
-        if (tmp != null){
-            enemyBase.addUnit(tmp);
+        // Toggle range display with 'R' key
+        if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.R)) {
+            showRanges = !showRanges;
+            System.out.println("Range display: " + (showRanges ? "ON" : "OFF"));
         }
-        enemyBase.updateUnits(delta);
+        
+        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
+        
+        // Spawn des ennemis
+        Unit tmpEnemy = enemyBase.spawnUnit(this, delta);
+        if (tmpEnemy != null){
+            enemyBase.addUnit(tmpEnemy);
+        }
+        
+        // Spawn des alliés
+        Unit tmpAlly = playerBase.spawnUnit(this, delta);
+        if (tmpAlly != null){
+            playerBase.addUnit(tmpAlly);
+        }
+        
+        // Update : les ennemis attaquent les alliés et vice-versa
+        enemyBase.updateUnits(delta, playerBase.getUnits());
+        playerBase.updateUnits(delta, enemyBase.getUnits());
+        
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
 

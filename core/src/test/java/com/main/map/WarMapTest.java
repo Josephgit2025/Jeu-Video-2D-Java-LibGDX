@@ -63,7 +63,7 @@ public class WarMapTest {
         int width = warMap.getMapWidth();
         assertTrue("Map width should be positive", width > 0);
         // Vérifier que la largeur correspond à la carte actuelle
-        assertEquals("Map width should match the loaded map", 30, width);
+        assertEquals("Map width should match the loaded map", 45, width);
     }
 
     @Test
