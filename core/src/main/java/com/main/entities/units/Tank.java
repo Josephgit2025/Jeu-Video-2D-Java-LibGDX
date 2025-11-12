@@ -44,7 +44,15 @@ public class Tank extends Soldier {
     @Override
     public void render(SpriteBatch batch) {
         TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
-        batch.draw(currentFrame, posX, posY);
+        
+        float visualWidth = 85;
+        float visualHeight = 50;
+        
+        // Centrer horizontalement et aligner les pieds du sprite avec le bas de la hitbox
+        float offsetX = (this.width - visualWidth) / 2;
+        float offsetY = 0; // Aligner le bas du sprite avec le bas de la hitbox (pieds alignés)
+        
+        batch.draw(currentFrame, this.posX + offsetX, this.posY + offsetY, visualWidth, visualHeight);
     }
 
     @Override
@@ -52,5 +60,4 @@ public class Tank extends Soldier {
         this.setSpritePosX(this.posX + this.speed * delta);
         this.stateTime = this.stateTime + delta;
     }
-
 }
