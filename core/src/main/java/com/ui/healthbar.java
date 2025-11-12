@@ -31,11 +31,11 @@ public class healthbar implements Disposable {
     private static final float ICON_OFFSET = 32f;
     
     // Colors
-    private static final Color BACKGROUND_COLOR = new Color(0.3f, 0.3f, 0.3f, 0.8f); // Dark gray
-    private static final Color BORDER_COLOR = new Color(0.1f, 0.1f, 0.1f, 1f); // Dark border
-    private static final Color HEALTH_COLOR = new Color(0.2f, 0.8f, 0.2f, 1f); // Green
-    private static final Color LOW_HEALTH_COLOR = new Color(0.8f, 0.2f, 0.2f, 1f); // Red
-    private static final Color MEDIUM_HEALTH_COLOR = new Color(0.9f, 0.7f, 0.2f, 1f); // Orange
+    private static final Color BACKGROUND_COLOR = new Color(0.3f, 0.3f, 0.3f, 0.8f);    // Dark gray
+    private static final Color BORDER_COLOR = new Color(0.1f, 0.1f, 0.1f, 1f);          // Dark border
+    private static final Color HEALTH_COLOR = new Color(0.2f, 0.8f, 0.2f, 1f);          // Green
+    private static final Color LOW_HEALTH_COLOR = new Color(0.8f, 0.2f, 0.2f, 1f);      // Red
+    private static final Color MEDIUM_HEALTH_COLOR = new Color(0.9f, 0.7f, 0.2f, 1f);   // Orange
     
     // Border thickness
     private static final float BORDER_THICKNESS = 2f;
