@@ -49,8 +49,8 @@ public class GameScreen implements Screen {
         hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.mapWidth = map.getMapWidthInPixels();
         this.mapHeight = map.getMapHeightInPixels();
-        this.enemyBase = new Base(this.mapWidth, 300);
-        this.playerBase = new Base(0, 300);
+        this.enemyBase = new Base(this.mapWidth, 300, false); // false = spawn zombies
+        this.playerBase = new Base(0, 300, true); // true = spawn soldiers
     }
 
     @Override
@@ -93,7 +93,11 @@ public class GameScreen implements Screen {
         map.render();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
+        // Render toutes les unités
         for (Unit elem : enemyBase.getUnits()){
+            elem.render(batch);
+        }
+        for (Unit elem : playerBase.getUnits()){
             elem.render(batch);
         }
         hero.render(batch);
@@ -118,11 +122,23 @@ public class GameScreen implements Screen {
 
     private void update(float delta) {
         hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
-        Unit tmp = enemyBase.spawnUnit(this, delta);
-        if (tmp != null){
-            enemyBase.addUnit(tmp);
+        
+        // Spawn des ennemis
+        Unit tmpEnemy = enemyBase.spawnUnit(this, delta);
+        if (tmpEnemy != null){
+            enemyBase.addUnit(tmpEnemy);
         }
-        enemyBase.updateUnits(delta);
+        
+        // Spawn des alliés
+        Unit tmpAlly = playerBase.spawnUnit(this, delta);
+        if (tmpAlly != null){
+            playerBase.addUnit(tmpAlly);
+        }
+        
+        // Update : les ennemis attaquent les alliés et vice-versa
+        enemyBase.updateUnits(delta, playerBase.getUnits());
+        playerBase.updateUnits(delta, enemyBase.getUnits());
+        
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
 

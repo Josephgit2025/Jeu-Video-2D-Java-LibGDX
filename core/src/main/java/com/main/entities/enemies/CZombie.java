@@ -20,6 +20,7 @@ import com.main.weapons.Weapon;
 
 public class CZombie extends Zombie {
     private Animation<TextureRegion> walkLeft;
+    private TextureRegion attackFrame;
     private float stateTime = 0f;
     private boolean moving = false;
     private List<Texture> loadedTextures = new ArrayList<>();
@@ -27,19 +28,47 @@ public class CZombie extends Zombie {
 
     public CZombie(int posX, int posY) {
         super("zombie/crawl/Walk1.png", posX, posY);
-        this.health = 200;
+        this.health = 100;
         this.speed = 40;
-        this.attackDamage = 10; 
-        this.attackSpeed = 2;
-        this.range = 3;
+        this.attackDamage = 5;
+        this.attackSpeed = 1;
+        this.range = 150; // Portée courte pour zombie
 
         TextureRegion[] leftFrames = loadFrames("zombie/crawl/Walk%d.png", 10);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
+        
+        // Use first frame as attack pose
+        this.attackFrame = leftFrames[0];
     }
 
     @Override
     public void move(float delta) {
+        this.moving = false; // Reset moving state
+        
+        // Update attack animation timer
+        if (attackAnimationTimer > 0) {
+            attackAnimationTimer -= delta;
+            this.stateTime += delta;
+            if (attackAnimationTimer <= 0) {
+                currentState = UnitState.WALKING;
+                this.stateTime = 0;
+            }
+            return;
+        }
+        
+        // Vérifie si une cible est à portée, si oui, ne bouge pas
+        if (target != null && !target.isDead()) {
+            double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
+            if (distance <= this.range) {
+                currentState = UnitState.IDLE;
+                this.stateTime += delta;
+                return;
+            }
+        }
+        
+        // Only move and animate if not in combat
+        currentState = UnitState.WALKING;
         this.setSpritePosX(this.posX - this.speed * delta);
         this.moving = true;
         this.stateTime += delta;
@@ -47,7 +76,20 @@ public class CZombie extends Zombie {
 
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = walkLeft.getKeyFrame(stateTime, true);
+        TextureRegion currentFrame;
+        
+        // Choose frame based on current state
+        switch (getCurrentState()) {
+            case ATTACKING:
+            case IDLE:
+                currentFrame = attackFrame;
+                break;
+            case WALKING:
+            default:
+                currentFrame = walkLeft.getKeyFrame(stateTime, true);
+                break;
+        }
+        
         batch.draw(currentFrame, this.posX, this.posY);
     }
 

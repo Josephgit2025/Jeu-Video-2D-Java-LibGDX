@@ -8,6 +8,6 @@ public class SZombie extends Zombie {
         this.speed = 2;
         this.attackDamage = 10; 
         this.attackSpeed = 2;
-        this.range = 3;
+        this.range = 150; // Portée courte pour zombie
     }
 }

@@ -15,9 +15,13 @@ import com.main.entities.Unit;
 
 public class Melee extends Soldier {
     private Animation<TextureRegion> walkAnimation;
+    private Animation<TextureRegion> attackAnimation;
+    private Animation<TextureRegion> idleAnimation;
     private final float frameDuration = 0.2f;
     private float stateTime = 0f;
-    private TextureRegion[] res;
+    private TextureRegion[] walkFrames;
+    private TextureRegion[] attackFrames;
+    private TextureRegion idleFrame;
 
     public Melee(float posX, float posY) {
         super("Melee/Walk1.png", posX, posY);
@@ -25,10 +29,19 @@ public class Melee extends Soldier {
         this.attackDamage = 20;
         this.speed = 100;
         this.attackSpeed = 2;
-        this.range = 80;
-        this.res = loadFrames("Melee/Walk%d.png", 8);
-        this.walkAnimation = new Animation<>(frameDuration, res);
+        this.range = 150; // Portée courte pour mêlée
+        
+        // Load animations
+        this.walkFrames = loadFrames("Melee/Walk%d.png", 8);
+        this.walkAnimation = new Animation<>(frameDuration, walkFrames);
         walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        
+        this.attackFrames = loadFrames("Melee/Attack_%d.png", 3);
+        this.attackAnimation = new Animation<>(0.15f, attackFrames);
+        attackAnimation.setPlayMode(Animation.PlayMode.NORMAL); // Play once
+        
+        Texture idleTex = new Texture(Gdx.files.internal("Melee/Idle.png"));
+        this.idleFrame = new TextureRegion(idleTex);
     }
 
     private TextureRegion[] loadFrames(String pattern, int count) {
@@ -42,12 +55,50 @@ public class Melee extends Soldier {
 
     @Override
     public void render(SpriteBatch batch){
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime,true);
-        batch.draw(currentFrame,posX,posY);
+        TextureRegion currentFrame;
+        
+        // Choose animation based on current state
+        switch (getCurrentState()) {
+            case ATTACKING:
+                currentFrame = attackAnimation.getKeyFrame(stateTime, false);
+                break;
+            case IDLE:
+                currentFrame = idleFrame;
+                break;
+            case WALKING:
+            default:
+                currentFrame = walkAnimation.getKeyFrame(stateTime, true);
+                break;
+        }
+        
+        batch.draw(currentFrame, posX, posY);
     }
 
     @Override
     public void move(float delta){
+        // Update attack animation timer
+        if (attackAnimationTimer > 0) {
+            attackAnimationTimer -= delta;
+            this.stateTime += delta; // Continue attack animation
+            if (attackAnimationTimer <= 0) {
+                currentState = UnitState.WALKING;
+                this.stateTime = 0; // Reset for next animation
+            }
+            return; // Don't move during attack animation
+        }
+        
+        // Check if we need to stop for attack
+        if (target != null && !target.isDead()) {
+            double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
+            if (distance <= this.range) {
+                currentState = UnitState.IDLE;
+                this.stateTime += delta; // Keep animation running
+                return;
+            }
+        }
+        
+        // Only move if not in combat
+        currentState = UnitState.WALKING;
         this.setSpritePosX(this.posX + this.speed * delta);
         this.stateTime = this.stateTime + delta;
     }
