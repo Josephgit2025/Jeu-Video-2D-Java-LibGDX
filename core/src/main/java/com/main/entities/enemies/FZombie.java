@@ -22,6 +22,8 @@ import com.main.weapons.Weapon;
 
 public class FZombie extends Zombie {
     private Animation<TextureRegion> walkLeft;
+    private Animation<TextureRegion> attackAnimation;
+    private TextureRegion idleFrame;
     private float stateTime = 0f;
     private boolean moving = false;
     private List<Texture> loadedTextures = new ArrayList<>();
@@ -29,19 +31,54 @@ public class FZombie extends Zombie {
 
     public FZombie(int posX, int posY) {
         super("zombie/normal/Walk1.png", posX, posY);
-        this.health = 500;
+        this.health = 300;
         this.speed = 80;
-        this.attackDamage = 20; 
-        this.attackSpeed = 3;
-        this.range = 2;
-
+        this.attackDamage = 15;
+        this.attackSpeed = 1;
+        this.range = 150; // Portée courte pour zombie
+        
+        // Load walk animation
         TextureRegion[] leftFrames = loadFrames("zombie/normal/Walk%d.png", 10);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
+        
+        // Load attack animation
+        Texture attackTex = new Texture(Gdx.files.internal("zombie/normal/Attack.png"));
+        this.attackAnimation = new Animation<>(0.2f, new TextureRegion(attackTex));
+        attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
+        
+        // Load idle frame
+        Texture idleTex = new Texture(Gdx.files.internal("zombie/normal/Idle.png"));
+        this.idleFrame = new TextureRegion(idleTex);
     }
 
     @Override
     public void move(float delta) {
+        this.moving = false; // Reset moving state
+        
+        // Update attack animation timer
+        if (attackAnimationTimer > 0) {
+            attackAnimationTimer -= delta;
+            this.stateTime += delta;
+            if (attackAnimationTimer <= 0) {
+                currentState = UnitState.WALKING;
+                this.stateTime = 0;
+            }
+            return;
+        }
+        
+        // Vérifie si une cible est à portée, si oui, ne bouge pas
+        if (target != null && !target.isDead()) {
+            double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
+            if (distance <= this.range) {
+                currentState = UnitState.IDLE;
+                this.stateTime += delta;
+                return;
+            }
+        }
+        
+        // Only move and animate if not in combat
+        currentState = UnitState.WALKING;
         this.setSpritePosX(this.posX - this.speed * delta);
         this.moving = true;
         this.stateTime += delta;
@@ -49,7 +86,22 @@ public class FZombie extends Zombie {
 
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = walkLeft.getKeyFrame(stateTime, true);
+        TextureRegion currentFrame;
+        
+        // Choose animation based on current state
+        switch (getCurrentState()) {
+            case ATTACKING:
+                currentFrame = attackAnimation.getKeyFrame(stateTime, false);
+                break;
+            case IDLE:
+                currentFrame = idleFrame;
+                break;
+            case WALKING:
+            default:
+                currentFrame = walkLeft.getKeyFrame(stateTime, true);
+                break;
+        }
+        
         batch.draw(currentFrame, this.posX, this.posY);
     }
 

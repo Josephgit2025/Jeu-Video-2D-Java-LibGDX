@@ -8,7 +8,7 @@ public class XLZombie extends Zombie {
         this.speed = 1;
         this.attackDamage = 20; 
         this.attackSpeed = 3;
-        this.range = 2;
+        this.range = 150; // Portée courte pour zombie
     }
 
 }

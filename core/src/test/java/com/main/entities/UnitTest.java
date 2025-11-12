@@ -26,6 +26,17 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class UnitTest {
+    @Test
+    public void testAttackTargetOutOfRange() {
+        // Place la cible hors de portée
+        unit.target = enemy2; // enemy2 est loin
+        unit.attackCooldown = 0;
+        int initialHealth = enemy2.health;
+        unit.attack();
+        // L'attaque ne doit pas infliger de dégâts ni changer le cooldown
+        assertEquals(initialHealth, enemy2.health);
+        assertEquals(0, unit.attackCooldown);
+    }
 
     private static HeadlessApplication application;
     private TestUnit unit;
