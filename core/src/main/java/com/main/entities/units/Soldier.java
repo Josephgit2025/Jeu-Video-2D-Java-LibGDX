@@ -12,5 +12,7 @@ public class Soldier extends Unit {
     public void move(float delta){
         // move to the right by default
         this.setSpritePosX(this.posX + this.speed * delta);
+        // advance shared animation timer for simple soldiers that don't override it
+        this.stateTime += delta;
     }
 }

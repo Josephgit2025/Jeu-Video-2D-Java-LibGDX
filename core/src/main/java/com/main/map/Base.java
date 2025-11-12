@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.main.GameScreen;
 import com.main.entities.Unit;
 import com.main.entities.enemies.CZombie;
@@ -31,13 +32,29 @@ public class Base {
     private List<Unit> units; // Unités de cette base
     private Random random;
     private boolean isPlayerBase; // true = spawn soldiers, false = spawn zombies
+    private String name; // Name for debugging
+    private Rectangle collisionBox; // Hitbox de la base (3 tuiles de large x hauteur de la map)
+    private static final int TILE_SIZE = 16; // Taille d'une tuile dans Tiled
+    private static final float SCALE = 2.0f; // Scale de la map
 
-    public Base(int posX, int posY, boolean isPlayerBase) {
+    public Base(int posX, int posY, boolean isPlayerBase, int mapHeight) {
         this.position = new Position(posX, posY);
         lastSpawn = 0.0f;
         this.units = new ArrayList<>();
         random = new Random();
         this.isPlayerBase = isPlayerBase;
+        this.name = isPlayerBase ? "PLAYER BASE" : "ENEMY BASE";
+        
+        // Créer la hitbox : 3 tuiles de large * TILE_SIZE * SCALE, hauteur totale de la map
+        float boxWidth = 3 * TILE_SIZE * SCALE; // 3 tuiles * 16px * 2 = 96px
+        float boxHeight = mapHeight; // Toute la hauteur de la map
+        
+        // Position : pour la base joueur (gauche), pour la base ennemie (droite - 3 tuiles)
+        float boxX = isPlayerBase ? posX : (posX - boxWidth);
+        float boxY = 0; // Du bas de la map
+        
+        this.collisionBox = new Rectangle(boxX, boxY, boxWidth, boxHeight);
+        System.out.println(name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
     }
 
     public int getHealth() {
@@ -53,7 +70,24 @@ public class Base {
     }
 
     public void takeDamage(int damage) {
+        int oldHealth = this.health;
         this.health -= damage;
+        if (this.health < 0) {
+            this.health = 0;
+        }
+        System.out.println(">>> " + name + " takes " + damage + " damage! (HP: " + oldHealth + " -> " + this.health + ")");
+    }
+    
+    public boolean isDestroyed() {
+        return this.health <= 0;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public Rectangle getCollisionBox() {
+        return collisionBox;
     }
 
     public void addUnit(Unit unit) {
@@ -114,15 +148,17 @@ public class Base {
      * Met à jour toutes les unités de cette base
      * @param delta Le temps écoulé
      * @param enemies La liste des ennemis à attaquer
+     * @param enemyBase La base ennemie à attaquer si pas d'ennemis
      */
-    public void updateUnits(float delta, List<Unit> enemies) {
+    public void updateUnits(float delta, List<Unit> enemies, Base enemyBase) {
         // Supprime les unités mortes
         units.removeIf(Unit::isDead);
 
         // Met à jour chaque unité
         for (Unit unit : units) {
-            unit.move(delta);
-            
+            // Set enemy base as target
+            unit.setTargetBase(enemyBase);
+
             // Filtre uniquement les ennemis vivants
             List<Unit> liveEnemies = new ArrayList<>();
             if (enemies != null) {
@@ -132,10 +168,13 @@ public class Base {
                     }
                 }
             }
-            
+
+            // Determine target and update cooldown BEFORE moving so move(delta) sees the correct state
             unit.selectTarget(liveEnemies);
             unit.updateCooldown(delta);
-            unit.attack();
+
+            // Move will handle attack triggering and animation timing internally
+            unit.move(delta);
         }
     }
 }

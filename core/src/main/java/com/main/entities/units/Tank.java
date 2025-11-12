@@ -15,10 +15,10 @@ public class Tank extends Soldier {
     private Animation<TextureRegion> walkAnimation;
     private Animation<TextureRegion> attackAnimation;
     private TextureRegion idleFrame;
-    private float stateTime = 0f;
+    // uses inherited stateTime from Unit
     private boolean moving = false;
     private List<Texture> loadedTextures = new ArrayList<>();
-    private final float FRAME_DURATION = 0.2f;
+    private final float FRAME_DURATION = 0.1f;
 
     public Tank(float posX, float posY) {
         super("Tank/Ride1.png", posX, posY);
@@ -33,20 +33,10 @@ public class Tank extends Soldier {
         walkAnimation = new Animation<>(FRAME_DURATION, walkFrames);
         walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
 
-        // Use spritesheet for attack animation (muzzle flash effect)
-        Texture attackSheet = new Texture(Gdx.files.internal("Tank/right_fire_blue-Sheet.png"));
-        TextureRegion[][] tmp = TextureRegion.split(attackSheet,
-                attackSheet.getWidth() / 3,
-                attackSheet.getHeight() / 1);
-        TextureRegion[] attackFrames = new TextureRegion[3];
-        int index = 0;
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 3; j++) {
-                attackFrames[index++] = tmp[i][j];
-            }
-        }
-        attackAnimation = new Animation<>(0.1f, attackFrames);
-        attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
+    TextureRegion[] attackFrames = loadFrames("Tank/Attack%d.png", 6);
+    attackAnimation = new Animation<>(FRAME_DURATION, attackFrames);
+    // Attack should play once per attack, not loop
+    attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
 
         // Idle is just first frame of walk
         this.idleFrame = walkFrames[0];
@@ -99,21 +89,40 @@ public class Tank extends Soldier {
             }
             return;
         }
-
-        // Check if we need to stop for attack
+        // If there's a living unit target, handle engagement
         if (target != null && !target.isDead()) {
             double distance = Math
                     .sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
             if (distance <= this.range) {
-                currentState = UnitState.IDLE;
-                this.stateTime += delta;
+                // In range: use shared attack logic so damage, cooldown and attack animation
+                // timer are applied
+                if (attackCooldown <= 0f) {
+                    attack();
+                    this.stateTime = 0f;
+                } else {
+                    currentState = UnitState.IDLE;
+                    this.stateTime += delta;
+                }
                 return;
             }
         }
 
-        // Only move and animate if not in combat
+        // If attack animation or cooldown stopped us, check generic stop condition
+        if (shouldStopMoving()) {
+            currentState = UnitState.IDLE;
+            this.stateTime += delta;
+            return;
+        }
+
+        // Default movement: move right (soldier direction) with collision check
         currentState = UnitState.WALKING;
-        this.setSpritePosX(this.posX + this.speed * delta);
-        this.stateTime = this.stateTime + delta;
+        float newX = calculateNewPositionX(delta, 1);
+        this.setSpritePosX(newX);
+        this.stateTime += delta;
+    }
+
+    @Override
+    protected float getAttackAnimationDuration() {
+        return attackAnimation.getAnimationDuration();
     }
 }
