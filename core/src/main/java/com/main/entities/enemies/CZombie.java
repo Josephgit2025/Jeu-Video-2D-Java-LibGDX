@@ -21,7 +21,7 @@ import com.main.weapons.Weapon;
 public class CZombie extends Zombie {
     private Animation<TextureRegion> walkLeft;
     private TextureRegion attackFrame;
-    private float stateTime = 0f;
+    // uses inherited stateTime from Unit
     private boolean moving = false;
     private List<Texture> loadedTextures = new ArrayList<>();
     private final float FRAME_DURATION = 0.2f;
@@ -56,15 +56,24 @@ public class CZombie extends Zombie {
             }
             return;
         }
-        
-        // Check if should stop (using parent logic)
+        // If there's a unit target and it's in range, attack
+        if (target != null && !target.isDead()) {
+            double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
+            if (distance <= this.range) {
+                attack();
+                this.stateTime += delta;
+                return;
+            }
+        }
+
+        // If should stop (eg base in range or attack animation), idle
         if (shouldStopMoving()) {
             currentState = UnitState.IDLE;
             this.stateTime += delta;
             return;
         }
-        
-        // Move left (zombies direction) with collision check
+
+        // Default: move left (zombies direction) with collision check
         currentState = UnitState.WALKING;
         float newX = calculateNewPositionX(delta, -1); // -1 for left movement
         this.setSpritePosX(newX);
@@ -99,5 +108,10 @@ public class CZombie extends Zombie {
             frames[i] = new TextureRegion(tex);
         }
         return frames;
+    }
+
+    @Override
+    protected float getAttackAnimationDuration() {
+        return FRAME_DURATION;
     }
 }

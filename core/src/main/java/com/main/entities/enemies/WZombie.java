@@ -10,11 +10,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
 
-
 public class WZombie extends Zombie {
     private Animation<TextureRegion> walkLeft;
     private TextureRegion attackFrame; // Use first walk frame as attack
-    private float stateTime = 0f;
+    // uses inherited stateTime from Unit
     private boolean moving = false;
     private List<Texture> loadedTextures = new ArrayList<>();
     private final float FRAME_DURATION = 0.2f;
@@ -26,11 +25,11 @@ public class WZombie extends Zombie {
         this.attackDamage = 20;
         this.attackSpeed = 0.8f; // 0.8 seconds between attacks (fast zombie)
         this.range = 50; // Portée égale au Melee
-        
+
         TextureRegion[] leftFrames = loadFrames("zombie/women/Walk%d.png", 7);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
-        
+
         // Use first frame as attack pose
         this.attackFrame = leftFrames[0];
     }
@@ -38,7 +37,7 @@ public class WZombie extends Zombie {
     @Override
     public void move(float delta) {
         this.moving = false; // Reset moving state
-        
+
         // Update attack animation timer
         if (attackAnimationTimer > 0) {
             attackAnimationTimer -= delta;
@@ -49,15 +48,25 @@ public class WZombie extends Zombie {
             }
             return;
         }
-        
-        // Check if should stop (using parent logic)
+        // If there's a target and it's in range, attack using shared logic
+        if (target != null && !target.isDead()) {
+            double distance = Math
+                    .sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
+            if (distance <= this.range) {
+                attack();
+                this.stateTime += delta;
+                return;
+            }
+        }
+
+        // If should stop (eg base in range or attack animation), idle
         if (shouldStopMoving()) {
             currentState = UnitState.IDLE;
             this.stateTime += delta;
             return;
         }
-        
-        // Move left (zombies direction) with collision check
+
+        // Default: move left towards enemy base
         currentState = UnitState.WALKING;
         float newX = calculateNewPositionX(delta, -1); // -1 for left movement
         this.setSpritePosX(newX);
@@ -68,7 +77,7 @@ public class WZombie extends Zombie {
     @Override
     public void render(SpriteBatch batch) {
         TextureRegion currentFrame;
-        
+
         // Choose frame based on current state
         switch (getCurrentState()) {
             case ATTACKING:
@@ -80,8 +89,13 @@ public class WZombie extends Zombie {
                 currentFrame = walkLeft.getKeyFrame(stateTime, true);
                 break;
         }
-        
+
         batch.draw(currentFrame, this.posX, this.posY);
+    }
+
+    @Override
+    protected float getAttackAnimationDuration() {
+        return FRAME_DURATION;
     }
 
     private TextureRegion[] loadFrames(String pattern, int count) {

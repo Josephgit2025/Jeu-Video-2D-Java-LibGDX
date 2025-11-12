@@ -158,9 +158,7 @@ public class Base {
         for (Unit unit : units) {
             // Set enemy base as target
             unit.setTargetBase(enemyBase);
-            
-            unit.move(delta);
-            
+
             // Filtre uniquement les ennemis vivants
             List<Unit> liveEnemies = new ArrayList<>();
             if (enemies != null) {
@@ -170,10 +168,13 @@ public class Base {
                     }
                 }
             }
-            
+
+            // Determine target and update cooldown BEFORE moving so move(delta) sees the correct state
             unit.selectTarget(liveEnemies);
             unit.updateCooldown(delta);
-            unit.attack();
+
+            // Move will handle attack triggering and animation timing internally
+            unit.move(delta);
         }
     }
 }
