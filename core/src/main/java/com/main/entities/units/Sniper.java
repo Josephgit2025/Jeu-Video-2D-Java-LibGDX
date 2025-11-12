@@ -20,8 +20,8 @@ public class Sniper extends Soldier {
         this.health = 150;
         this.attackDamage = 40;
         this.speed = 30;
-        this.attackSpeed = 3;
-        this.range = 500; // Portée longue pour sniper
+        this.attackSpeed = 2.5f; // 2.5 seconds between attacks (slower sniper fire)
+        this.range = 250; // Portée longue pour sniper
         
         // Load animations
         TextureRegion[] walkFrames = loadFrames("Sniper/Walk%d.png", 8);

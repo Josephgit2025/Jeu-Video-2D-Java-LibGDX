@@ -21,13 +21,13 @@ public abstract class Unit {
     protected Sprite sprite;
     protected int health;
     protected int attackDamage;
-    protected int attackSpeed;
+    protected float attackSpeed; // Time in seconds between attacks
     protected float speed;
     protected Unit target;
     // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la
     // classe Effect si nécessaire
     protected int range;
-    protected int attackCooldown = 0;
+    protected float attackCooldown = 0f; // Current cooldown in seconds
     protected Texture texture;
     protected float width, height;
     
@@ -91,7 +91,7 @@ public abstract class Unit {
         return attackDamage;
     }
 
-    public int getAttackSpeed() {
+    public float getAttackSpeed() {
         return attackSpeed;
     }
 
@@ -103,7 +103,7 @@ public abstract class Unit {
         return range;
     }
 
-    public int getAttackCooldown() {
+    public float getAttackCooldown() {
         return attackCooldown;
     }
 
@@ -218,9 +218,12 @@ public abstract class Unit {
     /**
      * Met à jour le cooldown d'attaque
      */
-    public void updateCooldown() {
+    public void updateCooldown(float delta) {
         if (attackCooldown > 0) {
-            attackCooldown--;
+            attackCooldown -= delta; // Decrement by time in seconds
+            if (attackCooldown < 0) {
+                attackCooldown = 0;
+            }
         }
     }
 

@@ -28,8 +28,8 @@ public class Melee extends Soldier {
         this.health = 200;
         this.attackDamage = 20;
         this.speed = 100;
-        this.attackSpeed = 2;
-        this.range = 150; // Portée courte pour mêlée
+        this.attackSpeed = 1.0f; // 1 second between attacks
+        this.range = 50; // Portée courte pour mêlée
         
         // Load animations
         this.walkFrames = loadFrames("Melee/Walk%d.png", 8);

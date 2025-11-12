@@ -28,11 +28,11 @@ public class CZombie extends Zombie {
 
     public CZombie(int posX, int posY) {
         super("zombie/crawl/Walk1.png", posX, posY);
-        this.health = 100;
+        this.health = 300; // Augmenté pour être plus résistant
         this.speed = 40;
-        this.attackDamage = 5;
-        this.attackSpeed = 1;
-        this.range = 150; // Portée courte pour zombie
+        this.attackDamage = 15;
+        this.attackSpeed = 1.2f; // 1.2 seconds between attacks (slower zombie)
+        this.range = 50; // Portée égale au Melee
 
         TextureRegion[] leftFrames = loadFrames("zombie/crawl/Walk%d.png", 10);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);

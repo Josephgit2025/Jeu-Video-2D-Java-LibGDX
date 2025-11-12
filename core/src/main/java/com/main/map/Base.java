@@ -134,7 +134,7 @@ public class Base {
             }
             
             unit.selectTarget(liveEnemies);
-            unit.updateCooldown();
+            unit.updateCooldown(delta);
             unit.attack();
         }
     }

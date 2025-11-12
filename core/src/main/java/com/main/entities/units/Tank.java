@@ -27,8 +27,8 @@ public class Tank extends Soldier {
         this.health = 500;
         this.attackDamage = 30;
         this.speed = 15;
-        this.attackSpeed = 3;
-        this.range = 200; // Portée moyenne
+        this.attackSpeed = 3.0f; // 3 seconds between attacks (slow heavy weapon)
+        this.range = 100; // Portée moyenne
         
         // Load walk animation
         TextureRegion[] walkFrames = loadFrames("Tank/Ride%d.png", 2);

@@ -21,11 +21,11 @@ public class WZombie extends Zombie {
 
     public WZombie(int posX, int posY) {
         super("zombie/women/Walk1.png", posX, posY);
-        this.health = 200;
+        this.health = 350; // Augmenté pour être plus résistant
         this.speed = 130;
-        this.attackDamage = 10;
-        this.attackSpeed = 2;
-        this.range = 150; // Portée courte pour zombie
+        this.attackDamage = 20;
+        this.attackSpeed = 0.8f; // 0.8 seconds between attacks (fast zombie)
+        this.range = 50; // Portée égale au Melee
         
         TextureRegion[] leftFrames = loadFrames("zombie/women/Walk%d.png", 7);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
