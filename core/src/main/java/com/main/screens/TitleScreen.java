@@ -161,11 +161,8 @@ public class TitleScreen implements Screen {
             float textX = (WORLD_WIDTH - layout.width) / 2f;
             float textHeight = layout.height;
 
-            // Fixed: proper bounding box check
-            // The text is drawn at (textX, textY), so the bottom is at textY and top is at textY + textHeight
-            if (mx >= textX && mx <= textX + layout.width && my >= textY && my <= textY + textHeight) {
+            if (mx >= textX && mx <= textX + layout.width && my >= textY - textHeight && my <= textY)
                 selectedIndex = i;
-            }
         }
     }
 
