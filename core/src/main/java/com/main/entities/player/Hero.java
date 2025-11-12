@@ -33,28 +33,28 @@ public class Hero extends Unit {
     private boolean moving = false;
     private Direction direction = Direction.DOWN;
     private List<Texture> loadedTextures = new ArrayList<>();
-    private final float FRAME_DURATION = 0.08f;
-    private final float FRAME_DURATIONW = 0.15f;
+    private final float FRAME_DURATION = 0.12f;
+    private final float FRAME_DURATIONW = 0.12f;
 
     public Hero(float posX, float posY, WarMap map) {
-        super("units/hero/down1n.png", posX, posY);
+        super("sold/down1.png", posX, posY);
 
-        TextureRegion[] rightFrames = loadFrames("units/hero/right%d.png", 8);
+        TextureRegion[] rightFrames = loadFrames("sold/right%d.png", 8);
         walkRight = new Animation<>(FRAME_DURATION, rightFrames);
         walkRight.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] leftFrames = loadFrames("units/hero/left%d.png",
+        TextureRegion[] leftFrames = loadFrames("sold/left%d.png",
                 8);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] upFrames = loadFrames("units/hero/up%dn.png",
-                4);
+        TextureRegion[] upFrames = loadFrames("sold/up%d.png",
+                8);
         walkUp = new Animation<>(FRAME_DURATIONW, upFrames);
         walkUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] downFrames = loadFrames("units/hero/down%dn.png",
-                3);
+        TextureRegion[] downFrames = loadFrames("sold/down%d.png",
+                8);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
         this.health = 500;
@@ -112,7 +112,7 @@ public class Hero extends Unit {
 
     public void moveUp(float delta, float mapHeight) {
         float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
-        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)){
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
             if (newY + this.height > mapHeight) {
                 this.setSpritePosY(mapHeight - this.height);
             } else {
@@ -154,8 +154,8 @@ public class Hero extends Unit {
         }
     }
 
-    public void setWeapon(Weapon weapon){
-        if (weapon != null){
+    public void setWeapon(Weapon weapon) {
+        if (weapon != null) {
             this.weapon = weapon;
         }
     }
@@ -179,29 +179,39 @@ public class Hero extends Unit {
 
     public void render(SpriteBatch batch) {
         TextureRegion currentFrame;
+        float visualWidth;
+        float visualHeight;
+
         switch (direction) {
             case RIGHT:
                 currentFrame = walkRight.getKeyFrame(stateTime, true);
+                visualWidth = 50;
+                visualHeight = 50;
                 break;
             case LEFT:
                 currentFrame = walkLeft.getKeyFrame(stateTime, true);
+                visualWidth = 50;
+                visualHeight = 50;
                 break;
             case UP:
                 currentFrame = walkUp.getKeyFrame(stateTime, true);
+                visualWidth = 30;
+                visualHeight = 50;
                 break;
             default:
                 currentFrame = walkDown.getKeyFrame(stateTime, true);
+                visualWidth = 30;
+                visualHeight = 50;
                 break;
         }
-        
+
         // Dessiner le sprite plus grand visuellement (90x90) mais hitbox reste 32x48
-        float visualWidth = 90;
-        float visualHeight = 90;
-        
-        // Centrer horizontalement et aligner les pieds du sprite avec le bas de la hitbox
+
+        // Centrer horizontalement et aligner les pieds du sprite avec le bas de la
+        // hitbox
         float offsetX = (this.width - visualWidth) / 2;
         float offsetY = 0; // Aligner le bas du sprite avec le bas de la hitbox (pieds alignés)
-        
+
         batch.draw(currentFrame, this.posX + offsetX, this.posY + offsetY, visualWidth, visualHeight);
     }
 
