@@ -57,19 +57,17 @@ public class CZombie extends Zombie {
             return;
         }
         
-        // Vérifie si une cible est à portée, si oui, ne bouge pas
-        if (target != null && !target.isDead()) {
-            double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
-            if (distance <= this.range) {
-                currentState = UnitState.IDLE;
-                this.stateTime += delta;
-                return;
-            }
+        // Check if should stop (using parent logic)
+        if (shouldStopMoving()) {
+            currentState = UnitState.IDLE;
+            this.stateTime += delta;
+            return;
         }
         
-        // Only move and animate if not in combat
+        // Move left (zombies direction) with collision check
         currentState = UnitState.WALKING;
-        this.setSpritePosX(this.posX - this.speed * delta);
+        float newX = calculateNewPositionX(delta, -1); // -1 for left movement
+        this.setSpritePosX(newX);
         this.moving = true;
         this.stateTime += delta;
     }

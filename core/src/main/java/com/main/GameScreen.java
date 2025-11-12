@@ -50,8 +50,8 @@ public class GameScreen implements Screen {
         hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.mapWidth = map.getMapWidthInPixels();
         this.mapHeight = map.getMapHeightInPixels();
-        this.enemyBase = new Base(this.mapWidth, 300, false); // false = spawn zombies
-        this.playerBase = new Base(0, 300, true); // true = spawn soldiers
+        this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
+        this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
     }
 
     @Override
@@ -129,6 +129,26 @@ public class GameScreen implements Screen {
                 }
             }
             
+            // Draw bases (blue for player, orange for enemy)
+            shapeRenderer.setColor(0, 0, 1, 0.7f); // Blue for player base
+            shapeRenderer.circle(playerBase.getPosition().getPosX(), 
+                                playerBase.getPosition().getPosY(), 
+                                50); // Base visual size
+            
+            shapeRenderer.setColor(1, 0.5f, 0, 0.7f); // Orange for enemy base
+            shapeRenderer.circle(enemyBase.getPosition().getPosX(), 
+                                enemyBase.getPosition().getPosY(), 
+                                50); // Base visual size
+            
+            // Draw base collision hitboxes (purple for player, yellow for enemy)
+            shapeRenderer.setColor(0.5f, 0, 0.5f, 0.5f); // Purple for player base hitbox
+            com.badlogic.gdx.math.Rectangle playerBox = playerBase.getCollisionBox();
+            shapeRenderer.rect(playerBox.x, playerBox.y, playerBox.width, playerBox.height);
+            
+            shapeRenderer.setColor(1, 1, 0, 0.5f); // Yellow for enemy base hitbox
+            com.badlogic.gdx.math.Rectangle enemyBox = enemyBase.getCollisionBox();
+            shapeRenderer.rect(enemyBox.x, enemyBox.y, enemyBox.width, enemyBox.height);
+            
             shapeRenderer.end();
         }
         
@@ -170,9 +190,19 @@ public class GameScreen implements Screen {
             playerBase.addUnit(tmpAlly);
         }
         
-        // Update : les ennemis attaquent les alliés et vice-versa
-        enemyBase.updateUnits(delta, playerBase.getUnits());
-        playerBase.updateUnits(delta, enemyBase.getUnits());
+        // Update : les ennemis attaquent les alliés (et leur base) et vice-versa
+        enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase);
+        playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase);
+        
+        // Check for game over conditions
+        if (playerBase.isDestroyed()) {
+            System.out.println("GAME OVER - Player base destroyed!");
+            // TODO: Implement game over screen
+        }
+        if (enemyBase.isDestroyed()) {
+            System.out.println("VICTORY - Enemy base destroyed!");
+            // TODO: Implement victory screen
+        }
         
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
