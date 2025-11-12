@@ -28,7 +28,7 @@ public class hud implements Disposable {
     private healthbar healthBar;
     
     // Gold display
-    private int gold;
+    private gold goldDisplay;
     
     // UI positions and dimensions
     private static final float HEALTH_BAR_X = 20f;
@@ -52,11 +52,11 @@ public class hud implements Disposable {
         font.setColor(Color.WHITE);
         font.getData().setScale(1.5f);
         
-        // Initialize health bar
-        healthBar = new healthbar(HEALTH_BAR_X, HEALTH_BAR_Y, 200f, 30f);
+        // Initialize health bar with heart icon
+        healthBar = new healthbar(HEALTH_BAR_X, HEALTH_BAR_Y, 200f, 30f, "ui/heart.png");
         
-        // Initialize gold
-        gold = 0;
+        // Initialize gold display with coin icon
+        goldDisplay = new gold(GOLD_X, GOLD_Y, "ui/gold.png");
     }
     
     /**
@@ -67,7 +67,7 @@ public class hud implements Disposable {
      */
     public void update(int currentHealth, int maxHealth, int currentGold) {
         healthBar.update(currentHealth, maxHealth);
-        this.gold = currentGold;
+        goldDisplay.update(currentGold);
     }
     
     /**
@@ -81,13 +81,11 @@ public class hud implements Disposable {
         shapeRenderer.setProjectionMatrix(camera.combined);
         batch.setProjectionMatrix(camera.combined);
         
-        // Render health bar
-        healthBar.render(shapeRenderer);
+        // Render health bar with heart icon
+        healthBar.render(shapeRenderer, batch);
         
-        // Render gold display
-        batch.begin();
-        font.draw(batch, "Gold: " + gold, GOLD_X, GOLD_Y);
-        batch.end();
+        // Render gold display with coin icon
+        goldDisplay.render(batch);
     }
     
     /**
@@ -105,7 +103,7 @@ public class hud implements Disposable {
      * @param amount Amount to add
      */
     public void addGold(int amount) {
-        this.gold += amount;
+        goldDisplay.addGold(amount);
     }
     
     /**
@@ -114,11 +112,7 @@ public class hud implements Disposable {
      * @return true if successful, false if not enough gold
      */
     public boolean removeGold(int amount) {
-        if (this.gold >= amount) {
-            this.gold -= amount;
-            return true;
-        }
-        return false;
+        return goldDisplay.removeGold(amount);
     }
     
     /**
@@ -126,7 +120,7 @@ public class hud implements Disposable {
      * @return Current gold
      */
     public int getGold() {
-        return gold;
+        return goldDisplay.getGold();
     }
     
     /**
@@ -134,7 +128,7 @@ public class hud implements Disposable {
      * @param gold Gold amount to set
      */
     public void setGold(int gold) {
-        this.gold = gold;
+        goldDisplay.setGold(gold);
     }
     
     @Override
@@ -143,5 +137,6 @@ public class hud implements Disposable {
         shapeRenderer.dispose();
         font.dispose();
         healthBar.dispose();
+        goldDisplay.dispose();
     }
 }

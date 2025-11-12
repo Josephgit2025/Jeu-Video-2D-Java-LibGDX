@@ -27,6 +27,10 @@ public class Hero extends Unit {
     protected int dexterity;
     protected int agility;
     protected Weapon weapon;
+    
+    // Gold system
+    protected int gold = 0;
+    protected int maxHealth = 500;
     private WarMap map;
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
     private float stateTime = 0f;
@@ -209,6 +213,82 @@ public class Hero extends Unit {
     public void move(float delta) {
         // Hero movement is handled via specific methods (moveUp/moveDown/etc.)
         // This default implementation does nothing.
+    }
+
+    // === HEALTH SYSTEM ===
+    
+    /**
+     * Get current health
+     * @return Current health value
+     */
+    public int getCurrentHealth() {
+        return this.health;
+    }
+    
+    /**
+     * Get maximum health
+     * @return Maximum health value
+     */
+    public int getMaxHealth() {
+        return this.maxHealth;
+    }
+    
+    /**
+     * Set maximum health
+     * @param maxHealth New maximum health
+     */
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+        if (this.health > maxHealth) {
+            this.health = maxHealth;
+        }
+    }
+    
+    /**
+     * Heal the hero
+     * @param amount Amount to heal
+     */
+    public void heal(int amount) {
+        this.health = Math.min(maxHealth, this.health + amount);
+    }
+    
+    // === GOLD SYSTEM ===
+    
+    /**
+     * Get current gold amount
+     * @return Current gold
+     */
+    public int getGold() {
+        return this.gold;
+    }
+    
+    /**
+     * Set gold amount directly
+     * @param gold Gold amount to set
+     */
+    public void setGold(int gold) {
+        this.gold = Math.max(0, gold);
+    }
+    
+    /**
+     * Add gold to current amount
+     * @param amount Amount to add
+     */
+    public void addGold(int amount) {
+        this.gold += amount;
+    }
+    
+    /**
+     * Remove gold from current amount
+     * @param amount Amount to remove
+     * @return true if successful, false if not enough gold
+     */
+    public boolean removeGold(int amount) {
+        if (this.gold >= amount) {
+            this.gold -= amount;
+            return true;
+        }
+        return false;
     }
 
 }

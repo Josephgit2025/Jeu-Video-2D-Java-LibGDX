@@ -1,6 +1,8 @@
 package com.ui;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -23,6 +25,10 @@ public class healthbar implements Disposable {
     
     // Visual components
     private BitmapFont font;
+    private Texture heartIcon;
+    private boolean hasIcon;
+    private static final float ICON_SIZE = 28f;
+    private static final float ICON_OFFSET = 35f;
     
     // Colors
     private static final Color BACKGROUND_COLOR = new Color(0.3f, 0.3f, 0.3f, 0.8f); // Dark gray
@@ -35,7 +41,7 @@ public class healthbar implements Disposable {
     private static final float BORDER_THICKNESS = 2f;
     
     /**
-     * Constructor for HealthBar
+     * Constructor for HealthBar without icon
      * @param x X position (top-left corner)
      * @param y Y position (top-left corner)
      * @param width Width of the health bar
@@ -48,11 +54,31 @@ public class healthbar implements Disposable {
         this.height = height;
         this.currentHealth = 100;
         this.maxHealth = 100;
+        this.hasIcon = false;
         
         // Initialize font for text display
         font = new BitmapFont();
         font.setColor(Color.WHITE);
         font.getData().setScale(1.2f);
+    }
+    
+    /**
+     * Constructor for HealthBar with heart icon
+     * @param x X position (top-left corner)
+     * @param y Y position (top-left corner)
+     * @param width Width of the health bar
+     * @param height Height of the health bar
+     * @param heartIconPath Path to heart icon texture
+     */
+    public healthbar(float x, float y, float width, float height, String heartIconPath) {
+        this(x, y, width, height);
+        try {
+            this.heartIcon = new Texture(heartIconPath);
+            this.hasIcon = true;
+        } catch (Exception e) {
+            System.err.println("Could not load heart icon: " + heartIconPath);
+            this.hasIcon = false;
+        }
     }
     
     /**
@@ -98,11 +124,18 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Render the health bar with text
+     * Render the health bar with text and optional heart icon
      * @param shapeRenderer ShapeRenderer for drawing shapes
-     * @param batch SpriteBatch for drawing text
+     * @param batch SpriteBatch for drawing text and icon
      */
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
+        // Draw heart icon if available
+        if (hasIcon && heartIcon != null) {
+            batch.begin();
+            batch.draw(heartIcon, x - ICON_OFFSET, y - 2, ICON_SIZE, ICON_SIZE);
+            batch.end();
+        }
+        
         // Render the bar
         render(shapeRenderer);
         
@@ -167,5 +200,8 @@ public class healthbar implements Disposable {
     @Override
     public void dispose() {
         font.dispose();
+        if (heartIcon != null) {
+            heartIcon.dispose();
+        }
     }
 }

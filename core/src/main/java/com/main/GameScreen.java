@@ -13,6 +13,7 @@ import com.main.entities.Unit;
 import com.main.entities.player.Hero;
 import com.main.map.Base;
 import com.main.map.WarMap;
+import com.ui.hud;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -30,6 +31,7 @@ public class GameScreen implements Screen {
     private Base playerBase;
     private int mapWidth;
     private int mapHeight;
+    private hud hudDisplay;
 
     private enum Direction {
         UP, DOWN, LEFT, RIGHT
@@ -51,6 +53,9 @@ public class GameScreen implements Screen {
         this.mapHeight = map.getMapHeightInPixels();
         this.enemyBase = new Base(this.mapWidth, 300);
         this.playerBase = new Base(0, 300);
+        
+        // Initialize HUD
+        this.hudDisplay = new hud();
     }
 
     @Override
@@ -99,6 +104,10 @@ public class GameScreen implements Screen {
         hero.render(batch);
         batch.end();
         
+        // Render HUD (after game rendering)
+        hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
+        hudDisplay.render();
+        
         // DEBUG: Dessiner les rectangles de collision (décommenter pour debug)
         /*
         shapeRenderer.setProjectionMatrix(camera.combined);
@@ -129,6 +138,7 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        hudDisplay.resize(width, height);
     }
 
     @Override
@@ -155,6 +165,8 @@ public class GameScreen implements Screen {
             hero.dispose();
         if (map != null)
             map.dispose();
+        if (hudDisplay != null)
+            hudDisplay.dispose();
     }
 
     public SpriteBatch getBatch() {
