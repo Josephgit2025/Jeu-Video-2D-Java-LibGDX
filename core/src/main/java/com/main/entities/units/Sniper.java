@@ -1,12 +1,10 @@
 package com.main.entities.units;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.main.entities.Unit;
 
 public class Sniper extends Soldier {
     private Animation<TextureRegion> walkAnimation;
@@ -103,9 +101,18 @@ public class Sniper extends Soldier {
         }
 
         // Only move and animate if not in combat
+        // Check if should stop (using parent logic)
+        if (shouldStopMoving()) {
+            currentState = UnitState.IDLE;
+            this.stateTime += delta;
+            return;
+        }
+
+        // Move right (soldiers direction) with collision check
         currentState = UnitState.WALKING;
-        this.setSpritePosX(this.posX + this.speed * delta);
-        this.stateTime = this.stateTime + delta;
+        float newX = calculateNewPositionX(delta, 1);
+        this.setSpritePosX(newX);
+        this.stateTime += delta;
     }
 
     @Override

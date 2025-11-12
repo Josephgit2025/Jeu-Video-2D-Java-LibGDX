@@ -1,17 +1,10 @@
 package com.main.entities.units;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.main.entities.player.Ability;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.main.entities.Unit;
 
 public class Melee extends Soldier {
     private Animation<TextureRegion> walkAnimation;
@@ -117,7 +110,14 @@ public class Melee extends Soldier {
 
         // No target: walk forward (player soldiers move to the right by default)
         currentState = UnitState.WALKING;
-        this.setSpritePosX(this.posX + this.speed * delta);
+        this.setSpritePosX(this.posX + this.speed * delta);        
+        // Check if should stop (using parent logic)
+        if (shouldStopMoving()) {
+            currentState = UnitState.IDLE;
+            this.stateTime += delta;
+            return;
+        }
+    
         this.stateTime += delta;
     }
 

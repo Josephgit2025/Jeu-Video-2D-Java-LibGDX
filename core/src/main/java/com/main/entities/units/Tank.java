@@ -89,8 +89,7 @@ public class Tank extends Soldier {
             }
             return;
         }
-
-        // Check if we need to stop for attack
+        // If there's a living unit target, handle engagement
         if (target != null && !target.isDead()) {
             double distance = Math
                     .sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
@@ -108,10 +107,18 @@ public class Tank extends Soldier {
             }
         }
 
-        // Only move and animate if not in combat
+        // If attack animation or cooldown stopped us, check generic stop condition
+        if (shouldStopMoving()) {
+            currentState = UnitState.IDLE;
+            this.stateTime += delta;
+            return;
+        }
+
+        // Default movement: move right (soldier direction) with collision check
         currentState = UnitState.WALKING;
-        this.setSpritePosX(this.posX + this.speed * delta);
-        this.stateTime = this.stateTime + delta;
+        float newX = calculateNewPositionX(delta, 1);
+        this.setSpritePosX(newX);
+        this.stateTime += delta;
     }
 
     @Override
