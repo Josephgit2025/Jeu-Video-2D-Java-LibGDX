@@ -25,8 +25,8 @@ public class gold implements Disposable {
     private boolean hasIcon;
     
     // Display settings
-    private static final float ICON_SIZE = 24f;
-    private static final float TEXT_OFFSET_X = 30f; // Offset for text if icon is present
+    private static final float ICON_SIZE = 26f;
+    private static final float TEXT_OFFSET_X = 32f; // Offset for text if icon is present
     
     // Colors
     private static final Color GOLD_COLOR = new Color(1f, 0.84f, 0f, 1f); // Gold color
@@ -87,9 +87,11 @@ public class gold implements Disposable {
         
         float textX = x;
         
-        // Draw coin icon if available
+        // Draw coin icon if available (aligned vertically with text)
         if (hasIcon && coinIcon != null) {
-            batch.draw(coinIcon, x, y - ICON_SIZE / 2, ICON_SIZE, ICON_SIZE);
+            // Calculate vertical center alignment with the text
+            float iconY = y - font.getLineHeight() / 2 - ICON_SIZE / 2 + 2;
+            batch.draw(coinIcon, x, iconY, ICON_SIZE, ICON_SIZE);
             textX += TEXT_OFFSET_X;
         }
         

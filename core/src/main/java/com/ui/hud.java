@@ -31,10 +31,10 @@ public class hud implements Disposable {
     private gold goldDisplay;
     
     // UI positions and dimensions
-    private static final float HEALTH_BAR_X = 20f;
+    private static final float HEALTH_BAR_X = 50f;
     private static final float HEALTH_BAR_Y = 550f;
-    private static final float GOLD_X = 20f;
-    private static final float GOLD_Y = 520f;
+    private static final float GOLD_X = 50f;
+    private static final float GOLD_Y = 515f;
     
     /**
      * Constructor for HUD

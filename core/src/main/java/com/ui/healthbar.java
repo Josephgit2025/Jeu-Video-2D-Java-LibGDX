@@ -27,8 +27,8 @@ public class healthbar implements Disposable {
     private BitmapFont font;
     private Texture heartIcon;
     private boolean hasIcon;
-    private static final float ICON_SIZE = 28f;
-    private static final float ICON_OFFSET = 35f;
+    private static final float ICON_SIZE = 26f;
+    private static final float ICON_OFFSET = 32f;
     
     // Colors
     private static final Color BACKGROUND_COLOR = new Color(0.3f, 0.3f, 0.3f, 0.8f); // Dark gray
@@ -129,10 +129,10 @@ public class healthbar implements Disposable {
      * @param batch SpriteBatch for drawing text and icon
      */
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        // Draw heart icon if available
+        // Draw heart icon if available (aligned vertically with the bar)
         if (hasIcon && heartIcon != null) {
             batch.begin();
-            batch.draw(heartIcon, x - ICON_OFFSET, y - 2, ICON_SIZE, ICON_SIZE);
+            batch.draw(heartIcon, x - ICON_OFFSET, y + (height - ICON_SIZE) / 2, ICON_SIZE, ICON_SIZE);
             batch.end();
         }
         
