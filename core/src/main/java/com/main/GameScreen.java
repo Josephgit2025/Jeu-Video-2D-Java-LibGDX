@@ -58,6 +58,8 @@ public class GameScreen implements Screen {
         this.mapHeight = map.getMapHeightInPixels();
         this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
+        // Initialize HUD
+        this.hudDisplay = new hud();
     }
 
     @Override
@@ -276,7 +278,9 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
-        hudDisplay.resize(width, height);
+        if (hudDisplay != null) {
+            hudDisplay.resize(width, height);
+        }
     }
 
     @Override
