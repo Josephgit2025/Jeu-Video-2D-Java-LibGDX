@@ -3,6 +3,7 @@ package com.main.entities.units;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Melee extends Soldier {
@@ -14,20 +15,32 @@ public class Melee extends Soldier {
         this.speed = 100;
         this.attackSpeed = 1.0f; // 1 second between attacks
         this.range = 50; // Portée courte pour mêlée
-        
+
         // Load walk animation
         TextureRegion[] walkFrames = loadFrames("Melee/Walk%d.png", 8);
         this.walkAnimation = new Animation<>(FRAME_DURATION, walkFrames);
         walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
-        
+
         // Load attack animation
-        TextureRegion[] attackFrames = loadFrames("Melee/Attack_%d.png", 3);
+        TextureRegion[] attackFrames = loadFrames("Melee/Attack_%d.png", 10);
         this.attackAnimation = new Animation<>(0.15f, attackFrames);
         attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
-        
+
         // Load idle frame
-        Texture idleTex = new Texture(Gdx.files.internal("Melee/Idle.png"));
+        Texture idleTex = new Texture(Gdx.files.internal("Melee/Walk1.png"));
         loadedTextures.add(idleTex);
         this.idleFrame = new TextureRegion(idleTex);
+    }
+
+    @Override
+    public void attack() {
+        // Call base attack to apply damage/cooldown and set ATTACKING state
+        super.attack();
+        // If base set ATTACKING, override animation duration to the real animation
+        // length
+        if (currentState == UnitState.ATTACKING) {
+            attackAnimationTimer = attackAnimation.getAnimationDuration();
+            stateTime = 0f;
+        }
     }
 }
