@@ -199,6 +199,33 @@ public class GameScreen implements Screen {
     }
 
     private void update(float delta) {
+        // Check if hero is dead
+        if (hero.getCurrentHealth() <= 0 && gameState == GameState.PLAYING) {
+            gameState = GameState.GAME_OVER;
+            System.out.println("GAME OVER - Hero died!");
+        }
+        
+        // Handle Game Over clicks
+        if (gameState == GameState.GAME_OVER && com.badlogic.gdx.Gdx.input.justTouched()) {
+            String action = gameOverOverlay.handleClick(
+                com.badlogic.gdx.Gdx.input.getX(), 
+                com.badlogic.gdx.Gdx.input.getY()
+            );
+            
+            if ("replay".equals(action)) {
+                System.out.println("Replay clicked!");
+                reset();
+            } else if ("quit".equals(action)) {
+                System.out.println("Quit clicked!");
+                game.setScreen(new com.main.screens.TitleScreen(game));
+            }
+        }
+        
+        // Don't update game if Game Over
+        if (gameState == GameState.GAME_OVER) {
+            return;
+        }
+        
         // Toggle range display with 'R' key
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.R)) {
             showRanges = !showRanges;
