@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -161,8 +162,17 @@ public class TitleScreen implements Screen {
             float textX = (WORLD_WIDTH - layout.width) / 2f;
             float textHeight = layout.height;
 
-            if (mx >= textX && mx <= textX + layout.width && my >= textY - textHeight && my <= textY)
+            // Créer un rectangle de collision avec des marges
+            com.badlogic.gdx.math.Rectangle buttonRect = new com.badlogic.gdx.math.Rectangle(
+                textX - 10,
+                textY - textHeight - 5,
+                layout.width + 20,
+                textHeight + 10
+            );
+            
+            if (buttonRect.contains(mx, my)) {
                 selectedIndex = i;
+            }
         }
     }
 
