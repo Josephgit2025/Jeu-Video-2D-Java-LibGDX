@@ -22,17 +22,13 @@ public class Tank extends Soldier {
         walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
 
         // Use spritesheet for attack animation (muzzle flash effect)
-        TextureRegion[] attackFrames = loadFrames("Tank/Attack%d.png", 6);
+        TextureRegion[] attackFrames = loadFrames("Tank/Attack%d.png", 7);
         attackAnimation = new Animation<>(FRAME_DURATION, attackFrames);
         // Attack should play once per attack, not loop
         attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
 
         // Idle: reuse walk frames if no dedicated idle frames are provided
-        if (walkFrames != null && walkFrames.length > 0) {
-            this.idleFrame = walkFrames[0];
-            this.idleFramer = new Animation<>(FRAME_DURATION, walkFrames);
-            this.idleFramer.setPlayMode(Animation.PlayMode.LOOP);
-        }
+        this.idleFrame = walkFrames[0];
     }
 
     @Override
@@ -41,30 +37,14 @@ public class Tank extends Soldier {
         TextureRegion currentFrame;
         switch (getCurrentState()) {
             case ATTACKING:
-                if (attackAnimation != null) {
-                    currentFrame = attackAnimation.getKeyFrame(stateTime, false);
-                } else if (idleFramer != null) {
-                    currentFrame = idleFramer.getKeyFrame(stateTime, true);
-                } else {
-                    currentFrame = idleFrame;
-                }
+                currentFrame = attackAnimation.getKeyFrame(stateTime, false);
                 break;
             case IDLE:
-                if (idleFramer != null) {
-                    currentFrame = idleFramer.getKeyFrame(stateTime, true);
-                } else {
-                    currentFrame = idleFrame;
-                }
+                currentFrame = idleFrame;
                 break;
             case WALKING:
             default:
-                if (walkAnimation != null) {
-                    currentFrame = walkAnimation.getKeyFrame(stateTime, true);
-                } else if (idleFramer != null) {
-                    currentFrame = idleFramer.getKeyFrame(stateTime, true);
-                } else {
-                    currentFrame = idleFrame;
-                }
+                currentFrame = walkAnimation.getKeyFrame(stateTime, true);
                 break;
         }
 
@@ -76,4 +56,56 @@ public class Tank extends Soldier {
 
         batch.draw(currentFrame, this.posX + offsetX, this.posY + offsetY, visualWidth, visualHeight);
     }
+
+    @Override
+    protected float getAttackAnimationDuration() {
+        if (attackAnimation != null) {
+            return attackAnimation.getAnimationDuration();
+        }
+        return super.getAttackAnimationDuration();
+    }
+
+    // @Override
+    // public void move(float delta) {
+    //     // Update attack animation timer
+    //     if (attackAnimationTimer > 0) {
+    //         attackAnimationTimer -= delta;
+    //         this.stateTime += delta;
+    //         if (attackAnimationTimer <= 0) {
+    //             currentState = UnitState.WALKING;
+    //             this.stateTime = 0;
+    //         }
+    //         return;
+    //     }
+    //     // If there's a living unit target, handle engagement
+    //     if (target != null && !target.isDead()) {
+    //         double distance = Math
+    //                 .sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
+    //         if (distance <= this.range) {
+    //             // In range: use shared attack logic so damage, cooldown and attack animation
+    //             // timer are applied
+    //             if (attackCooldown <= 0f) {
+    //                 attack();
+    //                 this.stateTime = 0f;
+    //             } else {
+    //                 currentState = UnitState.IDLE;
+    //                 this.stateTime += delta;
+    //             }
+    //             return;
+    //         }
+    //     }
+
+    //     // If attack animation or cooldown stopped us, check generic stop condition
+    //     if (shouldStopMoving()) {
+    //         currentState = UnitState.IDLE;
+    //         this.stateTime += delta;
+    //         return;
+    //     }
+
+    //     // Default movement: move right (soldier direction) with collision check
+    //     currentState = UnitState.WALKING;
+    //     float newX = calculateNewPositionX(delta, 1);
+    //     this.setSpritePosX(newX);
+    //     this.stateTime += delta;
+    // }
 }

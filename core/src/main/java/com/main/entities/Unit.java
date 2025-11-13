@@ -297,7 +297,8 @@ public abstract class Unit {
                 target.takeDamage(attackDamage);
                 attackCooldown = attackSpeed;
                 currentState = UnitState.ATTACKING;
-                attackAnimationTimer = ATTACK_ANIMATION_DURATION;
+                attackAnimationTimer = getAttackAnimationDuration();
+                this.stateTime = 0f;
                 return;
             }
         }
@@ -311,21 +312,12 @@ public abstract class Unit {
                 targetBase.takeDamage(attackDamage);
                 attackCooldown = attackSpeed;
                 currentState = UnitState.ATTACKING;
-                attackAnimationTimer = ATTACK_ANIMATION_DURATION;
+                    attackAnimationTimer = getAttackAnimationDuration();
+                    this.stateTime = 0f;
                 return;
             }
         }
-        if (attackCooldown <= 0) {
-            System.out.println(this.getClass().getSimpleName() + " attacks " + target.getClass().getSimpleName() +
-                    " (HP: " + target.getHealth() + " -> " + (target.getHealth() - attackDamage) + ")");
-            target.takeDamage(attackDamage);
-            attackCooldown = attackSpeed;
-            // Trigger attack animation and reset stateTime (subclasses may override
-            // getAttackAnimationDuration() to provide a specific duration)
-            currentState = UnitState.ATTACKING;
-            attackAnimationTimer = getAttackAnimationDuration();
-            this.stateTime = 0f;
-        }
+            // No default fallback here; attacks are handled above for targets or base.
     }
     
     /**
