@@ -27,6 +27,10 @@ public class Hero extends Unit {
     protected int dexterity;
     protected int agility;
     protected Weapon weapon;
+    
+    // Gold system
+    protected int gold = 0;
+    protected int maxHealth = 500;
     private WarMap map;
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
     // uses inherited stateTime from Unit
@@ -39,21 +43,21 @@ public class Hero extends Unit {
     public Hero(float posX, float posY, WarMap map) {
         super("sold/Idle.png", posX, posY);
 
-        TextureRegion[] rightFrames = loadFrames("sold/right%d.png", 8);
+        TextureRegion[] rightFrames = loadFrames("sold/RIght%d.png", 8);
         walkRight = new Animation<>(FRAME_DURATION, rightFrames);
         walkRight.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] leftFrames = loadFrames("sold/left%d.png",
+        TextureRegion[] leftFrames = loadFrames("sold/Left%d.png",
                 8);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] upFrames = loadFrames("sold/up%d.png",
+        TextureRegion[] upFrames = loadFrames("sold/Up%d.png",
                 8);
         walkUp = new Animation<>(FRAME_DURATIONW, upFrames);
         walkUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] downFrames = loadFrames("sold/down%d.png",
+        TextureRegion[] downFrames = loadFrames("sold/Down%d.png",
                 8);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
@@ -62,6 +66,9 @@ public class Hero extends Unit {
         this.speed = 8;
         this.attackSpeed = 1;
         this.map = map;
+        
+        // initialiser gold
+        this.gold = 50; // Start with 50 gold
     }
 
     private TextureRegion[] loadFrames(String pattern, int count) {
@@ -219,6 +226,82 @@ public class Hero extends Unit {
     public void move(float delta) {
         // Hero movement is handled via specific methods (moveUp/moveDown/etc.)
         // This default implementation does nothing.
+    }
+
+    // === HEALTH SYSTEM ===
+    
+    /**
+     * Get current health
+     * @return Current health value
+     */
+    public int getCurrentHealth() {
+        return this.health;
+    }
+    
+    /**
+     * Get maximum health
+     * @return Maximum health value
+     */
+    public int getMaxHealth() {
+        return this.maxHealth;
+    }
+    
+    /**
+     * Set maximum health
+     * @param maxHealth New maximum health
+     */
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+        if (this.health > maxHealth) {
+            this.health = maxHealth;
+        }
+    }
+    
+    /**
+     * Heal the hero
+     * @param amount Amount to heal
+     */
+    public void heal(int amount) {
+        this.health = Math.min(maxHealth, this.health + amount);
+    }
+    
+    // === GOLD SYSTEM ===
+    
+    /**
+     * Get current gold amount
+     * @return Current gold
+     */
+    public int getGold() {
+        return this.gold;
+    }
+    
+    /**
+     * Set gold amount directly
+     * @param gold Gold amount to set
+     */
+    public void setGold(int gold) {
+        this.gold = Math.max(0, gold);
+    }
+    
+    /**
+     * Add gold to current amount
+     * @param amount Amount to add
+     */
+    public void addGold(int amount) {
+        this.gold += amount;
+    }
+    
+    /**
+     * Remove gold from current amount
+     * @param amount Amount to remove
+     * @return true if successful, false if not enough gold
+     */
+    public boolean removeGold(int amount) {
+        if (this.gold >= amount) {
+            this.gold -= amount;
+            return true;
+        }
+        return false;
     }
 
 }

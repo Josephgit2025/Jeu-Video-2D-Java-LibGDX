@@ -1,5 +1,8 @@
 package com.main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -13,6 +16,7 @@ import com.main.entities.Unit;
 import com.main.entities.player.Hero;
 import com.main.map.Base;
 import com.main.map.WarMap;
+import com.ui.hud;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -30,6 +34,8 @@ public class GameScreen implements Screen {
     private Base playerBase;
     private int mapWidth;
     private int mapHeight;
+
+    private hud hudDisplay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
 
     private enum Direction {
@@ -52,6 +58,8 @@ public class GameScreen implements Screen {
         this.mapHeight = map.getMapHeightInPixels();
         this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
+        // Initialize HUD
+        this.hudDisplay = new hud();
     }
 
     @Override
@@ -103,6 +111,10 @@ public class GameScreen implements Screen {
         }
         hero.render(batch);
         batch.end();
+        
+        // Render HUD (after game rendering)
+        hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
+        hudDisplay.render();
         
         // Draw range circles if enabled
         if (showRanges) {
@@ -175,6 +187,13 @@ public class GameScreen implements Screen {
             showRanges = !showRanges;
             System.out.println("Range display: " + (showRanges ? "ON" : "OFF"));
         }
+
+        
+        // vérifier collision entre héros et ennemis
+        checkHeroEnemyCollisions(delta);
+        
+        // Remove dead enemies and give gold to hero
+        removeDeadEnemiesAndGiveGold();
         
         hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
         
@@ -206,10 +225,62 @@ public class GameScreen implements Screen {
         
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
+    
+    /**
+     * vérifier collision entre héros et ennemis et appliquer des dégâts sur lui
+     */
+    private void checkHeroEnemyCollisions(float delta) {
+        for (Unit enemy : enemyBase.getUnits()) {
+            if (enemy.isDead()) continue;
+            
+            // Simple collision detection using bounding boxes
+            float heroX = hero.getPosX();
+            float heroY = hero.getPosY();
+            float enemyX = enemy.getPosX();
+            float enemyY = enemy.getPosY();
+            
+            // Calculate distance between hero and enemy
+            float dx = heroX - enemyX;
+            float dy = heroY - enemyY;
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+            
+            // If enemy is close enough to attack (within range)
+            if (distance < 50f) { // 50 pixels = attack range
+                // Enemy damages hero (1 damage per second, adjusted by delta time)
+                if (Math.random() < 0.02) { // 2% chance per frame to hit
+                    hero.takeDamage(5); // 5 damage per hit
+                    System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
+                }
+            }
+        }
+    }
+    
+    /**
+     * Remove dead enemies from the list and give gold to hero
+     */
+    private void removeDeadEnemiesAndGiveGold() {
+        List<Unit> enemiesToRemove = new ArrayList<>();
+        
+        for (Unit enemy : enemyBase.getUnits()) {
+            if (enemy.isDead()) {
+                // Give gold to hero when enemy dies
+                int goldReward = 10; // 10 gold per enemy killed
+                hero.addGold(goldReward);
+                System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
+                enemiesToRemove.add(enemy);
+            }
+        }
+        
+        // Remove dead enemies
+        enemyBase.getUnits().removeAll(enemiesToRemove);
+    }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        if (hudDisplay != null) {
+            hudDisplay.resize(width, height);
+        }
     }
 
     @Override
@@ -236,6 +307,8 @@ public class GameScreen implements Screen {
             hero.dispose();
         if (map != null)
             map.dispose();
+        if (hudDisplay != null)
+            hudDisplay.dispose();
     }
 
     public SpriteBatch getBatch() {
