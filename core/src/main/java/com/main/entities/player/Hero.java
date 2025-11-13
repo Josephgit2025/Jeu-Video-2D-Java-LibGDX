@@ -89,23 +89,23 @@ public class Hero extends Unit {
      * @param mapHeight Hauteur de la map en pixels
      */
 
-    public void update(float delta, float mapWidth, float mapHeight) {
+    public void update(float delta, float mapWidth, float mapHeight, List<Unit> units) {
         // Déplacement avec les touches WASD ou flèches
         moving = false;
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            moveRight(delta, mapWidth);
+            moveRight(delta, mapWidth, units);
             moving = true;
             direction = Direction.RIGHT;
         } else if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            moveUp(delta, mapHeight);
+            moveUp(delta, mapHeight, units);
             moving = true;
             direction = Direction.UP;
         } else if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            moveLeft(delta);
+            moveLeft(delta, units);
             moving = true;
             direction = Direction.LEFT;
         } else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            moveDown(delta);
+            moveDown(delta, units);
             moving = true;
             direction = Direction.DOWN;
         }
@@ -117,9 +117,32 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveUp(float delta, float mapHeight) {
+    private boolean checkHeroEnemyCollisions(float newX, float newY, Unit enemy) {
+        if (enemy != null){
+            if (enemy.isDead()) 
+                return false;
+            
+            // Simple collision detection using bounding boxes
+            float enemyX = enemy.getPosX();
+            float enemyY = enemy.getPosY();
+            
+            // Calculate distance between hero and enemy
+            float dx = newX - enemyX;
+            float dy = newY - enemyY;
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+            System.out.println("Distanche with " + enemy.getClass().getSimpleName() + " " + distance);
+            if (distance < 50f) {
+                System.out.println("Hero hard stuck in Zombie");
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    public void moveUp(float delta, float mapHeight, List<Unit> enemies) {
         float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
-        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height) && !checkHeroEnemyCollisions(this.posX, newY, this.findClosestEnemy(enemies))) {
             if (newY + this.height > mapHeight) {
                 this.setSpritePosY(mapHeight - this.height);
             } else {
@@ -128,9 +151,9 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveDown(float delta) {
+    public void moveDown(float delta, List<Unit> enemies) {
         float newY = this.getPosY() - speed * delta * 60;
-        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height) && !checkHeroEnemyCollisions(this.posX, newY, this.findClosestEnemy(enemies))) {
             if (newY < 0) {
                 this.setSpritePosY(0);
             } else {
@@ -139,9 +162,9 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveLeft(float delta) {
+    public void moveLeft(float delta, List<Unit> enemies) {
         float newX = this.getPosX() - speed * delta * 60;
-        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height) && !checkHeroEnemyCollisions(newX, this.posY, this.findClosestEnemy(enemies))) {
             if (newX < 0) {
                 this.setSpritePosX(0);
             } else {
@@ -150,9 +173,9 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveRight(float delta, float mapWidth) {
+    public void moveRight(float delta, float mapWidth, List<Unit> enemies) {
         float newX = this.getPosX() + speed * delta * 60;
-        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height) && !checkHeroEnemyCollisions(newX, this.posY, this.findClosestEnemy(enemies))) {
             if (newX + this.width > mapWidth) {
                 this.setSpritePosX(mapWidth - this.width);
             } else {
