@@ -201,7 +201,7 @@ public abstract class Unit {
     /**
      * Trouve l'ennemi le plus proche dans une liste
      */
-    private Unit findClosestEnemy(List<Unit> enemies) {
+    protected Unit findClosestEnemy(List<Unit> enemies) {
         Unit closest = null;
         double minDistance = Double.MAX_VALUE;
         for (Unit enemy : enemies) {
@@ -325,8 +325,8 @@ public abstract class Unit {
             currentState = UnitState.ATTACKING;
             attackAnimationTimer = getAttackAnimationDuration();
             this.stateTime = 0f;
-            }
         }
+    }
     
     /**
      * Calcule la distance entre cette unité et la base ennemie

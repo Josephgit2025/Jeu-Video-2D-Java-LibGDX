@@ -27,6 +27,10 @@ public class Hero extends Unit {
     protected int dexterity;
     protected int agility;
     protected Weapon weapon;
+    
+    // Gold system
+    protected int gold = 0;
+    protected int maxHealth = 500;
     private WarMap map;
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
     // uses inherited stateTime from Unit
@@ -39,21 +43,21 @@ public class Hero extends Unit {
     public Hero(float posX, float posY, WarMap map) {
         super("sold/Idle.png", posX, posY);
 
-        TextureRegion[] rightFrames = loadFrames("sold/right%d.png", 8);
+        TextureRegion[] rightFrames = loadFrames("sold/RIght%d.png", 8);
         walkRight = new Animation<>(FRAME_DURATION, rightFrames);
         walkRight.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] leftFrames = loadFrames("sold/left%d.png",
+        TextureRegion[] leftFrames = loadFrames("sold/Left%d.png",
                 8);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] upFrames = loadFrames("sold/up%d.png",
+        TextureRegion[] upFrames = loadFrames("sold/Up%d.png",
                 8);
         walkUp = new Animation<>(FRAME_DURATIONW, upFrames);
         walkUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] downFrames = loadFrames("sold/down%d.png",
+        TextureRegion[] downFrames = loadFrames("sold/Down%d.png",
                 8);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
@@ -62,6 +66,9 @@ public class Hero extends Unit {
         this.speed = 8;
         this.attackSpeed = 1;
         this.map = map;
+        
+        // initialiser gold
+        this.gold = 50; // Start with 50 gold
     }
 
     private TextureRegion[] loadFrames(String pattern, int count) {
@@ -82,23 +89,23 @@ public class Hero extends Unit {
      * @param mapHeight Hauteur de la map en pixels
      */
 
-    public void update(float delta, float mapWidth, float mapHeight) {
+    public void update(float delta, float mapWidth, float mapHeight, List<Unit> units) {
         // Déplacement avec les touches WASD ou flèches
         moving = false;
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            moveRight(delta, mapWidth);
+            moveRight(delta, mapWidth, units);
             moving = true;
             direction = Direction.RIGHT;
         } else if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            moveUp(delta, mapHeight);
+            moveUp(delta, mapHeight, units);
             moving = true;
             direction = Direction.UP;
         } else if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            moveLeft(delta);
+            moveLeft(delta, units);
             moving = true;
             direction = Direction.LEFT;
         } else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            moveDown(delta);
+            moveDown(delta, units);
             moving = true;
             direction = Direction.DOWN;
         }
@@ -110,9 +117,32 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveUp(float delta, float mapHeight) {
+    private boolean checkHeroEnemyCollisions(float newX, float newY, Unit enemy) {
+        if (enemy != null){
+            if (enemy.isDead()) 
+                return false;
+            
+            // Simple collision detection using bounding boxes
+            float enemyX = enemy.getPosX();
+            float enemyY = enemy.getPosY();
+            
+            // Calculate distance between hero and enemy
+            float dx = newX - enemyX;
+            float dy = newY - enemyY;
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+            System.out.println("Distanche with " + enemy.getClass().getSimpleName() + " " + distance);
+            if (distance < 50f) {
+                System.out.println("Hero hard stuck in Zombie");
+                return true;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    public void moveUp(float delta, float mapHeight, List<Unit> enemies) {
         float newY = this.getPosY() + speed * delta * 60; // delta pour smooth movement
-        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height) && !checkHeroEnemyCollisions(this.posX, newY, this.findClosestEnemy(enemies))) {
             if (newY + this.height > mapHeight) {
                 this.setSpritePosY(mapHeight - this.height);
             } else {
@@ -121,9 +151,9 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveDown(float delta) {
+    public void moveDown(float delta, List<Unit> enemies) {
         float newY = this.getPosY() - speed * delta * 60;
-        if (!map.isCollisionRect(this.posX, newY, this.width, this.height)) {
+        if (!map.isCollisionRect(this.posX, newY, this.width, this.height) && !checkHeroEnemyCollisions(this.posX, newY, this.findClosestEnemy(enemies))) {
             if (newY < 0) {
                 this.setSpritePosY(0);
             } else {
@@ -132,9 +162,9 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveLeft(float delta) {
+    public void moveLeft(float delta, List<Unit> enemies) {
         float newX = this.getPosX() - speed * delta * 60;
-        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height) && !checkHeroEnemyCollisions(newX, this.posY, this.findClosestEnemy(enemies))) {
             if (newX < 0) {
                 this.setSpritePosX(0);
             } else {
@@ -143,9 +173,9 @@ public class Hero extends Unit {
         }
     }
 
-    public void moveRight(float delta, float mapWidth) {
+    public void moveRight(float delta, float mapWidth, List<Unit> enemies) {
         float newX = this.getPosX() + speed * delta * 60;
-        if (!map.isCollisionRect(newX, this.posY, this.width, this.height)) {
+        if (!map.isCollisionRect(newX, this.posY, this.width, this.height) && !checkHeroEnemyCollisions(newX, this.posY, this.findClosestEnemy(enemies))) {
             if (newX + this.width > mapWidth) {
                 this.setSpritePosX(mapWidth - this.width);
             } else {
@@ -219,6 +249,82 @@ public class Hero extends Unit {
     public void move(float delta) {
         // Hero movement is handled via specific methods (moveUp/moveDown/etc.)
         // This default implementation does nothing.
+    }
+
+    // === HEALTH SYSTEM ===
+    
+    /**
+     * Get current health
+     * @return Current health value
+     */
+    public int getCurrentHealth() {
+        return this.health;
+    }
+    
+    /**
+     * Get maximum health
+     * @return Maximum health value
+     */
+    public int getMaxHealth() {
+        return this.maxHealth;
+    }
+    
+    /**
+     * Set maximum health
+     * @param maxHealth New maximum health
+     */
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = maxHealth;
+        if (this.health > maxHealth) {
+            this.health = maxHealth;
+        }
+    }
+    
+    /**
+     * Heal the hero
+     * @param amount Amount to heal
+     */
+    public void heal(int amount) {
+        this.health = Math.min(maxHealth, this.health + amount);
+    }
+    
+    // === GOLD SYSTEM ===
+    
+    /**
+     * Get current gold amount
+     * @return Current gold
+     */
+    public int getGold() {
+        return this.gold;
+    }
+    
+    /**
+     * Set gold amount directly
+     * @param gold Gold amount to set
+     */
+    public void setGold(int gold) {
+        this.gold = Math.max(0, gold);
+    }
+    
+    /**
+     * Add gold to current amount
+     * @param amount Amount to add
+     */
+    public void addGold(int amount) {
+        this.gold += amount;
+    }
+    
+    /**
+     * Remove gold from current amount
+     * @param amount Amount to remove
+     * @return true if successful, false if not enough gold
+     */
+    public boolean removeGold(int amount) {
+        if (this.gold >= amount) {
+            this.gold -= amount;
+            return true;
+        }
+        return false;
     }
 
 }
