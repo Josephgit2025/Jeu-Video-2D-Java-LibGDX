@@ -17,6 +17,7 @@ import com.main.entities.player.Hero;
 import com.main.map.Base;
 import com.main.map.WarMap;
 import com.ui.hud;
+import com.ui.GameOverOverlay;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -36,6 +37,7 @@ public class GameScreen implements Screen {
     private int mapHeight;
 
     private hud hudDisplay;
+    private GameOverOverlay gameOverOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
 
     // Game Over state      (À TESTER)
@@ -67,6 +69,8 @@ public class GameScreen implements Screen {
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
         // Initialize HUD
         this.hudDisplay = new hud();
+        // Initialize Game Over Overlay
+        this.gameOverOverlay = new GameOverOverlay();
     }
 
     // Reset the game to initial state  ( À TESTER)
@@ -132,6 +136,11 @@ public class GameScreen implements Screen {
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
         hudDisplay.render();
+        
+        // Render Game Over Overlay if hero is dead
+        if (gameState == GameState.GAME_OVER) {
+            gameOverOverlay.render();
+        }
         
         // Draw range circles if enabled
         if (showRanges) {
@@ -325,6 +334,9 @@ public class GameScreen implements Screen {
         if (hudDisplay != null) {
             hudDisplay.resize(width, height);
         }
+        if (gameOverOverlay != null) {
+            gameOverOverlay.resize(width, height);
+        }
     }
 
     @Override
@@ -353,6 +365,8 @@ public class GameScreen implements Screen {
             map.dispose();
         if (hudDisplay != null)
             hudDisplay.dispose();
+        if (gameOverOverlay != null)
+            gameOverOverlay.dispose();
     }
 
     public SpriteBatch getBatch() {
