@@ -45,17 +45,20 @@ public class Base {
         random = new Random();
         this.isPlayerBase = isPlayerBase;
         this.name = isPlayerBase ? "PLAYER BASE" : "ENEMY BASE";
-        
-        // Créer la hitbox : 3 tuiles de large * TILE_SIZE * SCALE, hauteur totale de la map
+
+        // Créer la hitbox : 3 tuiles de large * TILE_SIZE * SCALE, hauteur totale de la
+        // map
         float boxWidth = 3 * TILE_SIZE * SCALE; // 3 tuiles * 16px * 2 = 96px
         float boxHeight = mapHeight; // Toute la hauteur de la map
-        
-        // Position : pour la base joueur (gauche), pour la base ennemie (droite - 3 tuiles)
+
+        // Position : pour la base joueur (gauche), pour la base ennemie (droite - 3
+        // tuiles)
         float boxX = isPlayerBase ? posX : (posX - boxWidth);
         float boxY = 0; // Du bas de la map
-        
+
         this.collisionBox = new Rectangle(boxX, boxY, boxWidth, boxHeight);
-        System.out.println(name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
+        System.out.println(
+                name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
     }
 
     public int getHealth() {
@@ -64,6 +67,10 @@ public class Base {
 
     public Position getPosition() {
         return position;
+    }
+
+    public float getPosX() {
+        return position.getPosX();
     }
 
     public int getAttackPower() {
@@ -76,17 +83,18 @@ public class Base {
         if (this.health < 0) {
             this.health = 0;
         }
-        System.out.println(">>> " + name + " takes " + damage + " damage! (HP: " + oldHealth + " -> " + this.health + ")");
+        System.out.println(
+                ">>> " + name + " takes " + damage + " damage! (HP: " + oldHealth + " -> " + this.health + ")");
     }
-    
+
     public boolean isDestroyed() {
         return this.health <= 0;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public Rectangle getCollisionBox() {
         return collisionBox;
     }
@@ -104,10 +112,10 @@ public class Base {
     public Unit spawnUnit(GameScreen screen, float delta) {
         if (lastSpawn >= 5.0f) {
             lastSpawn = 0.0f;
-            
+
             if (isPlayerBase) {
                 // Spawn soldiers (left side)
-                Type[] soldierTypes = {Type.TANK, Type.MELEE, Type.SNIPER};
+                Type[] soldierTypes = { Type.TANK, Type.MELEE, Type.SNIPER };
                 Type type = soldierTypes[random.nextInt(soldierTypes.length)];
                 switch (type) {
                     case TANK:
@@ -124,7 +132,7 @@ public class Base {
                 }
             } else {
                 // Spawn zombies (right side)
-                Type[] zombieTypes = {Type.WOMAN, Type.CRAWL, Type.FAST};
+                Type[] zombieTypes = { Type.WOMAN, Type.CRAWL, Type.FAST };
                 Type type = zombieTypes[random.nextInt(zombieTypes.length)];
                 switch (type) {
                     case WOMAN:
@@ -147,8 +155,9 @@ public class Base {
 
     /**
      * Met à jour toutes les unités de cette base
-     * @param delta Le temps écoulé
-     * @param enemies La liste des ennemis à attaquer
+     * 
+     * @param delta     Le temps écoulé
+     * @param enemies   La liste des ennemis à attaquer
      * @param enemyBase La base ennemie à attaquer si pas d'ennemis
      */
     public void updateUnits(float delta, List<Unit> enemies, Base enemyBase, Hero hero) {
@@ -172,9 +181,15 @@ public class Base {
             if (hero != null)
                 liveEnemies.add(hero);
 
-            // Determine target and update cooldown BEFORE moving so move(delta) sees the correct state
+            // Determine target and update cooldown BEFORE moving so move(delta) sees the
+            // correct state
             unit.selectTarget(liveEnemies);
             unit.updateCooldown(delta);
+
+            // À la fin de la boucle, après la gestion des attaques entre unités
+            if (unit.target == null && unit.isNearEnemyBase(enemyBase)) {
+                unit.attackBase(enemyBase);
+            }
 
             // Move will handle attack triggering and animation timing internally
             unit.move(delta);

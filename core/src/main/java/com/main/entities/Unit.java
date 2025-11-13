@@ -25,7 +25,7 @@ public abstract class Unit {
     protected int attackDamage;
     protected float attackSpeed; // Time in seconds between attacks
     protected float speed;
-    protected Unit target;
+    public Unit target;
     protected Base targetBase; // Reference to enemy base
     // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la
     // classe Effect si nécessaire
@@ -49,7 +49,6 @@ public abstract class Unit {
     protected float getAttackAnimationDuration() {
         return ATTACK_ANIMATION_DURATION;
     }
-    
 
     public Unit(String filePath, float posX, float posY) {
         this.posX = posX;
@@ -153,23 +152,25 @@ public abstract class Unit {
     }
 
     /**
-     * Vérifie si un mouvement vers newX causerait une collision avec la hitbox de la base ennemie
+     * Vérifie si un mouvement vers newX causerait une collision avec la hitbox de
+     * la base ennemie
      */
     protected boolean wouldCollideWithBase(float newX) {
         if (targetBase == null || targetBase.getCollisionBox() == null) {
             return false;
         }
-        
+
         // Créer un rectangle temporaire pour la nouvelle position
         Rectangle unitRect = new Rectangle(newX, this.posY, this.width, this.height);
-        
+
         // Vérifier la collision avec la hitbox de la base
         boolean collides = unitRect.overlaps(targetBase.getCollisionBox());
-        
+
         // if (collides) {
-        //     System.out.println(this.getClass().getSimpleName() + " BLOCKED by " + targetBase.getName() + " hitbox!");
+        // System.out.println(this.getClass().getSimpleName() + " BLOCKED by " +
+        // targetBase.getName() + " hitbox!");
         // }
-        
+
         return collides;
     }
 
@@ -234,17 +235,17 @@ public abstract class Unit {
             this.target = null;
         }
     }
-    
+
     public void setTargetBase(Base enemyBase) {
         this.targetBase = enemyBase;
     }
-    
+
     public Base getTargetBase() {
         return targetBase;
     }
-    
-    public void setTarget(Unit target){
-        if (target != null){
+
+    public void setTarget(Unit target) {
+        if (target != null) {
             this.target = target;
         }
     }
@@ -287,13 +288,15 @@ public abstract class Unit {
         return this.health <= 0;
     }
 
+    /**
+     * Attaque la cible actuelle (unité)
+     */
     public void attack() {
-        // Priority 1: Attack unit target if available
-        if (target != null && !target.isDead()) {
+        if (target != null && !target.isDead() && attackCooldown <= 0) {
             double distance = calculateDistance(target);
-            if (distance <= this.range && attackCooldown <= 0) {
-                System.out.println(this.getClass().getSimpleName() + " attacks " + target.getClass().getSimpleName() + 
-                                 " (HP: " + target.getHealth() + " -> " + (target.getHealth() - attackDamage) + ")");
+            if (distance <= this.range) {
+                System.out.println(this.getClass().getSimpleName() + " attacks " + target.getClass().getSimpleName() +
+                        " (HP: " + target.getHealth() + " -> " + (target.getHealth() - attackDamage) + ")");
                 target.takeDamage(attackDamage);
                 attackCooldown = attackSpeed;
                 currentState = UnitState.ATTACKING;
@@ -302,40 +305,64 @@ public abstract class Unit {
                 return;
             }
         }
-        
+
         // Priority 2: Attack enemy base if in range and no units to fight
-        if (targetBase != null && target == null) {
-            double distanceToBase = calculateDistanceToBase();
-            if (distanceToBase <= BASE_ATTACK_RANGE && attackCooldown <= 0) {
-                System.out.println(this.getClass().getSimpleName() + " attacks enemy BASE" + 
-                                 " (HP: " + targetBase.getHealth() + " -> " + (targetBase.getHealth() - attackDamage) + ")");
-                targetBase.takeDamage(attackDamage);
-                attackCooldown = attackSpeed;
-                currentState = UnitState.ATTACKING;
-                    attackAnimationTimer = getAttackAnimationDuration();
-                    this.stateTime = 0f;
-                return;
-            }
+        // if (targetBase != null && target == null) {
+        //     double distanceToBase = calculateDistanceToBase();
+        //     if (distanceToBase <= BASE_ATTACK_RANGE && attackCooldown <= 0) {
+        //         System.out.println(this.getClass().getSimpleName() + " attacks enemy BASE" +
+        //                 " (HP: " + targetBase.getHealth() + " -> " + (targetBase.getHealth() - attackDamage) + ")");
+        //         targetBase.takeDamage(attackDamage);
+        //         attackCooldown = attackSpeed;
+        //         currentState = UnitState.ATTACKING;
+        //         attackAnimationTimer = getAttackAnimationDuration();
+        //         this.stateTime = 0f;
+        //         return;
+        //     }
+        // }
+        // No default fallback here; attacks are handled above for targets or base.
+    }
+
+
+    // Méthode pour attaquer la base
+    public void attackBase(Base enemyBase) {
+        if (enemyBase != null && attackCooldown <= 0) {
+            System.out.println(">>> " + this.getClass().getSimpleName() + " at (" + (int) posX + "," + (int) posY +
+                    ") ATTACKS " + enemyBase.getName() +
+                    " (BASE HP: " + enemyBase.getHealth() + " -> " + (enemyBase.getHealth() - attackDamage) + ")");
+            enemyBase.takeDamage(this.attackDamage);
+            attackCooldown = attackSpeed;
+            attackAnimationTimer = ATTACK_ANIMATION_DURATION;
+            currentState = UnitState.ATTACKING;
         }
-            // No default fallback here; attacks are handled above for targets or base.
     }
-    
-    /**
-     * Calcule la distance entre cette unité et la base ennemie
-     */
-    protected double calculateDistanceToBase() {
-        if (targetBase == null) return Double.MAX_VALUE;
-        
-        float baseX = targetBase.getPosition().getPosX();
-        float baseY = targetBase.getPosition().getPosY();
-        
-        double deltaX = baseX - this.posX;
-        double deltaY = baseY - this.posY;
-        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+    // Méthode pour vérifier si proche de la base
+    public boolean isNearEnemyBase(Base base) {
+        if (base == null)
+            return false;
+        Rectangle baseBox = base.getCollisionBox();
+        if (baseBox == null)
+            return false;
+
+        // Calculer la distance entre l'unité et la hitbox de la base
+        float unitCenterX = this.posX + (this.width / 2);
+        float baseCenterX = baseBox.x + (baseBox.width / 2);
+        float distance = Math.abs(unitCenterX - baseCenterX);
+
+        boolean isNear = distance <= BASE_ATTACK_RANGE;
+        if (isNear && target == null) {
+            // System.out.println("🎯 " + this.getClass().getSimpleName() + " near " +
+            // base.getName() +
+            // " (distance: " + (int)distance + "/" + BASE_ATTACK_RANGE + ")");
+        }
+
+        return isNear;
     }
-    
+
     /**
      * Vérifie si l'unité doit s'arrêter (cible à portée ou base à portée)
+     * 
      * @return true si l'unité doit s'arrêter
      */
     protected boolean shouldStopMoving() {
@@ -343,7 +370,7 @@ public abstract class Unit {
         if (attackAnimationTimer > 0) {
             return true;
         }
-        
+
         // Stop if unit target in range
         if (target != null && !target.isDead()) {
             double distance = calculateDistance(target);
@@ -351,32 +378,31 @@ public abstract class Unit {
                 return true;
             }
         }
-        
+
         // Stop if base target in range
-        if (target == null && targetBase != null) {
-            double distanceToBase = calculateDistanceToBase();
-            if (distanceToBase <= BASE_ATTACK_RANGE) {
-                return true;
-            }
+        if (target == null && isNearEnemyBase(targetBase)) {
+            return true;
         }
-        
+
         return false;
     }
-    
+
     /**
-     * Calcule la nouvelle position X après mouvement, en tenant compte de la direction
-     * @param delta temps écoulé
+     * Calcule la nouvelle position X après mouvement, en tenant compte de la
+     * direction
+     * 
+     * @param delta     temps écoulé
      * @param direction direction du mouvement (1 = droite, -1 = gauche)
      * @return nouvelle position X, ou position actuelle si collision
      */
     protected float calculateNewPositionX(float delta, int direction) {
         float newX = this.posX + (this.speed * delta * direction);
-        
+
         // Check collision with enemy base hitbox
         if (wouldCollideWithBase(newX)) {
             return this.posX; // Stay in place
         }
-        
+
         return newX;
     }
 
@@ -387,6 +413,7 @@ public abstract class Unit {
     /**
      * Move the unit for this frame. Default implementation moves right.
      * Subclasses should override to provide specific movement behavior.
+     * 
      * @param delta Le temps écoulé depuis la dernière frame
      */
     public void move(float delta) {

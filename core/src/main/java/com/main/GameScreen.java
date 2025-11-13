@@ -140,17 +140,6 @@ public class GameScreen implements Screen {
                 }
             }
             
-            // Draw bases (blue for player, orange for enemy)
-            shapeRenderer.setColor(0, 0, 1, 0.7f); // Blue for player base
-            shapeRenderer.circle(playerBase.getPosition().getPosX(), 
-                                playerBase.getPosition().getPosY(), 
-                                50); // Base visual size
-            
-            shapeRenderer.setColor(1, 0.5f, 0, 0.7f); // Orange for enemy base
-            shapeRenderer.circle(enemyBase.getPosition().getPosX(), 
-                                enemyBase.getPosition().getPosY(), 
-                                50); // Base visual size
-            
             // Draw base collision hitboxes (purple for player, yellow for enemy)
             shapeRenderer.setColor(0.5f, 0, 0.5f, 0.5f); // Purple for player base hitbox
             com.badlogic.gdx.math.Rectangle playerBox = playerBase.getCollisionBox();
@@ -214,11 +203,11 @@ public class GameScreen implements Screen {
         
         // Check for game over conditions
         if (playerBase.isDestroyed()) {
-            System.out.println("GAME OVER - Player base destroyed!");
+            // System.out.println("GAME OVER - Player base destroyed!");
             // TODO: Implement game over screen
         }
         if (enemyBase.isDestroyed()) {
-            System.out.println("VICTORY - Enemy base destroyed!");
+            // System.out.println("VICTORY - Enemy base destroyed!");
             // TODO: Implement victory screen
         }
         
@@ -244,7 +233,7 @@ public class GameScreen implements Screen {
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
             if (distance < 50f) {
                 enemy.setTarget(this.hero);
-                System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
+                // System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
             }
         }
     }
@@ -260,7 +249,7 @@ public class GameScreen implements Screen {
                 // Give gold to hero when enemy dies
                 int goldReward = 10; // 10 gold per enemy killed
                 hero.addGold(goldReward);
-                System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
+                // System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
                 enemiesToRemove.add(enemy);
             }
         }
