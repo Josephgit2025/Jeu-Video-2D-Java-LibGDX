@@ -44,6 +44,10 @@ public class Zombie extends Unit {
         if (shouldStopMoving()) {
             currentState = UnitState.IDLE;
             this.stateTime += delta;
+            // Attaque la cible si elle est à portée
+            if (target != null && !target.isDead()) {
+                attack();
+            }
             return;
         }
         
