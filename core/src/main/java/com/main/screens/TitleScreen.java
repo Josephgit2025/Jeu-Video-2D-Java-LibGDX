@@ -98,12 +98,12 @@ public class TitleScreen implements Screen {
 
         batch.begin();
 
-        // ✅ Fond
+        // Fond
         if (background != null) {
             batch.draw(background, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         }
 
-        // ✅ LOGO PRINCIPAL
+        // LOGO PRINCIPAL
         if (titleLogo != null) {
             float logoWidth = 650f;
             float logoHeight = 220f;

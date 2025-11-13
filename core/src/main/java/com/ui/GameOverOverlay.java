@@ -13,14 +13,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 public class GameOverOverlay implements Disposable {
     
-    // Viewport and camera for overlay rendering (fixed on screen)
+
     private Viewport viewport;
     private OrthographicCamera camera;
-    
-    // Rendering components
+    private GlyphLayout titleLayout;
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     private BitmapFont titleFont;
@@ -87,7 +87,7 @@ public class GameOverOverlay implements Disposable {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         
         shapeRenderer.begin(ShapeType.Filled);
-        shapeRenderer.setColor(0, 0, 0, 0.7f); // Black with 70% opacity
+        shapeRenderer.setColor(0, 0, 0, 0.6f); // Black with 70% opacity
         shapeRenderer.rect(0, 0, OVERLAY_WIDTH, OVERLAY_HEIGHT);
         shapeRenderer.end();
         

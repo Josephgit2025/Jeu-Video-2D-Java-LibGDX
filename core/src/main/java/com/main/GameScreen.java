@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
@@ -39,13 +42,18 @@ public class GameScreen implements Screen {
     private hud hudDisplay;
     private GameOverOverlay gameOverOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
+    
+    // Pause display
+    private BitmapFont pauseFont;
 
-    // Game Over state      (À TESTER)
+    // Game Over state
     private enum GameState {
         PLAYING,
+        PAUSE,
         GAME_OVER
     }
-    private GameState gameState = GameState.PLAYING; // Game Playing
+    private GameState gameState = GameState.PLAYING;
+    private boolean pauseKeyPressed = false;
 
     private enum Direction {
         UP, DOWN, LEFT, RIGHT
@@ -71,9 +79,13 @@ public class GameScreen implements Screen {
         this.hudDisplay = new hud();
         // Initialize Game Over Overlay
         this.gameOverOverlay = new GameOverOverlay();
+        // Initialize Pause Font
+        this.pauseFont = new BitmapFont();
+        this.pauseFont.setColor(Color.WHITE);
+        this.pauseFont.getData().setScale(4f);
     }
 
-    // Reset the game to initial state  ( À TESTER)
+    // Recommencer le jeu
     public void reset() {
         // Reset game state
         this.map = new WarMap();
@@ -137,7 +149,32 @@ public class GameScreen implements Screen {
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
         hudDisplay.render();
         
-        // Render Game Over Overlay if hero is dead
+        // Render Pause overlay if in Pause state
+        if (gameState == GameState.PAUSE) {
+            // Draw semi-transparent overlay
+            com.badlogic.gdx.Gdx.gl.glEnable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+            com.badlogic.gdx.Gdx.gl.glBlendFunc(com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA, com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA);
+            
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(0, 0, 0, 0.5f); // Black with 50% opacity
+            shapeRenderer.rect(0, 0, com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
+            shapeRenderer.end();
+            
+            com.badlogic.gdx.Gdx.gl.glDisable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+            
+            // Draw "PAUSED" text centered
+            batch.begin();
+            GlyphLayout pauseLayout = new GlyphLayout(pauseFont, "PAUSED");
+            
+            // Draw with camera projection for game world coordinates (centered on camera)
+            batch.setProjectionMatrix(camera.combined);
+            pauseFont.draw(batch, "PAUSED", 
+                camera.position.x - pauseLayout.width / 2f, 
+                camera.position.y + pauseLayout.height / 2f);
+            batch.end();
+        }
+        
+        // Render Game Over Overlay if in Game Over state
         if (gameState == GameState.GAME_OVER) {
             gameOverOverlay.render();
         }
@@ -208,6 +245,22 @@ public class GameScreen implements Screen {
     }
 
     private void update(float delta) {
+        // Toggle pause with ESCAPE key
+        if (com.badlogic.gdx.Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.ESCAPE)) {
+            if (!pauseKeyPressed) {
+                pauseKeyPressed = true;
+                if (gameState == GameState.PLAYING) {
+                    gameState = GameState.PAUSE;
+                    System.out.println("Game PAUSED");
+                } else if (gameState == GameState.PAUSE) {
+                    gameState = GameState.PLAYING;
+                    System.out.println("Game RESUMED");
+                }
+            }
+        } else {
+            pauseKeyPressed = false;
+        }
+        
         // Check if hero is dead
         if (hero.getCurrentHealth() <= 0 && gameState == GameState.PLAYING) {
             gameState = GameState.GAME_OVER;
@@ -230,8 +283,8 @@ public class GameScreen implements Screen {
             }
         }
         
-        // Don't update game if Game Over
-        if (gameState == GameState.GAME_OVER) {
+        // Don't update game if Game Over or Paused
+        if (gameState == GameState.GAME_OVER || gameState == GameState.PAUSE) {
             return;
         }
         
@@ -367,6 +420,8 @@ public class GameScreen implements Screen {
             hudDisplay.dispose();
         if (gameOverOverlay != null)
             gameOverOverlay.dispose();
+        if (pauseFont != null)
+            pauseFont.dispose();
     }
 
     public SpriteBatch getBatch() {
