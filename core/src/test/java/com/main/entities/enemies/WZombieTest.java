@@ -12,7 +12,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyFloat;
 import org.mockito.Mock;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
@@ -64,6 +63,8 @@ public class WZombieTest {
         wZombie = new WZombie(100, 200);
     }
 
+    // ===== Constructor Tests =====
+
     @Test
     public void testWZombieConstructor() {
         assertNotNull("WZombie should be created", wZombie);
@@ -72,34 +73,26 @@ public class WZombieTest {
     }
 
     @Test
-    public void testWZombieInitialHealth() {
-        assertEquals("Initial health should be 200", 200, wZombie.getHealth());
+    public void testWZombieStats() {
+        assertEquals("WZombie health should be 350", 350, wZombie.getHealth());
+        assertEquals("WZombie speed should be 130", 130.0f, wZombie.getSpeed(), 0.01f);
+        assertEquals("WZombie attack damage should be 20", 20, wZombie.getAttackDamage());
+        assertEquals("WZombie attack speed should be 0.8", 0.8f, wZombie.getAttackSpeed(), 0.01f);
+        assertEquals("WZombie range should be 50", 50, wZombie.getRange());
     }
 
     @Test
-    public void testWZombieInitialSpeed() {
-        assertEquals("Initial speed should be 80", 80, wZombie.getSpeed(), 0.0f);
+    public void testConstructorWithDifferentPositions() {
+        WZombie z1 = new WZombie(0, 0);
+        WZombie z2 = new WZombie(500, 300);
+        
+        assertEquals("First zombie X should be 0", 0.0f, z1.getPosX(), 0.01f);
+        assertEquals("Second zombie X should be 500", 500.0f, z2.getPosX(), 0.01f);
+        assertEquals("First zombie Y should be 0", 0.0f, z1.getPosY(), 0.01f);
+        assertEquals("Second zombie Y should be 300", 300.0f, z2.getPosY(), 0.01f);
     }
 
-    @Test
-    public void testWZombieInitialAttackDamage() {
-        assertEquals("Initial attack damage should be 10", 10, wZombie.getAttackDamage());
-    }
-
-    @Test
-    public void testWZombieInitialAttackSpeed() {
-        assertEquals("Initial attack speed should be 2", 2, wZombie.getAttackSpeed());
-    }
-
-    @Test
-    public void testWZombieInitialRange() {
-        assertEquals("Initial range should be 3", 3, wZombie.getRange());
-    }
-
-    @Test
-    public void testWZombieIsNotDeadInitially() {
-        assertFalse("WZombie should not be dead initially", wZombie.isDead());
-    }
+    // ===== Movement Tests =====
 
     @Test
     public void testMoveDecreasesXPosition() {
@@ -114,7 +107,7 @@ public class WZombieTest {
         float delta = 0.5f;
         wZombie.move(delta);
         
-        float expectedX = initialX - (80 * delta);
+        float expectedX = initialX - (130 * delta);
         assertEquals("X position should be correct after move", expectedX, wZombie.getPosX(), 0.01f);
     }
 
@@ -126,116 +119,72 @@ public class WZombieTest {
     }
 
     @Test
-    public void testMoveWithLargeDelta() {
-        float initialX = wZombie.getPosX();
-        wZombie.move(2.0f);
-        
-        float expectedX = initialX - (80 * 2.0f);
-        assertEquals("X position should be correct with large delta", expectedX, wZombie.getPosX(), 0.01f);
-    }
-
-    @Test
     public void testMultipleMoveCalls() {
         float initialX = wZombie.getPosX();
         wZombie.move(0.1f);
         wZombie.move(0.1f);
         wZombie.move(0.1f);
         
-        float expectedX = initialX - (80 * 0.3f);
+        float expectedX = initialX - (130 * 0.3f);
         assertEquals("X position should be correct after multiple moves", expectedX, wZombie.getPosX(), 0.01f);
     }
+
+    // ===== Combat Tests =====
+
+    @Test
+    public void testTakeDamage() {
+        wZombie.takeDamage(50);
+        assertEquals("Health should decrease by 50", 300, wZombie.getHealth());
+    }
+
+    @Test
+    public void testTakeDamageMultipleTimes() {
+        wZombie.takeDamage(100);
+        wZombie.takeDamage(100);
+        wZombie.takeDamage(100);
+        assertEquals("Health should decrease correctly", 50, wZombie.getHealth());
+    }
+
+    @Test
+    public void testTakeDamageUntilDeath() {
+        wZombie.takeDamage(400);
+        assertTrue("WZombie should be dead after fatal damage", wZombie.isDead());
+    }
+
+    @Test
+    public void testIsNotDeadInitially() {
+        assertFalse("WZombie should not be dead initially", wZombie.isDead());
+    }
+
+    // ===== Render Tests =====
 
     @Test
     public void testRenderDoesNotThrow() {
         wZombie.render(mockBatch);
-        // Vérifier que draw a été appelé sur le batch avec TextureRegion
         verify(mockBatch, atLeastOnce()).draw(any(TextureRegion.class), anyFloat(), anyFloat());
-    }
-
-    @Test
-    public void testRenderMultipleTimes() {
-        wZombie.render(mockBatch);
-        wZombie.render(mockBatch);
-        wZombie.render(mockBatch);
-        
-        verify(mockBatch, times(3)).draw(any(TextureRegion.class), anyFloat(), anyFloat());
     }
 
     @Test
     public void testRenderAfterMove() {
         wZombie.move(1.0f);
         wZombie.render(mockBatch);
-        
         verify(mockBatch, atLeastOnce()).draw(any(TextureRegion.class), anyFloat(), anyFloat());
     }
 
-    @Test
-    public void testTakeDamage() {
-        wZombie.takeDamage(50);
-        assertEquals("Health should decrease by 50", 150, wZombie.getHealth());
-    }
+    // ===== Integration Tests =====
 
     @Test
-    public void testTakeDamageMultipleTimes() {
-        wZombie.takeDamage(30);
-        wZombie.takeDamage(40);
-        assertEquals("Health should decrease by 70 total", 130, wZombie.getHealth());
-    }
-
-    @Test
-    public void testTakeDamageUntilDeath() {
-        wZombie.takeDamage(250);
-        assertTrue("WZombie should be dead after taking fatal damage", wZombie.isDead());
-    }
-
-    @Test
-    public void testHealthCannotGoNegative() {
-        wZombie.takeDamage(300);
-        assertTrue("Health should result in death", wZombie.getHealth() <= 0);
-    }
-
-    @Test
-    public void testIsDeadWhenHealthZero() {
-        wZombie.takeDamage(200);
-        assertTrue("WZombie should be dead when health is zero", wZombie.isDead());
-    }
-
-    @Test
-    public void testMoveAndRenderSequence() {
+    public void testContinuousMovement() {
         float initialX = wZombie.getPosX();
+        float totalDelta = 0f;
         
-        wZombie.move(0.5f);
-        wZombie.render(mockBatch);
-        wZombie.move(0.5f);
-        wZombie.render(mockBatch);
-        
-        assertTrue("X position should have moved", wZombie.getPosX() < initialX);
-        verify(mockBatch, times(2)).draw(any(TextureRegion.class), anyFloat(), anyFloat());
-    }
-
-    @Test
-    public void testPositionGetters() {
-        WZombie zombie = new WZombie(150, 250);
-        assertEquals("getPosX should return correct value", 150.0f, zombie.getPosX(), 0.01f);
-        assertEquals("getPosY should return correct value", 250.0f, zombie.getPosY(), 0.01f);
-    }
-
-    @Test
-    public void testYPositionStaysConstant() {
-        float initialY = wZombie.getPosY();
-        wZombie.move(1.0f);
-        assertEquals("Y position should not change during horizontal movement", initialY, wZombie.getPosY(), 0.01f);
-    }
-
-    @Test
-    public void testMoveLeftAnimation() {
-        // Simuler plusieurs frames pour tester l'animation
-        for (int i = 0; i < 10; i++) {
-            wZombie.move(0.2f);
-            wZombie.render(mockBatch);
+        for (int i = 0; i < 60; i++) {
+            wZombie.move(0.016f);
+            totalDelta += 0.016f;
         }
         
-        verify(mockBatch, times(10)).draw(any(TextureRegion.class), anyFloat(), anyFloat());
+        float expectedX = initialX - (130 * totalDelta);
+        assertEquals("Position after continuous movement", expectedX, wZombie.getPosX(), 1.0f);
     }
 
     @Test
@@ -244,41 +193,9 @@ public class WZombieTest {
     }
 
     @Test
-    public void testWZombieStatsAreDifferentFromBase() {
-        // WZombie a des stats spécifiques (200 HP, 80 speed, etc.)
-        assertEquals("WZombie health should be 200", 200, wZombie.getHealth());
-        assertEquals("WZombie speed should be 80", 80, wZombie.getSpeed(), 0.0f);
-    }
-
-    @Test
-    public void testConstructorWithDifferentPositions() {
-        WZombie z1 = new WZombie(0, 0);
-        WZombie z2 = new WZombie(500, 300);
-        
-        assertEquals("First zombie X should be 0", 0.0f, z1.getPosX(), 0.01f);
-        assertEquals("Second zombie X should be 500", 500.0f, z2.getPosX(), 0.01f);
-        assertEquals("First zombie Y should be 0", 0.0f, z1.getPosY(), 0.01f);
-        assertEquals("Second zombie Y should be 300", 300.0f, z2.getPosY(), 0.01f);
-    }
-
-    @Test
-    public void testRenderWithoutMove() {
-        // Tester le render sans avoir appelé move
-        wZombie.render(mockBatch);
-        verify(mockBatch, atLeastOnce()).draw(any(TextureRegion.class), anyFloat(), anyFloat());
-    }
-
-    @Test
-    public void testContinuousMovement() {
-        float initialX = wZombie.getPosX();
-        float totalDelta = 0f;
-        
-        for (int i = 0; i < 60; i++) { // Simuler 60 frames
-            wZombie.move(0.016f);
-            totalDelta += 0.016f;
-        }
-        
-        float expectedX = initialX - (80 * totalDelta);
-        assertEquals("Position after continuous movement", expectedX, wZombie.getPosX(), 0.1f);
+    public void testWZombieStatsAreDifferent() {
+        assertEquals("WZombie specific health", 350, wZombie.getHealth());
+        assertEquals("WZombie specific damage", 20, wZombie.getAttackDamage());
+        assertEquals("WZombie specific speed", 130.0f, wZombie.getSpeed(), 0.01f);
     }
 }

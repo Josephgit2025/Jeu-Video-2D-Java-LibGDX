@@ -203,11 +203,11 @@ public class GameScreen implements Screen {
         
         // Check for game over conditions
         if (playerBase.isDestroyed()) {
-            System.out.println("GAME OVER - Player base destroyed!");
+            // System.out.println("GAME OVER - Player base destroyed!");
             // TODO: Implement game over screen
         }
         if (enemyBase.isDestroyed()) {
-            System.out.println("VICTORY - Enemy base destroyed!");
+            // System.out.println("VICTORY - Enemy base destroyed!");
             // TODO: Implement victory screen
         }
         
@@ -233,7 +233,6 @@ public class GameScreen implements Screen {
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
             if (distance < 50f) {
                 enemy.setTarget(this.hero);
-                System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
             }
         }
     }
