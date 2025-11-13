@@ -180,7 +180,7 @@ public class TitleScreen implements Screen {
         if (Gdx.input.justTouched() && selectedIndex != -1) {
             switch (menuItems[selectedIndex]) {
                 case "PLAY":
-                    game.showGameScreen();  // Au lieu de new GameScreen(game)
+                    game.showGameScreen();
                     break;
                 case "QUIT":
                     Gdx.app.postRunnable(() -> {
