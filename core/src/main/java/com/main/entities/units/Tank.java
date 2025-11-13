@@ -1,24 +1,12 @@
 package com.main.entities.units;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.main.entities.Unit;
 
 public class Tank extends Soldier {
-    private Animation<TextureRegion> walkAnimation;
-    private Animation<TextureRegion> attackAnimation;
-    private TextureRegion idleFrame;
-    private float stateTime = 0f;
-    private boolean moving = false;
-    private List<Texture> loadedTextures = new ArrayList<>();
-    private final float FRAME_DURATION = 0.2f;
 
     public Tank(float posX, float posY) {
         super("Tank/Ride1.png", posX, posY);
@@ -35,6 +23,7 @@ public class Tank extends Soldier {
 
         // Use spritesheet for attack animation (muzzle flash effect)
         Texture attackSheet = new Texture(Gdx.files.internal("Tank/right_fire_blue-Sheet.png"));
+        loadedTextures.add(attackSheet);
         TextureRegion[][] tmp = TextureRegion.split(attackSheet,
                 attackSheet.getWidth() / 3,
                 attackSheet.getHeight() / 1);
@@ -52,65 +41,17 @@ public class Tank extends Soldier {
         this.idleFrame = walkFrames[0];
     }
 
-    private TextureRegion[] loadFrames(String pattern, int count) {
-        TextureRegion[] frames = new TextureRegion[count];
-        for (int i = 0; i < count; i++) {
-            Texture tex = new Texture(Gdx.files.internal(String.format(pattern, i + 1)));
-            frames[i] = new TextureRegion(tex);
-        }
-        return frames;
-    }
-
     @Override
     public void render(SpriteBatch batch) {
-
-        TextureRegion currentFrame;
-        switch (getCurrentState()) {
-            case ATTACKING:
-                currentFrame = attackAnimation.getKeyFrame(stateTime, false);
-                break;
-            case IDLE:
-                currentFrame = idleFrame;
-                break;
-            case WALKING:
-            default:
-                currentFrame = walkAnimation.getKeyFrame(stateTime, true);
-                break;
+        TextureRegion currentFrame = getCurrentFrame();
+        if (currentFrame != null) {
+            float visualWidth = 85;
+            float visualHeight = 50;
+            float offsetX = (this.width - visualWidth) / 2;
+            float offsetY = 0;
+            
+            batch.draw(currentFrame, this.posX + offsetX, this.posY + offsetY, visualWidth, visualHeight);
         }
-
-        float visualWidth = 85;
-        float visualHeight = 50;
-
-        float offsetX = (this.width - visualWidth) / 2;
-        float offsetY = 0;
-
-        batch.draw(currentFrame, this.posX + offsetX, this.posY + offsetY, visualWidth, visualHeight);
-    }
-
-    @Override
-    public void move(float delta) {
-        // Update attack animation timer
-        if (attackAnimationTimer > 0) {
-            attackAnimationTimer -= delta;
-            this.stateTime += delta;
-            if (attackAnimationTimer <= 0) {
-                currentState = UnitState.WALKING;
-                this.stateTime = 0;
-            }
-            return;
-        }
-
-        // Check if should stop (using parent logic)
-        if (shouldStopMoving()) {
-            currentState = UnitState.IDLE;
-            this.stateTime += delta;
-            return;
-        }
-
-        // Move right (soldiers direction) with collision check
-        currentState = UnitState.WALKING;
-        float newX = calculateNewPositionX(delta, 1);
-        this.setSpritePosX(newX);
-        this.stateTime += delta;
     }
 }
+ 
