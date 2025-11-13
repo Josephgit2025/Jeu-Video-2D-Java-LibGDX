@@ -15,11 +15,11 @@ public class Soldier extends Unit {
     protected Animation<TextureRegion> walkAnimation;
     protected Animation<TextureRegion> attackAnimation;
     protected TextureRegion idleFrame;
-    protected float stateTime = 0f;
+    protected Animation<TextureRegion> idleFramer;
     protected List<Texture> loadedTextures = new ArrayList<>();
     protected final float FRAME_DURATION = 0.2f;
- 
-    public Soldier (String filePath, float posX, float posY) {
+
+    public Soldier(String filePath, float posX, float posY) {
         super(filePath, posX, posY);
     }
 
@@ -35,55 +35,77 @@ public class Soldier extends Unit {
             }
             return;
         }
+        // If there's a living unit target, handle engagement
+        if (target != null && !target.isDead()) {
+            double distance = Math
+                    .sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
+            if (distance <= this.range) {
+                // In range: use shared attack logic so damage, cooldown and attack animation
+                // timer are applied
+                if (attackCooldown <= 0f) {
+                    attack();
+                    this.stateTime = 0f;
+                } else {
+                    currentState = UnitState.IDLE;
+                    this.stateTime += delta;
+                }
+                return;
+            }
+        }
 
-        // Check if should stop (using parent logic)
+        // If attack animation or cooldown stopped us, check generic stop condition
         if (shouldStopMoving()) {
             currentState = UnitState.IDLE;
             this.stateTime += delta;
             return;
         }
 
-        // Move right (soldiers direction) with collision check
+        // Default movement: move right (soldier direction) with collision check
         currentState = UnitState.WALKING;
-        float newX = calculateNewPositionX(delta, 1); // 1 for right movement
+        float newX = calculateNewPositionX(delta, 1);
         this.setSpritePosX(newX);
         this.stateTime += delta;
     }
 
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = getCurrentFrame();
-        if (currentFrame != null) {
-            batch.draw(currentFrame, this.posX, this.posY);
+        TextureRegion currentFrame;
+
+        // Choose animation based on current state
+        switch (getCurrentState()) {
+            case ATTACKING:
+                if (attackAnimation != null) {
+                    currentFrame = attackAnimation.getKeyFrame(this.stateTime, false);
+                } else if (idleFramer != null) {
+                    currentFrame = idleFramer.getKeyFrame(this.stateTime, true);
+                } else {
+                    currentFrame = idleFrame;
+                }
+                break;
+            case IDLE:
+                if (idleFramer != null) {
+                    currentFrame = idleFramer.getKeyFrame(this.stateTime, true);
+                } else {
+                    currentFrame = idleFrame;
+                }
+                break;
+            case WALKING:
+            default:
+                if (walkAnimation != null) {
+                    currentFrame = walkAnimation.getKeyFrame(this.stateTime, true);
+                } else {
+                    currentFrame = idleFrame;
+                }
+                break;
         }
+
+        batch.draw(currentFrame, posX, posY);
     }
 
     /**
      * Get the current frame based on state - can be overridden by subclasses
      * for specific rendering behavior (e.g., Tank with custom size)
      */
-    protected TextureRegion getCurrentFrame() {
-        switch (getCurrentState()) {
-            case ATTACKING:
-                if (attackAnimation != null) {
-                    return attackAnimation.getKeyFrame(stateTime, false);
-                }
-                break;
-            case IDLE:
-                if (idleFrame != null) {
-                    return idleFrame;
-                }
-                break;
-            case WALKING:
-            default:
-                if (walkAnimation != null) {
-                    return walkAnimation.getKeyFrame(stateTime, true);
-                }
-                break;
-        }
-        // Fallback to first walk frame
-        return walkAnimation != null ? walkAnimation.getKeyFrame(0, false) : null;
-    }
 
     /**
      * Utility method to load animation frames from a pattern
