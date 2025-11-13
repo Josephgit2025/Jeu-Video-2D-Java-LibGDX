@@ -25,7 +25,7 @@ public class FZombie extends Zombie {
         attackAnimation.setPlayMode(Animation.PlayMode.LOOP);
 
         // Load idle frame
-        Texture idleTex = new Texture(Gdx.files.internal("zombie/normal/Idle.png"));
+        Texture idleTex = new Texture(Gdx.files.internal("zombie/normal/Walk1.png"));
         loadedTextures.add(idleTex);
         this.idleFrame = new TextureRegion(idleTex);
     }

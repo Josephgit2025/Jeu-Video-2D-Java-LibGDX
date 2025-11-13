@@ -16,31 +16,48 @@ public class Zombie extends Unit {
     protected Animation<TextureRegion> attackAnimation;
     protected TextureRegion attackFrame;
     protected TextureRegion idleFrame;
-    protected float stateTime = 0f;
     protected boolean moving = false;
     protected List<Texture> loadedTextures = new ArrayList<>();
     protected final float FRAME_DURATION = 0.2f;
 
-    public Zombie (String filePath, float posX, float posY) {
+    public Zombie(String filePath, float posX, float posY) {
         super(filePath, posX, posY);
     }
 
     @Override
     public void move(float delta) {
         this.moving = false; // Reset moving state
-        
+
         // Update attack animation timer
         if (attackAnimationTimer > 0) {
             attackAnimationTimer -= delta;
+            // advance shared animation time so attack animations progress
             this.stateTime += delta;
-            if (attackAnimationTimer <= 0) {
-                currentState = UnitState.WALKING;
-                this.stateTime = 0;
+            if (attackAnimationTimer > 0) {
+                return;
             }
-            return;
         }
-        
-        // Check if should stop (using parent logic)
+
+        // Vérifie si une cible est à portée, si oui, attaque (utilise Unit.attack()
+        // pour gérer cooldowns/timers)
+
+        // If there's a unit target and it's in range, attack
+        if (target != null && !target.isDead()) {
+            double distance = Math
+                    .sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
+            if (distance <= this.range) {
+                // Use the shared attack logic so damage, cooldown and attack animation timer
+                // are applied
+                attack();
+                // stateTime reset is handled by Unit.attack(); ensure we advance during this frame
+                this.stateTime += delta;
+                return;
+            }
+        }
+
+        // Only move and animate if not in combat
+
+        // If should stop (eg base in range or attack animation), idle
         if (shouldStopMoving()) {
             currentState = UnitState.IDLE;
             this.stateTime += delta;
@@ -50,8 +67,8 @@ public class Zombie extends Unit {
             }
             return;
         }
-        
-        // Move left (zombies direction) with collision check
+
+        // Default: move left (zombies direction) with collision check
         currentState = UnitState.WALKING;
         float newX = calculateNewPositionX(delta, -1); // -1 for left movement
         this.setSpritePosX(newX);
@@ -61,7 +78,42 @@ public class Zombie extends Unit {
 
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = getCurrentFrame();
+        TextureRegion currentFrame;
+        
+
+        // Choose animation based on current state
+        switch (getCurrentState()) {
+            case ATTACKING:
+                if (attackAnimation != null) {
+                    currentFrame = attackAnimation.getKeyFrame(stateTime, false);
+                } else if (attackFrame != null) {
+                    currentFrame = attackFrame;
+                } else if (idleFrame != null) {
+                    currentFrame = idleFrame;
+                } else {
+                    currentFrame = walkLeft != null ? walkLeft.getKeyFrame(stateTime, true) : null;
+                }
+                break;
+            case IDLE:
+                if (idleFrame != null) {
+                    currentFrame = idleFrame;
+                } else if (idleFrame == null && walkLeft != null) {
+                    currentFrame = walkLeft.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = null;
+                }
+                break;
+            case WALKING:
+            default:
+                if (walkLeft != null) {
+                    currentFrame = walkLeft.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = idleFrame;
+                }
+                break;
+        }
+
+        // draw the selected frame if any
         if (currentFrame != null) {
             batch.draw(currentFrame, this.posX, this.posY);
         }
@@ -71,33 +123,11 @@ public class Zombie extends Unit {
      * Get the current frame based on state - can be overridden by subclasses
      * for specific animation behavior
      */
-    protected TextureRegion getCurrentFrame() {
-        switch (getCurrentState()) {
-            case ATTACKING:
-                // If attackAnimation exists, use it; otherwise use attackFrame
-                if (attackAnimation != null) {
-                    return attackAnimation.getKeyFrame(stateTime, false);
-                } else if (attackFrame != null) {
-                    return attackFrame;
-                }
-                break;
-            case IDLE:
-                // Use idleFrame if it exists, otherwise attackFrame
-                if (idleFrame != null) {
-                    return idleFrame;
-                } else if (attackFrame != null) {
-                    return attackFrame;
-                }
-                break;
-            case WALKING:
-            default:
-                if (walkLeft != null) {
-                    return walkLeft.getKeyFrame(stateTime, true);
-                }
-                break;
+    protected float getAttackAnimationDuration() {
+        if (attackAnimation != null) {
+            return attackAnimation.getAnimationDuration();
         }
-        // Fallback to first walk frame
-        return walkLeft != null ? walkLeft.getKeyFrame(0, false) : null;
+        return super.getAttackAnimationDuration();
     }
 
     /**
