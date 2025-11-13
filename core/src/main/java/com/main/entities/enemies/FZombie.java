@@ -20,11 +20,9 @@ public class FZombie extends Zombie {
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
 
-        // Load attack animation
-        Texture attackTex = new Texture(Gdx.files.internal("zombie/normal/Attack.png"));
-        loadedTextures.add(attackTex);
-        this.attackAnimation = new Animation<>(0.2f, new TextureRegion(attackTex));
-        attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
+        TextureRegion[] attackTex = loadFrames("zombie/normal/Attack%d.png", 4);
+        attackAnimation = new Animation<>(FRAME_DURATION, attackTex);
+        attackAnimation.setPlayMode(Animation.PlayMode.LOOP);
 
         // Load idle frame
         Texture idleTex = new Texture(Gdx.files.internal("zombie/normal/Idle.png"));

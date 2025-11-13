@@ -14,20 +14,22 @@ public class Sniper extends Soldier {
         this.speed = 30;
         this.attackSpeed = 2.5f; // 2.5 seconds between attacks (slower sniper fire)
         this.range = 250; // Portée longue pour sniper
-        
+
         // Load walk animation
         TextureRegion[] walkFrames = loadFrames("Sniper/Walk%d.png", 8);
         this.walkAnimation = new Animation<>(FRAME_DURATION, walkFrames);
         walkAnimation.setPlayMode(Animation.PlayMode.LOOP);
-        
+
         // Load attack animation
-        TextureRegion[] attackFrames = loadFrames("Sniper/Shot_%d.png", 2);
+        TextureRegion[] attackFrames = loadFrames("Sniper/Attack%d.png", 7);
         this.attackAnimation = new Animation<>(0.1f, attackFrames);
         attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
-        
-        // Load idle frame
-        Texture idleTex = new Texture(Gdx.files.internal("Sniper/Idle.png"));
-        loadedTextures.add(idleTex);
-        this.idleFrame = new TextureRegion(idleTex);
+
+        // Texture idleTex = new Texture(Gdx.files.internal("Sniper/Idle.png"));
+        // this.idleFrame = new TextureRegion(idleTex);
+
+        TextureRegion[] idleFrames = loadFrames("Sniper/Idle%d.png", 8);
+        this.idleFramer = new Animation<>(FRAME_DURATION, idleFrames);
+        idleFramer.setPlayMode(Animation.PlayMode.LOOP);
     }
 }

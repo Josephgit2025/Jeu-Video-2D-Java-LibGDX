@@ -1,5 +1,7 @@
 package com.main.entities.enemies;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -18,7 +20,12 @@ public class WZombie extends Zombie {
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
 
-        // Use first frame as attack pose
-        this.attackFrame = leftFrames[0];
+        TextureRegion[] attackTex = loadFrames("zombie/women/Attack%d.png", 20);
+        attackAnimation = new Animation<>(0.1f, attackTex);
+        // Attack should play once when triggered
+        attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
+
+        Texture idleTex = new Texture(Gdx.files.internal("zombie/normal/Idle.png"));
+        this.idleFrame = new TextureRegion(idleTex);
     }
 }

@@ -183,7 +183,7 @@ public class GameScreen implements Screen {
         // Remove dead enemies and give gold to hero
         removeDeadEnemiesAndGiveGold();
         
-        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
+        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
         
         // Spawn des ennemis
         Unit tmpEnemy = enemyBase.spawnUnit(this, delta);
@@ -231,10 +231,7 @@ public class GameScreen implements Screen {
             float dx = heroX - enemyX;
             float dy = heroY - enemyY;
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
-            
-            // If enemy is close enough to attack (within range)
-            if (distance < 50f) { // 50 pixels = attack range
-                // Enemy damages hero (1 damage per second, adjusted by delta time)
+            if (distance < 50f) {
                 enemy.setTarget(this.hero);
                 System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
             }

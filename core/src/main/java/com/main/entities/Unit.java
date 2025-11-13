@@ -165,11 +165,11 @@ public abstract class Unit {
 
         // Vérifier la collision avec la hitbox de la base
         boolean collides = unitRect.overlaps(targetBase.getCollisionBox());
-
-        if (collides) {
-            System.out.println(this.getClass().getSimpleName() + " BLOCKED by " + targetBase.getName() + " hitbox!");
-        }
-
+        
+        // if (collides) {
+        //     System.out.println(this.getClass().getSimpleName() + " BLOCKED by " + targetBase.getName() + " hitbox!");
+        // }
+        
         return collides;
     }
 
@@ -201,7 +201,7 @@ public abstract class Unit {
     /**
      * Trouve l'ennemi le plus proche dans une liste
      */
-    private Unit findClosestEnemy(List<Unit> enemies) {
+    protected Unit findClosestEnemy(List<Unit> enemies) {
         Unit closest = null;
         double minDistance = Double.MAX_VALUE;
         for (Unit enemy : enemies) {
