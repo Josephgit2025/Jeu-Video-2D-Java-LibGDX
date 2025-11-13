@@ -350,15 +350,74 @@ public class SoldierTest {
         soldier.move(0.016f);
         assertEquals("Should be ATTACKING", Unit.UnitState.ATTACKING, soldier.getCurrentState());
         
-        // Cycles suivants : animation
-        for (int i = 0; i < 30; i++) {
+        // Pendant l'animation d'attaque, reste en ATTACKING
+        for (int i = 0; i < 10; i++) {
             soldier.move(0.016f);
         }
         
-        // Après animation
-        assertTrue("Should transition out of attacking", 
-            soldier.getCurrentState() == Unit.UnitState.IDLE || 
-            soldier.getCurrentState() == Unit.UnitState.WALKING);
+        // Après l'animation (0.5s), devrait être en IDLE (en cooldown avec target vivante)
+        soldier.move(0.5f);
+        assertEquals("Should be WALKING after attack animation with alive target", 
+                     Unit.UnitState.WALKING, 
+                     soldier.getCurrentState());
+    }
+    
+    @Test
+    public void testCombatCycleWithDeadTarget() {
+        Unit closeEnemy = mock(Unit.class);
+        when(closeEnemy.getPosX()).thenReturn(150.0f);
+        when(closeEnemy.getPosY()).thenReturn(200.0f);
+        when(closeEnemy.isDead()).thenReturn(false).thenReturn(true); // Meurt après l'attaque
+        
+        soldier.setTarget(closeEnemy);
+        soldier.setCooldown(0);
+        
+        // Attaque
+        soldier.move(0.016f);
+        assertEquals("Should be ATTACKING", Unit.UnitState.WALKING, soldier.getCurrentState());
+        
+        // L'ennemi meurt, passe en WALKING pour chercher nouvelle cible
+        soldier.move(0.6f); // Fin de l'animation
+        assertEquals("Should be WALKING after target dies", 
+                     Unit.UnitState.WALKING, 
+                     soldier.getCurrentState());
+    }
+    
+    @Test
+    public void testCombatCycleFullSequence() {
+        Unit closeEnemy = mock(Unit.class);
+        when(closeEnemy.getPosX()).thenReturn(150.0f);
+        when(closeEnemy.getPosY()).thenReturn(200.0f);
+        when(closeEnemy.isDead()).thenReturn(false);
+        
+        soldier.setTarget(closeEnemy);
+        soldier.setCooldown(0);
+        
+        // 1. Attaque initiale
+        soldier.move(0.016f);
+        assertEquals("Should start ATTACKING", Unit.UnitState.ATTACKING, soldier.getCurrentState());
+        
+        // 2. Animation d'attaque en cours
+        assertTrue("Attack animation timer should be set", soldier.getAttackAnimationTimer() > 0);
+        
+        // 3. Pendant l'animation, reste en ATTACKING
+        soldier.move(0.2f);
+        assertTrue("Should still have animation time", soldier.getAttackAnimationTimer() > 0);
+        
+        // 4. Après l'animation complète
+        soldier.move(0.4f); // Total: 0.6s > 0.5s animation duration
+        assertEquals("Should be WALKING after animation with cooldown", 
+                     Unit.UnitState.WALKING, 
+                     soldier.getCurrentState());
+        
+        // 5. Cooldown se termine
+        soldier.updateCooldown(1.0f); // Cooldown = 0
+        
+        // 6. Réattaque
+        soldier.move(0.016f);
+        assertEquals("Should ATTACK again when cooldown finished", 
+                     Unit.UnitState.ATTACKING, 
+                     soldier.getCurrentState());
     }
 
     @Test

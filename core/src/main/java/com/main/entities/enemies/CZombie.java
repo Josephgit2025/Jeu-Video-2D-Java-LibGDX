@@ -1,5 +1,7 @@
 package com.main.entities.enemies;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -17,8 +19,12 @@ public class CZombie extends Zombie {
         TextureRegion[] leftFrames = loadFrames("zombie/crawl/Walk%d.png", 10);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
-        
-        // Use first frame as attack pose
-        this.attackFrame = leftFrames[0];
+
+        TextureRegion[] attackTex = loadFrames("zombie/crawl/Attack%d.png", 12);
+        attackAnimation = new Animation<>(FRAME_DURATION, attackTex);
+        attackAnimation.setPlayMode(Animation.PlayMode.LOOP);
+
+        Texture idleTex = new Texture(Gdx.files.internal("zombie/crawl/Walk1.png"));
+        this.idleFrame = new TextureRegion(idleTex);
     }
 }

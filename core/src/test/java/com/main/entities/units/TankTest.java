@@ -558,7 +558,6 @@ public class TankTest {
         assertNotNull("Walk animation should be loaded", tank.walkAnimation);
         assertNotNull("Attack animation should be loaded", tank.attackAnimation);
         assertNotNull("Idle frame should be loaded", tank.idleFrame);
-        assertNotNull("Idle animation should be loaded", tank.idleFramer);
     }
 
     @Test

@@ -57,8 +57,8 @@ public class Base {
         float boxY = 0; // Du bas de la map
 
         this.collisionBox = new Rectangle(boxX, boxY, boxWidth, boxHeight);
-        System.out.println(
-                name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
+        // System.out.println(
+        //         name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
     }
 
     public int getHealth() {

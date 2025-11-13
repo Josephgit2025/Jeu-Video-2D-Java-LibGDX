@@ -235,7 +235,7 @@ public class ZombieTest {
         zombie.setTarget(target);
         zombie.move(0.016f);
         
-        assertEquals("State should be IDLE when target in range", Unit.UnitState.IDLE, zombie.getCurrentState());
+        assertEquals("State should be ATTACKING when target in range", Unit.UnitState.ATTACKING, zombie.getCurrentState());
     }
 
     // ===== Render Tests =====
@@ -264,13 +264,89 @@ public class ZombieTest {
     @Test
     public void testSelectTargetWithEnemy() {
         Unit enemy = mock(Unit.class);
-        when(enemy.getPosX()).thenReturn(120.0f);
+        // Zombie à (100, 200), range = 50
+        // Placer l'ennemi à portée : distance doit être <= 50
+        when(enemy.getPosX()).thenReturn(130.0f); // Distance X = 30
+        when(enemy.getPosY()).thenReturn(200.0f); // Distance Y = 0
+        // Distance totale = sqrt(30² + 0²) = 30 < 50 ✓
+        when(enemy.isDead()).thenReturn(false);
+        enemies.add(enemy);
+        
+        zombie.selectTarget(enemies);
+        assertNotNull("Target should be selected when enemy in range", zombie.getTarget());
+        assertEquals("Should select the close enemy", enemy, zombie.getTarget());
+    }
+    
+    @Test
+    public void testSelectTargetOutOfRange() {
+        Unit enemy = mock(Unit.class);
+        // Placer l'ennemi HORS de portée
+        when(enemy.getPosX()).thenReturn(500.0f); // Distance X = 400 > 50
         when(enemy.getPosY()).thenReturn(200.0f);
         when(enemy.isDead()).thenReturn(false);
         enemies.add(enemy);
         
         zombie.selectTarget(enemies);
-        assertNotNull("Target should be selected", zombie.getTarget());
+        assertNull("Target should not be selected when enemy out of range", zombie.getTarget());
+    }
+    
+    @Test
+    public void testSelectTargetClosest() {
+        // Ennemi proche (à portée)
+        Unit closeEnemy = mock(Unit.class);
+        when(closeEnemy.getPosX()).thenReturn(120.0f); // Distance = 20
+        when(closeEnemy.getPosY()).thenReturn(200.0f);
+        when(closeEnemy.isDead()).thenReturn(false);
+        
+        // Ennemi plus loin (hors portée)
+        Unit farEnemy = mock(Unit.class);
+        when(farEnemy.getPosX()).thenReturn(200.0f); // Distance = 100
+        when(farEnemy.getPosY()).thenReturn(200.0f);
+        when(farEnemy.isDead()).thenReturn(false);
+        
+        enemies.add(farEnemy);
+        enemies.add(closeEnemy);
+        
+        zombie.selectTarget(enemies);
+        
+        assertNotNull("Should select a target", zombie.getTarget());
+        assertEquals("Should select closest enemy in range", closeEnemy, zombie.getTarget());
+    }
+    
+    @Test
+    public void testSelectTargetIgnoresDeadEnemies() {
+        Unit deadEnemy = mock(Unit.class);
+        when(deadEnemy.getPosX()).thenReturn(120.0f);
+        when(deadEnemy.getPosY()).thenReturn(200.0f);
+        when(deadEnemy.isDead()).thenReturn(true); // Mort !
+        
+        Unit aliveEnemy = mock(Unit.class);
+        when(aliveEnemy.getPosX()).thenReturn(130.0f);
+        when(aliveEnemy.getPosY()).thenReturn(200.0f);
+        when(aliveEnemy.isDead()).thenReturn(false);
+        
+        enemies.add(deadEnemy);
+        enemies.add(aliveEnemy);
+        
+        zombie.selectTarget(enemies);
+        
+        assertNotNull("Should select alive enemy", zombie.getTarget());
+        assertEquals("Should ignore dead enemy", aliveEnemy, zombie.getTarget());
+    }
+    
+    @Test
+    public void testSelectTargetAtExactRange() {
+        Unit enemy = mock(Unit.class);
+        // Placer l'ennemi exactement à la limite de portée (50)
+        when(enemy.getPosX()).thenReturn(150.0f);
+        when(enemy.getPosY()).thenReturn(200.0f);
+        when(enemy.isDead()).thenReturn(false);
+        enemies.add(enemy);
+        
+        zombie.selectTarget(enemies);
+        
+        // Devrait être sélectionné si range <= 50
+        assertNotNull("Target at exact range should be selected", zombie.getTarget());
     }
 
     // ===== Cooldown Tests =====

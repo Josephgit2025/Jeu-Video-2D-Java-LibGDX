@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -16,6 +19,7 @@ import com.main.entities.player.Hero;
 import com.main.map.Base;
 import com.main.map.WarMap;
 import com.ui.hud;
+import com.ui.GameOverOverlay;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -35,7 +39,20 @@ public class GameScreen implements Screen {
     private int mapHeight;
 
     private hud hudDisplay;
+    private GameOverOverlay gameOverOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
+    
+    // Pause display
+    private BitmapFont pauseFont;
+
+    // Game Over state
+    private enum GameState {
+        PLAYING,
+        PAUSE,
+        GAME_OVER
+    }
+    private GameState gameState = GameState.PLAYING;
+    private boolean pauseKeyPressed = false;
 
     private enum Direction {
         UP, DOWN, LEFT, RIGHT
@@ -59,6 +76,22 @@ public class GameScreen implements Screen {
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
         // Initialize HUD
         this.hudDisplay = new hud();
+        // Initialize Game Over Overlay
+        this.gameOverOverlay = new GameOverOverlay();
+        // Initialize Pause Font
+        this.pauseFont = new BitmapFont();
+        this.pauseFont.setColor(Color.WHITE);
+        this.pauseFont.getData().setScale(4f);
+    }
+
+    // Recommencer le jeu après avoir perdu
+    public void reset() {
+        // Reset game state
+        this.map = new WarMap();
+        this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
+        this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
+        this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
+        this.gameState = GameState.PLAYING;
     }
 
     @Override
@@ -115,6 +148,36 @@ public class GameScreen implements Screen {
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
         hudDisplay.render();
         
+        // Render Pause overlay if in Pause state
+        if (gameState == GameState.PAUSE) {
+            // Draw semi-transparent overlay
+            com.badlogic.gdx.Gdx.gl.glEnable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+            com.badlogic.gdx.Gdx.gl.glBlendFunc(com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA, com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA);
+            
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(0, 0, 0, 0.5f); // Black with 50% opacity
+            shapeRenderer.rect(0, 0, com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
+            shapeRenderer.end();
+            
+            com.badlogic.gdx.Gdx.gl.glDisable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
+
+            // Draw "PAUSED" texte centré
+            batch.begin();
+            GlyphLayout pauseLayout = new GlyphLayout(pauseFont, "PAUSED");
+            
+            // Draw with camera projection for game world coordinates (centered on camera)
+            batch.setProjectionMatrix(camera.combined);
+            pauseFont.draw(batch, "PAUSED", 
+                camera.position.x - pauseLayout.width / 2f, 
+                camera.position.y + pauseLayout.height / 2f);
+            batch.end();
+        }
+        
+        // Render Game Over Overlay if in Game Over state
+        if (gameState == GameState.GAME_OVER) {
+            gameOverOverlay.render();
+        }
+        
         // Draw range circles if enabled
         if (showRanges) {
             shapeRenderer.setProjectionMatrix(camera.combined);
@@ -170,6 +233,49 @@ public class GameScreen implements Screen {
     }
 
     private void update(float delta) {
+        // Toggle pause with ESCAPE key
+        if (com.badlogic.gdx.Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.ESCAPE)) {
+            if (!pauseKeyPressed) {
+                pauseKeyPressed = true;
+                if (gameState == GameState.PLAYING) {
+                    gameState = GameState.PAUSE;
+                    System.out.println("Game PAUSED");
+                } else if (gameState == GameState.PAUSE) {
+                    gameState = GameState.PLAYING;
+                    System.out.println("Game RESUMED");
+                }
+            }
+        } else {
+            pauseKeyPressed = false;
+        }
+        
+        // Check if hero is dead
+        if (hero.getCurrentHealth() <= 0 && gameState == GameState.PLAYING) {
+            gameState = GameState.GAME_OVER;
+            System.out.println("GAME OVER - Hero died!");
+        }
+        
+        // Handle Game Over clicks
+        if (gameState == GameState.GAME_OVER && com.badlogic.gdx.Gdx.input.justTouched()) {
+            String action = gameOverOverlay.handleClick(
+                com.badlogic.gdx.Gdx.input.getX(), 
+                com.badlogic.gdx.Gdx.input.getY()
+            );
+            
+            if ("replay".equals(action)) {
+                System.out.println("Replay clicked!");
+                reset();
+            } else if ("quit".equals(action)) {
+                System.out.println("Quit clicked!");
+                game.setScreen(new com.main.screens.TitleScreen(game));
+            }
+        }
+        
+        // Don't update game if Game Over or Paused
+        if (gameState == GameState.GAME_OVER || gameState == GameState.PAUSE) {
+            return;
+        }
+        
         // Toggle range display with 'R' key
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.R)) {
             showRanges = !showRanges;
@@ -248,7 +354,7 @@ public class GameScreen implements Screen {
                 // Give gold to hero when enemy dies
                 int goldReward = 10; // 10 gold per enemy killed
                 hero.addGold(goldReward);
-                System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
+                // System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
                 enemiesToRemove.add(enemy);
             }
         }
@@ -262,6 +368,9 @@ public class GameScreen implements Screen {
         viewport.update(width, height, true);
         if (hudDisplay != null) {
             hudDisplay.resize(width, height);
+        }
+        if (gameOverOverlay != null) {
+            gameOverOverlay.resize(width, height);
         }
     }
 
@@ -291,6 +400,10 @@ public class GameScreen implements Screen {
             map.dispose();
         if (hudDisplay != null)
             hudDisplay.dispose();
+        if (gameOverOverlay != null)
+            gameOverOverlay.dispose();
+        if (pauseFont != null)
+            pauseFont.dispose();
     }
 
     public SpriteBatch getBatch() {

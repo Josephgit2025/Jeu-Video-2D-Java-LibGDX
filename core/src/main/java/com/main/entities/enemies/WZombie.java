@@ -25,7 +25,7 @@ public class WZombie extends Zombie {
         // Attack should play once when triggered
         attackAnimation.setPlayMode(Animation.PlayMode.NORMAL);
 
-        Texture idleTex = new Texture(Gdx.files.internal("zombie/normal/Idle.png"));
+        Texture idleTex = new Texture(Gdx.files.internal("zombie/women/Walk1.png"));
         this.idleFrame = new TextureRegion(idleTex);
     }
 }

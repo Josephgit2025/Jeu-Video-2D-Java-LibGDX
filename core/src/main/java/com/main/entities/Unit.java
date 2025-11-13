@@ -123,7 +123,12 @@ public abstract class Unit {
         return texture;
     }
 
-    public void setCooldown(int cd) {
+
+    public float getAttackAnimationTimer() {
+        return attackAnimationTimer;
+    }
+
+    public void setCooldown(float cd) {
         this.attackCooldown = cd;
     }
 
@@ -165,11 +170,12 @@ public abstract class Unit {
 
         // Vérifier la collision avec la hitbox de la base
         boolean collides = unitRect.overlaps(targetBase.getCollisionBox());
-        
+
         // if (collides) {
-        //     System.out.println(this.getClass().getSimpleName() + " BLOCKED by " + targetBase.getName() + " hitbox!");
+        // System.out.println(this.getClass().getSimpleName() + " BLOCKED by " +
+        // targetBase.getName() + " hitbox!");
         // }
-        
+
         return collides;
     }
 
@@ -177,8 +183,8 @@ public abstract class Unit {
      * Calcule la distance entre cette unité et une autre
      */
     private double calculateDistance(Unit other) {
-        float dx = this.posX - other.posX;
-        float dy = this.posY - other.posY;
+        float dx = this.posX - other.getPosX();
+        float dy = this.posY - other.getPosY();
         return Math.sqrt(dx * dx + dy * dy);
     }
 
@@ -188,9 +194,9 @@ public abstract class Unit {
     public List<Unit> detectEnemiesInRange(List<Unit> enemies) {
         List<Unit> inRange = new ArrayList<>();
         for (Unit unit : enemies) {
-            if (unit != this) {
+            if (unit != this && !unit.isDead()) {
                 double distance = calculateDistance(unit);
-                if (distance <= this.range) {
+                if ((int)distance <= this.range) {
                     inRange.add(unit);
                 }
             }
@@ -206,7 +212,7 @@ public abstract class Unit {
         double minDistance = Double.MAX_VALUE;
         for (Unit enemy : enemies) {
             double distance = calculateDistance(enemy);
-            if (distance < minDistance) {
+            if (distance < minDistance && !enemy.isDead()) {
                 minDistance = distance;
                 closest = enemy;
             }
@@ -301,13 +307,34 @@ public abstract class Unit {
                 currentState = UnitState.ATTACKING;
                 attackAnimationTimer = getAttackAnimationDuration();
                 this.stateTime = 0f;
+                return;
             }
         }
+
+        // Priority 2: Attack enemy base if in range and no units to fight
+        // if (targetBase != null && target == null) {
+        //     double distanceToBase = calculateDistanceToBase();
+        //     if (distanceToBase <= BASE_ATTACK_RANGE && attackCooldown <= 0) {
+        //         System.out.println(this.getClass().getSimpleName() + " attacks enemy BASE" +
+        //                 " (HP: " + targetBase.getHealth() + " -> " + (targetBase.getHealth() - attackDamage) + ")");
+        //         targetBase.takeDamage(attackDamage);
+        //         attackCooldown = attackSpeed;
+        //         currentState = UnitState.ATTACKING;
+        //         attackAnimationTimer = getAttackAnimationDuration();
+        //         this.stateTime = 0f;
+        //         return;
+        //     }
+        // }
+        // No default fallback here; attacks are handled above for targets or base.
     }
+
 
     // Méthode pour attaquer la base
     public void attackBase(Base enemyBase) {
         if (enemyBase != null && attackCooldown <= 0) {
+            System.out.println(">>> " + this.getClass().getSimpleName() + " at (" + (int) posX + "," + (int) posY +
+                    ") ATTACKS " + enemyBase.getName() +
+                    " (BASE HP: " + enemyBase.getHealth() + " -> " + (enemyBase.getHealth() - attackDamage) + ")");
             enemyBase.takeDamage(this.attackDamage);
             attackCooldown = attackSpeed;
             attackAnimationTimer = ATTACK_ANIMATION_DURATION;
@@ -328,7 +355,14 @@ public abstract class Unit {
         float baseCenterX = baseBox.x + (baseBox.width / 2);
         float distance = Math.abs(unitCenterX - baseCenterX);
 
-        return distance <= BASE_ATTACK_RANGE;
+        boolean isNear = distance <= BASE_ATTACK_RANGE;
+        if (isNear && target == null) {
+            // System.out.println("🎯 " + this.getClass().getSimpleName() + " near " +
+            // base.getName() +
+            // " (distance: " + (int)distance + "/" + BASE_ATTACK_RANGE + ")");
+        }
+
+        return isNear;
     }
 
     /**

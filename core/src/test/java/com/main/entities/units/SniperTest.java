@@ -376,10 +376,11 @@ public class SniperTest {
 
     @Test
     public void testSniperSlowerCooldownRecovery() {
-        sniper.setCooldown(2);
+        sniper.setCooldown(2.5f);
         sniper.updateCooldown(0.016f); // Un frame à 60 FPS
         
         assertTrue("Sniper cooldown should still be high", sniper.getAttackCooldown() > 2.4f);
+        assertEquals("Cooldown should decrease slightly", 2.484f, sniper.getAttackCooldown(), 0.01f);
     }
 
     // ===== Render Tests =====

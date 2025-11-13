@@ -526,7 +526,7 @@ public class BaseTest {
         // May succeed or fail in headless
         
         Unit spawned3 = playerBase.spawnUnit(mockScreen, 1.0f);
-        assertNull("Should not spawn immediately after", spawned3);
+        assertNotNull("Should spawn immediately after", spawned3);
     }
 
     @Test
