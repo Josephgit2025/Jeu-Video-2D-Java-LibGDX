@@ -308,6 +308,9 @@ public abstract class Unit {
     // Méthode pour attaquer la base
     public void attackBase(Base enemyBase) {
         if (enemyBase != null && attackCooldown <= 0) {
+            System.out.println(">>> " + this.getClass().getSimpleName() + " at (" + (int)posX + "," + (int)posY + 
+                             ") ATTACKS " + enemyBase.getName() + 
+                             " (BASE HP: " + enemyBase.getHealth() + " -> " + (enemyBase.getHealth() - attackDamage) + ")");
             enemyBase.takeDamage(this.attackDamage);
             attackCooldown = attackSpeed;
             attackAnimationTimer = ATTACK_ANIMATION_DURATION;
@@ -327,8 +330,14 @@ public abstract class Unit {
         float unitCenterX = this.posX + (this.width / 2);
         float baseCenterX = baseBox.x + (baseBox.width / 2);
         float distance = Math.abs(unitCenterX - baseCenterX);
+        
+        boolean isNear = distance <= BASE_ATTACK_RANGE;
+        if (isNear && target == null) {
+            // System.out.println("🎯 " + this.getClass().getSimpleName() + " near " + base.getName() + 
+                            //  " (distance: " + (int)distance + "/" + BASE_ATTACK_RANGE + ")");
+        }
 
-        return distance <= BASE_ATTACK_RANGE;
+        return isNear;
     }
 
     /**

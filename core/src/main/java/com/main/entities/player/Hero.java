@@ -130,7 +130,7 @@ public class Hero extends Unit {
             float dx = newX - enemyX;
             float dy = newY - enemyY;
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
-            System.out.println("Distanche with " + enemy.getClass().getSimpleName() + " " + distance);
+            // System.out.println("Distanche with " + enemy.getClass().getSimpleName() + " " + distance);
             if (distance < 50f) {
                 System.out.println("Hero hard stuck in Zombie");
                 return true;
