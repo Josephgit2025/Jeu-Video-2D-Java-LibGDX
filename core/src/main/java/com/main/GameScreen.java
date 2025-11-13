@@ -38,6 +38,13 @@ public class GameScreen implements Screen {
     private hud hudDisplay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
 
+    // Game Over state      (À TESTER)
+    private enum GameState {
+        PLAYING,
+        GAME_OVER
+    }
+    private GameState gameState = GameState.PLAYING; // Game Playing
+
     private enum Direction {
         UP, DOWN, LEFT, RIGHT
     }
@@ -60,6 +67,16 @@ public class GameScreen implements Screen {
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
         // Initialize HUD
         this.hudDisplay = new hud();
+    }
+
+    // Reset the game to initial state  ( À TESTER)
+    public void reset() {
+        // Reset game state
+        this.map = new WarMap();
+        this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
+        this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
+        this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
+        this.gameState = GameState.PLAYING;
     }
 
     @Override

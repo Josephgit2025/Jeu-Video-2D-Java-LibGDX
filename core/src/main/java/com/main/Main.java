@@ -7,12 +7,23 @@ import com.main.screens.TitleScreen;
 // Main gere les ecrans, GameScreen gere le jeu
 public class Main extends Game {
     private GameScreen gameScreen;
+    private TitleScreen titleScreen;
 
     @Override
     public void create() {
         // Créer et définir l'écran de jeu
         gameScreen = new GameScreen(this);
-        setScreen(new TitleScreen(this));
+        titleScreen = new TitleScreen(this);
+        setScreen(titleScreen);
+    }
+    
+    // À TESTER
+    public void showTitleScreen() {
+        setScreen(titleScreen);
+    }
+
+    public void showGameScreen() {
+        setScreen(gameScreen);
     }
 
     @Override
