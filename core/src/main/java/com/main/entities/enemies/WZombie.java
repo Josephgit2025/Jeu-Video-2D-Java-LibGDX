@@ -17,7 +17,7 @@ public class WZombie extends Zombie {
         TextureRegion[] leftFrames = loadFrames("zombie/women/Walk%d.png", 7);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
-        
+
         // Use first frame as attack pose
         this.attackFrame = leftFrames[0];
     }
