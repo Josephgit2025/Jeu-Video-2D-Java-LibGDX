@@ -140,17 +140,6 @@ public class GameScreen implements Screen {
                 }
             }
             
-            // Draw bases (blue for player, orange for enemy)
-            shapeRenderer.setColor(0, 0, 1, 0.7f); // Blue for player base
-            shapeRenderer.circle(playerBase.getPosition().getPosX(), 
-                                playerBase.getPosition().getPosY(), 
-                                50); // Base visual size
-            
-            shapeRenderer.setColor(1, 0.5f, 0, 0.7f); // Orange for enemy base
-            shapeRenderer.circle(enemyBase.getPosition().getPosX(), 
-                                enemyBase.getPosition().getPosY(), 
-                                50); // Base visual size
-            
             // Draw base collision hitboxes (purple for player, yellow for enemy)
             shapeRenderer.setColor(0.5f, 0, 0.5f, 0.5f); // Purple for player base hitbox
             com.badlogic.gdx.math.Rectangle playerBox = playerBase.getCollisionBox();
