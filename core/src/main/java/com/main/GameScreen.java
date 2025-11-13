@@ -85,7 +85,7 @@ public class GameScreen implements Screen {
         this.pauseFont.getData().setScale(4f);
     }
 
-    // Recommencer le jeu
+    // Recommencer le jeu après avoir perdu
     public void reset() {
         // Reset game state
         this.map = new WarMap();
