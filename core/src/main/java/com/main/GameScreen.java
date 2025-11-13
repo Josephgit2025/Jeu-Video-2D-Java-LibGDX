@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -204,17 +203,6 @@ public class GameScreen implements Screen {
                 }
             }
             
-            // Draw bases (blue for player, orange for enemy)
-            shapeRenderer.setColor(0, 0, 1, 0.7f); // Blue for player base
-            shapeRenderer.circle(playerBase.getPosition().getPosX(), 
-                                playerBase.getPosition().getPosY(), 
-                                50); // Base visual size
-            
-            shapeRenderer.setColor(1, 0.5f, 0, 0.7f); // Orange for enemy base
-            shapeRenderer.circle(enemyBase.getPosition().getPosX(), 
-                                enemyBase.getPosition().getPosY(), 
-                                50); // Base visual size
-            
             // Draw base collision hitboxes (purple for player, yellow for enemy)
             shapeRenderer.setColor(0.5f, 0, 0.5f, 0.5f); // Purple for player base hitbox
             com.badlogic.gdx.math.Rectangle playerBox = playerBase.getCollisionBox();
@@ -301,7 +289,7 @@ public class GameScreen implements Screen {
         // Remove dead enemies and give gold to hero
         removeDeadEnemiesAndGiveGold();
         
-        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels());
+        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
         
         // Spawn des ennemis
         Unit tmpEnemy = enemyBase.spawnUnit(this, delta);
@@ -316,16 +304,16 @@ public class GameScreen implements Screen {
         }
         
         // Update : les ennemis attaquent les alliés (et leur base) et vice-versa
-        enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase);
-        playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase);
+        enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase, this.hero);
+        playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase, null);
         
         // Check for game over conditions
         if (playerBase.isDestroyed()) {
-            System.out.println("GAME OVER - Player base destroyed!");
+            // System.out.println("GAME OVER - Player base destroyed!");
             // TODO: Implement game over screen
         }
         if (enemyBase.isDestroyed()) {
-            System.out.println("VICTORY - Enemy base destroyed!");
+            // System.out.println("VICTORY - Enemy base destroyed!");
             // TODO: Implement victory screen
         }
         
@@ -349,14 +337,9 @@ public class GameScreen implements Screen {
             float dx = heroX - enemyX;
             float dy = heroY - enemyY;
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
-            
-            // If enemy is close enough to attack (within range)
-            if (distance < 50f) { // 50 pixels = attack range
-                // Enemy damages hero (1 damage per second, adjusted by delta time)
-                if (Math.random() < 0.02) { // 2% chance per frame to hit
-                    hero.takeDamage(5); // 5 damage per hit
-                    System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
-                }
+            if (distance < 50f) {
+                enemy.setTarget(this.hero);
+                // System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
             }
         }
     }
@@ -372,7 +355,7 @@ public class GameScreen implements Screen {
                 // Give gold to hero when enemy dies
                 int goldReward = 10; // 10 gold per enemy killed
                 hero.addGold(goldReward);
-                System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
+                // System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
                 enemiesToRemove.add(enemy);
             }
         }
