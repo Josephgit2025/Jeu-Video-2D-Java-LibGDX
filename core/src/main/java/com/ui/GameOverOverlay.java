@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -110,9 +111,11 @@ public class GameOverOverlay implements Disposable {
         // Draw text
         batch.begin();
         
-        // Title: "Votre Héros est mort"
+        // Title: "Votre Héros est mort -Game Over"
+        GlyphLayout titleLayout = new GlyphLayout(titleFont, "Game Over");
+        float titleX = (OVERLAY_WIDTH - titleLayout.width) / 2f;
         titleFont.draw(batch, "Game Over", 
-            OVERLAY_WIDTH / 2 - 250, 
+            titleX, 
             OVERLAY_HEIGHT / 2 + 120
         );
         
@@ -151,9 +154,10 @@ public class GameOverOverlay implements Disposable {
      * @return "replay" if replay button clicked, "quit" if quit button clicked, null otherwise
      */
     public String handleClick(int screenX, int screenY) {
-        // Convert screen coordinates to viewport coordinates
-        float worldX = screenX * (OVERLAY_WIDTH / Gdx.graphics.getWidth());
-        float worldY = (Gdx.graphics.getHeight() - screenY) * (OVERLAY_HEIGHT / Gdx.graphics.getHeight());
+        // Convert screen coordinates to viewport coordinates using unproject (same as TitleScreen)
+        Vector2 mouse = viewport.unproject(new Vector2(screenX, screenY));
+        float worldX = mouse.x;
+        float worldY = mouse.y;
         
         if (replayButton.contains(worldX, worldY)) {
             return "replay";
