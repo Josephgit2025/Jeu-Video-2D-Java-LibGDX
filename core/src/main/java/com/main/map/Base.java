@@ -10,6 +10,7 @@ import com.main.entities.Unit;
 import com.main.entities.enemies.CZombie;
 import com.main.entities.enemies.FZombie;
 import com.main.entities.enemies.WZombie;
+import com.main.entities.player.Hero;
 import com.main.entities.units.Melee;
 import com.main.entities.units.Sniper;
 import com.main.entities.units.Tank;
@@ -150,7 +151,7 @@ public class Base {
      * @param enemies La liste des ennemis à attaquer
      * @param enemyBase La base ennemie à attaquer si pas d'ennemis
      */
-    public void updateUnits(float delta, List<Unit> enemies, Base enemyBase) {
+    public void updateUnits(float delta, List<Unit> enemies, Base enemyBase, Hero hero) {
         // Supprime les unités mortes
         units.removeIf(Unit::isDead);
 
@@ -168,6 +169,8 @@ public class Base {
                     }
                 }
             }
+            if (hero != null)
+                liveEnemies.add(hero);
 
             // Determine target and update cooldown BEFORE moving so move(delta) sees the correct state
             unit.selectTarget(liveEnemies);

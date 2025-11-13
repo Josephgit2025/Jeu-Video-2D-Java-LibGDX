@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -210,8 +209,8 @@ public class GameScreen implements Screen {
         }
         
         // Update : les ennemis attaquent les alliés (et leur base) et vice-versa
-        enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase);
-        playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase);
+        enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase, this.hero);
+        playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase, null);
         
         // Check for game over conditions
         if (playerBase.isDestroyed()) {
@@ -247,10 +246,8 @@ public class GameScreen implements Screen {
             // If enemy is close enough to attack (within range)
             if (distance < 50f) { // 50 pixels = attack range
                 // Enemy damages hero (1 damage per second, adjusted by delta time)
-                if (Math.random() < 0.02) { // 2% chance per frame to hit
-                    hero.takeDamage(5); // 5 damage per hit
-                    System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
-                }
+                enemy.setTarget(this.hero);
+                System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
             }
         }
     }
