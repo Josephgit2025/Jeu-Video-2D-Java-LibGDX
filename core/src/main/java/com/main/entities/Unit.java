@@ -166,9 +166,9 @@ public abstract class Unit {
         // Vérifier la collision avec la hitbox de la base
         boolean collides = unitRect.overlaps(targetBase.getCollisionBox());
         
-        if (collides) {
-            System.out.println(this.getClass().getSimpleName() + " BLOCKED by " + targetBase.getName() + " hitbox!");
-        }
+        // if (collides) {
+        //     System.out.println(this.getClass().getSimpleName() + " BLOCKED by " + targetBase.getName() + " hitbox!");
+        // }
         
         return collides;
     }
