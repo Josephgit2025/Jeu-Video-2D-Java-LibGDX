@@ -325,8 +325,8 @@ public abstract class Unit {
             currentState = UnitState.ATTACKING;
             attackAnimationTimer = getAttackAnimationDuration();
             this.stateTime = 0f;
-            }
         }
+    }
     
     /**
      * Calcule la distance entre cette unité et la base ennemie
