@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 public class GameOverOverlay implements Disposable {
     
@@ -29,6 +30,9 @@ public class GameOverOverlay implements Disposable {
     // Button rectangles for click detection
     private Rectangle replayButton;
     private Rectangle quitButton;
+    
+    // Hover effect
+    private int selectedIndex = -1; // -1 = rien, 0 = REPLAY, 1 = QUIT
     
     // UI dimensions
     private static final float OVERLAY_WIDTH = 800f;
@@ -51,9 +55,19 @@ public class GameOverOverlay implements Disposable {
         titleFont.setColor(Color.RED);
         titleFont.getData().setScale(3f);
         
-        buttonFont = new BitmapFont();
-        buttonFont.setColor(Color.WHITE);
-        buttonFont.getData().setScale(2f);
+        // Police identique à TitleScreen avec bordure et ombre
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PressStart2P.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = 32;
+        parameter.borderWidth = 2.5f;
+        parameter.borderColor = new Color(0f, 0f, 0f, 0.85f);
+        parameter.shadowOffsetX = 2;
+        parameter.shadowOffsetY = -2;
+        parameter.shadowColor = new Color(0f, 0f, 0f, 0.7f);
+        parameter.magFilter = com.badlogic.gdx.graphics.Texture.TextureFilter.Nearest;
+        parameter.minFilter = com.badlogic.gdx.graphics.Texture.TextureFilter.Nearest;
+        buttonFont = generator.generateFont(parameter);
+        generator.dispose();
         
         // Initialize button rectangles (centered)
         float centerX = OVERLAY_WIDTH / 2;
@@ -75,6 +89,9 @@ public class GameOverOverlay implements Disposable {
     }
 
     public void render() {
+        // Update hover effect
+        updateHover();
+        
         // Update camera
         camera.update();
         
@@ -102,9 +119,6 @@ public class GameOverOverlay implements Disposable {
         );
         shapeRenderer.end();
         
-        // Draw buttons
-        drawButton(replayButton, Color.GREEN);
-        drawButton(quitButton, Color.RED);
         
         Gdx.gl.glDisable(GL20.GL_BLEND);
         
@@ -119,16 +133,19 @@ public class GameOverOverlay implements Disposable {
             OVERLAY_HEIGHT / 2 + 120
         );
         
-        // Button labels
-        buttonFont.draw(batch, "REPLAY", 
-            replayButton.x + 50, 
-            replayButton.y + 40
-        );
-        
-        buttonFont.draw(batch, "QUIT", 
-            quitButton.x + 70, 
-            quitButton.y + 40
-        );
+        // Effet d'hover pour REPLAY (visually on top, but index 1 due to Y inversion)
+        GlyphLayout replayLayout = new GlyphLayout(buttonFont, "REPLAY");
+        float replayX = (OVERLAY_WIDTH - replayLayout.width) / 2f;
+        Color replayColor = (selectedIndex == 1) ? Color.YELLOW : Color.WHITE;
+        buttonFont.setColor(replayColor);
+        buttonFont.draw(batch, replayLayout, replayX, replayButton.y + 40);
+
+        // Effet d'hover pour QUIT (visually on bottom, but index 0 due to Y inversion)
+        GlyphLayout quitLayout = new GlyphLayout(buttonFont, "QUIT");
+        float quitX = (OVERLAY_WIDTH - quitLayout.width) / 2f;
+        Color quitColor = (selectedIndex == 0) ? Color.YELLOW : Color.WHITE;
+        buttonFont.setColor(quitColor);
+        buttonFont.draw(batch, quitLayout, quitX, quitButton.y + 40);
         
         batch.end();
     }
@@ -168,6 +185,46 @@ public class GameOverOverlay implements Disposable {
         }
         
         return null;
+    }
+    
+    private void updateHover() {
+        Vector2 mouse = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
+        float mx = mouse.x;
+        float my = mouse.y;
+
+        selectedIndex = -1;
+
+        // QUIT button (en bas, index 1) - utilise le Rectangle pour la détection
+        GlyphLayout quitLayout = new GlyphLayout(buttonFont, "QUIT");
+        float quitX = (OVERLAY_WIDTH - quitLayout.width) / 2f;
+        
+        // Créer un rectangle de collision centré sur le texte
+        Rectangle quitHitbox = new Rectangle(
+            quitX - 10,
+            quitButton.y + 40 - quitLayout.height - 5,
+            quitLayout.width + 20,
+            quitLayout.height + 10
+        );
+        
+        if (quitHitbox.contains(mx, my)) {
+            selectedIndex = 1;
+        }
+
+        // REPLAY button (en haut, index 0) - utilise le Rectangle pour la détection
+        GlyphLayout replayLayout = new GlyphLayout(buttonFont, "REPLAY");
+        float replayX = (OVERLAY_WIDTH - replayLayout.width) / 2f;
+        
+        // Créer un rectangle de collision centré sur le texte
+        Rectangle replayHitbox = new Rectangle(
+            replayX - 10, 
+            replayButton.y + 40 - replayLayout.height - 5,
+            replayLayout.width + 20,
+            replayLayout.height + 10
+        );
+        
+        if (replayHitbox.contains(mx, my)) {
+            selectedIndex = 0;
+        }
     }
     
     public void resize(int width, int height) {

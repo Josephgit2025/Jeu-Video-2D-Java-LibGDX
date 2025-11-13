@@ -161,8 +161,8 @@ public class GameScreen implements Screen {
             shapeRenderer.end();
             
             com.badlogic.gdx.Gdx.gl.glDisable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
-            
-            // Draw "PAUSED" text centered
+
+            // Draw "PAUSED" texte centré
             batch.begin();
             GlyphLayout pauseLayout = new GlyphLayout(pauseFont, "PAUSED");
             
