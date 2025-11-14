@@ -96,6 +96,8 @@ public class GameScreen implements Screen {
         this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
         this.unitShop = new UnitShop(playerBase, hero);
+        // Resize the new unitShop to match current window size
+        this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
     }
 
