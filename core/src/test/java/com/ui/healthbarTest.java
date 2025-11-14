@@ -466,7 +466,7 @@ public class healthbarTest {
 
     @Test
     public void testCombatLoop() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i <= 10; i++) {
             healthBar.update(100 - i * 10, 100);
             healthBar.render(mockShapeRenderer);
         }
@@ -511,7 +511,7 @@ public class healthbarTest {
         healthBar.update(50, 100);
         
         // Simulate regeneration over time
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i <= 50; i++) {
             int newHealth = Math.min(50 + i, 100);
             healthBar.update(newHealth, 100);
         }
@@ -524,7 +524,7 @@ public class healthbarTest {
         healthBar.update(100, 100);
         
         // Simulate poison damage over time
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i <= 20; i++) {
             int newHealth = Math.max(100 - i * 5, 0);
             healthBar.update(newHealth, 100);
             healthBar.render(mockShapeRenderer);

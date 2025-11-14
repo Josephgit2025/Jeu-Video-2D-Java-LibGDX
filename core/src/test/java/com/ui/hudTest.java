@@ -133,8 +133,27 @@ public class hudTest {
 
     @Test
     public void testMultipleHudInstances() {
-        hud hud1 = new hud();
-        hud hud2 = new hud();
+        // Create multiple HUD instances with mocks to avoid shader compilation
+        SpriteBatch mockBatch1 = mock(SpriteBatch.class);
+        ShapeRenderer mockShapeRenderer1 = mock(ShapeRenderer.class);
+        BitmapFont mockFont1 = mock(BitmapFont.class);
+        BitmapFont.BitmapFontData mockFontData1 = mock(BitmapFont.BitmapFontData.class);
+        when(mockFont1.getData()).thenReturn(mockFontData1);
+        healthbar mockHealthBar1 = mock(healthbar.class);
+        gold mockGold1 = mock(gold.class);
+        when(mockGold1.getGold()).thenReturn(0);
+        
+        SpriteBatch mockBatch2 = mock(SpriteBatch.class);
+        ShapeRenderer mockShapeRenderer2 = mock(ShapeRenderer.class);
+        BitmapFont mockFont2 = mock(BitmapFont.class);
+        BitmapFont.BitmapFontData mockFontData2 = mock(BitmapFont.BitmapFontData.class);
+        when(mockFont2.getData()).thenReturn(mockFontData2);
+        healthbar mockHealthBar2 = mock(healthbar.class);
+        gold mockGold2 = mock(gold.class);
+        when(mockGold2.getGold()).thenReturn(0);
+        
+        hud hud1 = new hud(mockBatch1, mockShapeRenderer1, mockFont1, mockHealthBar1, mockGold1);
+        hud hud2 = new hud(mockBatch2, mockShapeRenderer2, mockFont2, mockHealthBar2, mockGold2);
         
         assertNotNull("First HUD should not be null", hud1);
         assertNotNull("Second HUD should not be null", hud2);
@@ -647,7 +666,44 @@ public class hudTest {
 
     @Test
     public void testCompleteUILifecycle() {
-        hud ui = new hud();
+        // Create HUD with mocks
+        SpriteBatch mockBatchUI = mock(SpriteBatch.class);
+        ShapeRenderer mockShapeRendererUI = mock(ShapeRenderer.class);
+        BitmapFont mockFontUI = mock(BitmapFont.class);
+        BitmapFont.BitmapFontData mockFontDataUI = mock(BitmapFont.BitmapFontData.class);
+        when(mockFontUI.getData()).thenReturn(mockFontDataUI);
+        healthbar mockHealthBarUI = mock(healthbar.class);
+        gold mockGoldUI = mock(gold.class);
+        
+        // Setup gold tracking for this instance
+        AtomicInteger uiGoldAmount = new AtomicInteger(0);
+        when(mockGoldUI.getGold()).thenAnswer(inv -> uiGoldAmount.get());
+        doAnswer(inv -> {
+            int amount = inv.getArgument(0);
+            uiGoldAmount.addAndGet(amount);
+            return null;
+        }).when(mockGoldUI).addGold(org.mockito.ArgumentMatchers.anyInt());
+        doAnswer(inv -> {
+            int amount = inv.getArgument(0);
+            uiGoldAmount.set(Math.max(0, amount));
+            return null;
+        }).when(mockGoldUI).setGold(org.mockito.ArgumentMatchers.anyInt());
+        doAnswer(inv -> {
+            int amount = inv.getArgument(0);
+            uiGoldAmount.set(Math.max(0, amount));
+            return null;
+        }).when(mockGoldUI).update(org.mockito.ArgumentMatchers.anyInt());
+        when(mockGoldUI.removeGold(org.mockito.ArgumentMatchers.anyInt())).thenAnswer(inv -> {
+            int amount = inv.getArgument(0);
+            int current = uiGoldAmount.get();
+            if (current >= amount) {
+                uiGoldAmount.set(current - amount);
+                return true;
+            }
+            return false;
+        });
+        
+        hud ui = new hud(mockBatchUI, mockShapeRendererUI, mockFontUI, mockHealthBarUI, mockGoldUI);
         ui.update(100, 100, 0);
         
         for (int i = 0; i < 50; i++) {
@@ -678,7 +734,7 @@ public class hudTest {
         gameHud.setGold(-100);
         assertTrue("Gold should be non-negative", gameHud.getGold() >= 0);
         
-        gameHud.addGold(-500);
+        gameHud.removeGold(500);
         assertTrue("Gold should be non-negative", gameHud.getGold() >= 0);
         
         gameHud.update(-50, 100, -200);

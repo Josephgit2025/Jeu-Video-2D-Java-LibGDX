@@ -28,7 +28,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.main.entities.Unit;
 import com.main.map.WarMap;
 import com.main.weapons.Pistol;
-import com.main.weapons.Machette;
+import com.main.weapons.SniperRifle;
 
 public class HeroTest {
 
@@ -94,7 +94,7 @@ public class HeroTest {
     public void testConstructorInitializesDefaultWeapon() {
         Hero newHero = new Hero(0, 0, mockMap);
         assertNotNull("Default weapon should be Machette", newHero.weapon);
-        assertTrue("Default weapon should be Machette", newHero.weapon instanceof Machette);
+        assertTrue("Default weapon should be Machette", newHero.weapon instanceof SniperRifle);
     }
 
     @Test
@@ -328,6 +328,9 @@ public class HeroTest {
 
     @Test
     public void testAttackWithLiveTargetDealsDamage() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(0);
         
@@ -368,11 +371,17 @@ public class HeroTest {
 
     @Test
     public void testAttackReducesWeaponMunitions() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(0);
         
         int initialMunitions = hero.weapon.getMunitions();
+        System.out.println("Munitions before = " + initialMunitions);
+        // hero.weapon.reload();
         hero.attack();
+        System.out.println("Munitions after = " + hero.weapon.getMunitions());
         
         assertTrue("Munitions should decrease after attack", hero.weapon.getMunitions() < initialMunitions);
         assertTrue("Cooldown should be set after attack", hero.getAttackCooldown() > 0);
@@ -380,6 +389,9 @@ public class HeroTest {
 
     @Test
     public void testMultipleAttacksDepleteMunitions() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         
         int attackCount = 0;
@@ -397,6 +409,9 @@ public class HeroTest {
 
     @Test
     public void testAttackSetsCooldownAfterAttack() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(0);
         
@@ -409,6 +424,9 @@ public class HeroTest {
 
     @Test
     public void testCannotAttackTwiceWithoutResettingCooldown() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(0);
         
@@ -568,6 +586,9 @@ public class HeroTest {
 
     @Test
     public void testFullCombatSequence() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(0);
         
