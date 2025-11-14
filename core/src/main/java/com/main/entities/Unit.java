@@ -337,8 +337,11 @@ public abstract class Unit {
                     " (BASE HP: " + enemyBase.getHealth() + " -> " + (enemyBase.getHealth() - attackDamage) + ")");
             enemyBase.takeDamage(this.attackDamage);
             attackCooldown = attackSpeed;
-            attackAnimationTimer = ATTACK_ANIMATION_DURATION;
+            // Use subclass-specific attack animation duration when available
+            attackAnimationTimer = getAttackAnimationDuration();
             currentState = UnitState.ATTACKING;
+            this.stateTime = 0f;
+            System.out.println("[ANIM] " + this.getClass().getSimpleName() + " base attack timer set: " + attackAnimationTimer);
         }
     }
 
@@ -423,10 +426,14 @@ public abstract class Unit {
      */
     public void move(float delta) {
         if (currentState == UnitState.ATTACKING) {
+            float before = attackAnimationTimer;
             attackAnimationTimer -= delta;
             // advance shared animation timer so attack animations progress when
             // using default move implementation
             this.stateTime += delta;
+            if (before > 0 && attackAnimationTimer <= 0) {
+                System.out.println("[ANIM] " + this.getClass().getSimpleName() + " attack animation finished (was " + before + ")");
+            }
             if (attackAnimationTimer > 0) {
                 return;
             }
@@ -463,6 +470,33 @@ public abstract class Unit {
                 return;
             }
         }
+        // If no unit target, handle enemy base: attack when in range, otherwise move toward it
+        if (targetBase != null) {
+            float baseX = targetBase.getPosition().getPosX();
+            float baseY = targetBase.getPosition().getPosY();
+            double distanceToBase = Math.sqrt(Math.pow(baseX - this.posX, 2) + Math.pow(baseY - this.posY, 2));
+            if (distanceToBase <= BASE_ATTACK_RANGE) {
+                // In range of base: attempt an attack if cooldown ready
+                if (attackCooldown <= 0) {
+                    // Use dedicated base attack helper so we apply base damage and animation
+                    attackBase(targetBase);
+                    this.stateTime = 0f;
+                    return;
+                } else {
+                    currentState = UnitState.IDLE;
+                    this.stateTime += delta;
+                    return;
+                }
+            } else {
+                // Not yet in base range: walk towards the base
+                currentState = UnitState.WALKING;
+                int direction = (targetBase.getPosition().getPosX() > posX) ? 1 : -1;
+                setSpritePosX(calculateNewPositionX(delta, direction));
+                this.stateTime += delta;
+                return;
+            }
+        }
+
         currentState = UnitState.IDLE;
         // advance idle animation timer for units using default move()
         this.stateTime += delta;
