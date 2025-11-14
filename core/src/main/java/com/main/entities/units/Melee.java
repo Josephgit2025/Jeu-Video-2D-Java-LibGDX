@@ -43,4 +43,24 @@ public class Melee extends Soldier {
             stateTime = 0f;
         }
     }
+
+    @Override
+    protected float getAttackAnimationDuration() {
+        if (this.attackAnimation != null) {
+            return this.attackAnimation.getAnimationDuration();
+        }
+        return super.getAttackAnimationDuration();
+    }
+
+    @Override
+    public void attackBase(com.main.map.Base enemyBase) {
+        // Call super to apply damage/cooldown/state changes, then ensure the
+        // animation timer matches the melee attack animation length.
+        super.attackBase(enemyBase);
+        if (this.attackAnimation != null) {
+            this.attackAnimationTimer = this.attackAnimation.getAnimationDuration();
+            this.stateTime = 0f;
+            System.out.println("[ANIM] " + this.getClass().getSimpleName() + " base attack timer set: " + this.attackAnimationTimer);
+        }
+    }
 }
