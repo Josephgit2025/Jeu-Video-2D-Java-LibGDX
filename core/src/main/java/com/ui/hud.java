@@ -46,11 +46,11 @@ public class hud implements Disposable {
     private static final float GOLD_Y = 535f;
     
     // Base health bar positions and dimensions
-    private static final float BASE_HEALTH_BAR_WIDTH = 250f;
+    private static final float BASE_HEALTH_BAR_WIDTH = 175f;
     private static final float BASE_HEALTH_BAR_HEIGHT = 20f;
     private static final float BASE_HEALTH_BAR_Y = 20f;
     private static final float PLAYER_BASE_HEALTH_BAR_X = 50f;
-    private static final float ENEMY_BASE_HEALTH_BAR_X = 500f;
+    private static final float ENEMY_BASE_HEALTH_BAR_X = 575f;
     
     // Base icon settings
     private static final float BASE_ICON_SIZE = 40f;

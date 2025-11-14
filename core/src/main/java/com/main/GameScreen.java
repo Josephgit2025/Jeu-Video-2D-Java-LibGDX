@@ -20,6 +20,7 @@ import com.main.map.Base;
 import com.main.map.WarMap;
 import com.ui.hud;
 import com.ui.GameOverOverlay;
+import com.ui.BaseDestroyedOverlay;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -40,6 +41,7 @@ public class GameScreen implements Screen {
 
     private hud hudDisplay;
     private GameOverOverlay gameOverOverlay;
+    private BaseDestroyedOverlay baseDestroyedOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
     
     // Pause display
@@ -49,7 +51,8 @@ public class GameScreen implements Screen {
     private enum GameState {
         PLAYING,
         PAUSE,
-        GAME_OVER
+        GAME_OVER,
+        BASE_DESTROYED
     }
     private GameState gameState = GameState.PLAYING;
     private boolean pauseKeyPressed = false;
@@ -78,6 +81,8 @@ public class GameScreen implements Screen {
         this.hudDisplay = new hud();
         // Initialize Game Over Overlay
         this.gameOverOverlay = new GameOverOverlay();
+        // Initialize Base Destroyed Overlay
+        this.baseDestroyedOverlay = new BaseDestroyedOverlay();
         // Initialize Pause Font
         this.pauseFont = new BitmapFont();
         this.pauseFont.setColor(Color.WHITE);
@@ -179,6 +184,11 @@ public class GameScreen implements Screen {
             gameOverOverlay.render();
         }
         
+        // Render Base Destroyed Overlay if player base is destroyed
+        if (gameState == GameState.BASE_DESTROYED) {
+            baseDestroyedOverlay.render();
+        }
+        
         // Draw range circles if enabled
         if (showRanges) {
             shapeRenderer.setProjectionMatrix(camera.combined);
@@ -254,6 +264,12 @@ public class GameScreen implements Screen {
         if (hero.getCurrentHealth() <= 0 && gameState == GameState.PLAYING) {
             gameState = GameState.GAME_OVER;
             System.out.println("GAME OVER - Hero died!");
+        }
+        
+        // Check if player base is destroyed
+        if (playerBase.isDestroyed() && gameState == GameState.PLAYING) {
+            gameState = GameState.BASE_DESTROYED;
+            System.out.println("BASE DESTROYED - Player base has been destroyed!");
         }
         
         // Handle Game Over clicks
@@ -374,6 +390,9 @@ public class GameScreen implements Screen {
         if (gameOverOverlay != null) {
             gameOverOverlay.resize(width, height);
         }
+        if (baseDestroyedOverlay != null) {
+            baseDestroyedOverlay.resize(width, height);
+        }
     }
 
     @Override
@@ -404,6 +423,8 @@ public class GameScreen implements Screen {
             hudDisplay.dispose();
         if (gameOverOverlay != null)
             gameOverOverlay.dispose();
+        if (baseDestroyedOverlay != null)
+            baseDestroyedOverlay.dispose();
         if (pauseFont != null)
             pauseFont.dispose();
     }

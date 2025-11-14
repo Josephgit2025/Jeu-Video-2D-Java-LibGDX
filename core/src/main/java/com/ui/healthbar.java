@@ -30,12 +30,12 @@ public class healthbar implements Disposable {
     private static final float ICON_SIZE = 26f;
     private static final float ICON_OFFSET = 32f;
     
-    // Colors (style isométrique)
-    private static final Color BACKGROUND_COLOR = new Color(0.95f, 0.95f, 0.95f, 1f);   // Blanc/gris clair
-    private static final Color BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f, 1f);          // Gris foncé (au lieu de noir)
-    private static final Color HEALTH_COLOR = new Color(0.2f, 0.8f, 0.2f, 1f);          // Green
-    private static final Color LOW_HEALTH_COLOR = new Color(0.8f, 0.2f, 0.2f, 1f);      // Red
-    private static final Color MEDIUM_HEALTH_COLOR = new Color(1f, 0.75f, 0f, 1f);      // Orange/jaune
+    // Colors (style jeu 2D)
+    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1f);      // Fond gris foncé (style 2D)
+    private static final Color BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f, 1f);          // Gris foncé
+    private static final Color HEALTH_COLOR = new Color(0.1f, 0.9f, 0.1f, 1f);          // Vert vif
+    private static final Color LOW_HEALTH_COLOR = new Color(0.9f, 0.1f, 0.1f, 1f);      // Rouge vif
+    private static final Color MEDIUM_HEALTH_COLOR = new Color(1f, 0.6f, 0f, 1f);       // Orange vif
     
     // Border thickness (plus épais pour style isométrique)
     private static final float BORDER_THICKNESS = 4f;
