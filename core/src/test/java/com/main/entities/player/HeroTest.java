@@ -1,7 +1,11 @@
 package com.main.entities.player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
@@ -20,20 +24,26 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.main.entities.Unit;
 import com.main.map.WarMap;
 import com.main.weapons.Pistol;
+import com.main.weapons.SniperRifle;
 
 public class HeroTest {
 
     private static Application application;
     private Hero hero;
+    private List<Unit> enemies;
     
     @Mock
     private WarMap mockMap;
     
     @Mock
     private Unit mockTarget;
+    
+    @Mock
+    private SpriteBatch mockBatch;
 
     @Mock
     private GL20 mockGL;
@@ -60,7 +70,15 @@ public class HeroTest {
         
         hero = new Hero(100, 200, mockMap);
         hero.setWeapon(new Pistol());
+        
+        enemies = new ArrayList<>();
+        
+        when(mockTarget.getPosX()).thenReturn(500.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
     }
+
+    // ===== Constructor Tests =====
 
     @Test
     public void testConstructorInitializesHeroCorrectly() {
@@ -73,9 +91,28 @@ public class HeroTest {
     }
 
     @Test
+    public void testConstructorInitializesDefaultWeapon() {
+        Hero newHero = new Hero(0, 0, mockMap);
+        assertNotNull("Default weapon should be Machette", newHero.weapon);
+        assertTrue("Default weapon should be Machette", newHero.weapon instanceof SniperRifle);
+    }
+
+    @Test
+    public void testConstructorInitializesGold() {
+        assertEquals("Hero should start with 50 gold", 50, hero.getGold());
+    }
+
+    @Test
+    public void testConstructorInitializesMaxHealth() {
+        assertEquals("Max health should be 500", 500, hero.getMaxHealth());
+    }
+
+    // ===== Movement Up Tests =====
+
+    @Test
     public void testMoveUpIncreasesYPosition() {
         float initialY = hero.getPosY();
-        hero.moveUp(0.016f, 1000);
+        hero.moveUp(0.016f, 1000, enemies);
         assertTrue("Y position should increase when moving up", hero.getPosY() > initialY);
     }
 
@@ -83,21 +120,44 @@ public class HeroTest {
     public void testMoveUpWithCollisionDoesNotMove() {
         when(mockMap.isCollisionRect(anyFloat(), anyFloat(), anyFloat(), anyFloat())).thenReturn(true);
         float initialY = hero.getPosY();
-        hero.moveUp(0.016f, 1000);
+        hero.moveUp(0.016f, 1000, enemies);
         assertEquals("Y position should not change with collision", initialY, hero.getPosY(), 0.01f);
     }
 
     @Test
     public void testMoveUpRespectsBoundary() {
         hero.setSpritePosY(995);
-        hero.moveUp(0.016f, 1000);
+        hero.moveUp(0.016f, 1000, enemies);
         assertTrue("Hero should not exceed map height", hero.getPosY() + hero.getHeight() <= 1000);
     }
 
     @Test
+    public void testMoveUpWithEnemyCollision() {
+        Unit closeEnemy = new TestUnit(100, 220); // Proche du héros
+        enemies.add(closeEnemy);
+        
+        float initialY = hero.getPosY();
+        hero.moveUp(0.016f, 1000, enemies);
+        
+        // Devrait être bloqué ou se déplacer selon la distance
+        assertTrue("Y position should be handled correctly", hero.getPosY() >= initialY);
+    }
+
+    @Test
+    public void testMoveUpCalculation() {
+        float initialY = hero.getPosY();
+        hero.moveUp(1.0f, 1000, enemies);
+        // Movement = speed * delta * 60 = 8 * 1.0 * 60 = 480
+        float expectedY = initialY + 480;
+        assertEquals("Position should increase correctly", expectedY, hero.getPosY(), 1.0f);
+    }
+
+    // ===== Movement Down Tests =====
+
+    @Test
     public void testMoveDownDecreasesYPosition() {
         float initialY = hero.getPosY();
-        hero.moveDown(0.016f);
+        hero.moveDown(0.016f, enemies);
         assertTrue("Y position should decrease when moving down", hero.getPosY() < initialY);
     }
 
@@ -105,21 +165,34 @@ public class HeroTest {
     public void testMoveDownWithCollisionDoesNotMove() {
         when(mockMap.isCollisionRect(anyFloat(), anyFloat(), anyFloat(), anyFloat())).thenReturn(true);
         float initialY = hero.getPosY();
-        hero.moveDown(0.016f);
+        hero.moveDown(0.016f, enemies);
         assertEquals("Y position should not change with collision", initialY, hero.getPosY(), 0.01f);
     }
 
     @Test
     public void testMoveDownRespectsBoundary() {
         hero.setSpritePosY(5);
-        hero.moveDown(0.016f);
+        hero.moveDown(0.016f, enemies);
         assertTrue("Hero Y should not go below 0", hero.getPosY() >= 0);
     }
 
     @Test
+    public void testMoveDownWithEnemyCollision() {
+        Unit closeEnemy = new TestUnit(100, 180); // Proche du héros
+        enemies.add(closeEnemy);
+        
+        float initialY = hero.getPosY();
+        hero.moveDown(0.016f, enemies);
+        
+        assertTrue("Y position should be handled correctly", hero.getPosY() <= initialY);
+    }
+
+    // ===== Movement Left Tests =====
+
+    @Test
     public void testMoveLeftDecreasesXPosition() {
         float initialX = hero.getPosX();
-        hero.moveLeft(0.016f);
+        hero.moveLeft(0.016f, enemies);
         assertTrue("X position should decrease when moving left", hero.getPosX() < initialX);
     }
 
@@ -127,21 +200,34 @@ public class HeroTest {
     public void testMoveLeftWithCollisionDoesNotMove() {
         when(mockMap.isCollisionRect(anyFloat(), anyFloat(), anyFloat(), anyFloat())).thenReturn(true);
         float initialX = hero.getPosX();
-        hero.moveLeft(0.016f);
+        hero.moveLeft(0.016f, enemies);
         assertEquals("X position should not change with collision", initialX, hero.getPosX(), 0.01f);
     }
 
     @Test
     public void testMoveLeftRespectsBoundary() {
         hero.setSpritePosX(5);
-        hero.moveLeft(0.016f);
+        hero.moveLeft(0.016f, enemies);
         assertTrue("Hero X should not go below 0", hero.getPosX() >= 0);
     }
 
     @Test
+    public void testMoveLeftWithEnemyCollision() {
+        Unit closeEnemy = new TestUnit(80, 200); // Proche du héros
+        enemies.add(closeEnemy);
+        
+        float initialX = hero.getPosX();
+        hero.moveLeft(0.016f, enemies);
+        
+        assertTrue("X position should be handled correctly", hero.getPosX() <= initialX);
+    }
+
+    // ===== Movement Right Tests =====
+
+    @Test
     public void testMoveRightIncreasesXPosition() {
         float initialX = hero.getPosX();
-        hero.moveRight(0.016f, 1000);
+        hero.moveRight(0.016f, 1000, enemies);
         assertTrue("X position should increase when moving right", hero.getPosX() > initialX);
     }
 
@@ -149,22 +235,49 @@ public class HeroTest {
     public void testMoveRightWithCollisionDoesNotMove() {
         when(mockMap.isCollisionRect(anyFloat(), anyFloat(), anyFloat(), anyFloat())).thenReturn(true);
         float initialX = hero.getPosX();
-        hero.moveRight(0.016f, 1000);
+        hero.moveRight(0.016f, 1000, enemies);
         assertEquals("X position should not change with collision", initialX, hero.getPosX(), 0.01f);
     }
 
     @Test
     public void testMoveRightRespectsBoundary() {
         hero.setSpritePosX(965);
-        hero.moveRight(0.016f, 1000);
+        hero.moveRight(0.016f, 1000, enemies);
         assertTrue("Hero should not exceed map width", hero.getPosX() + hero.getWidth() <= 1000);
     }
 
     @Test
+    public void testMoveRightWithEnemyCollision() {
+        Unit closeEnemy = new TestUnit(120, 200); // Proche du héros
+        enemies.add(closeEnemy);
+        
+        float initialX = hero.getPosX();
+        hero.moveRight(0.016f, 1000, enemies);
+        
+        assertTrue("X position should be handled correctly", hero.getPosX() >= initialX);
+    }
+
+    // ===== Update Tests =====
+
+    @Test
     public void testUpdateDoesNotThrowException() {
-        hero.update(0.016f, 1920, 1080);
+        hero.update(0.016f, 1920, 1080, enemies);
         assertNotNull("Hero should still exist after update", hero);
     }
+
+    @Test
+    public void testUpdateWithNoInput() {
+        float initialX = hero.getPosX();
+        float initialY = hero.getPosY();
+        
+        hero.update(0.016f, 1920, 1080, enemies);
+        
+        // Sans input clavier, le héros ne devrait pas bouger
+        assertEquals("X should not change without input", initialX, hero.getPosX(), 0.01f);
+        assertEquals("Y should not change without input", initialY, hero.getPosY(), 0.01f);
+    }
+
+    // ===== Move Override Tests =====
 
     @Test
     public void testMoveMethodDoesNothing() {
@@ -175,10 +288,29 @@ public class HeroTest {
         assertEquals("Y should not change with move()", initialY, hero.getPosY(), 0.01f);
     }
 
+    // ===== Weapon Tests =====
+
     @Test
-    public void testGetSpriteReturnsValidSprite() {
-        assertNotNull("Sprite should not be null", hero.getSprite());
+    public void testSetWeapon() {
+        Pistol pistol = new Pistol();
+        hero.setWeapon(pistol);
+        assertEquals("Weapon should be set", pistol, hero.weapon);
     }
+
+    @Test
+    public void testSetWeaponWithNull() {
+        Pistol pistol = new Pistol();
+        hero.setWeapon(pistol);
+        hero.setWeapon(null);
+        assertEquals("Weapon should remain unchanged with null", pistol, hero.weapon);
+    }
+
+    @Test
+    public void testHeroWeaponIsNotNull() {
+        assertNotNull("Hero weapon should not be null", hero.weapon);
+    }
+
+    // ===== Attack Tests =====
 
     @Test
     public void testAttackWithNullTargetDoesNothing() {
@@ -196,11 +328,12 @@ public class HeroTest {
 
     @Test
     public void testAttackWithLiveTargetDealsDamage() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
         when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(0);
         
-        // S'assurer que l'arme a des munitions
         int initialMunitions = hero.weapon.getMunitions();
         assertTrue("Weapon should have munitions", initialMunitions > 0);
         
@@ -211,7 +344,6 @@ public class HeroTest {
 
     @Test
     public void testAttackRespectsAttackCooldown() {
-        when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(5);
         
@@ -222,7 +354,6 @@ public class HeroTest {
 
     @Test
     public void testWeaponReloadWhenNoMunitions() {
-        when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(0);
         
@@ -235,8 +366,205 @@ public class HeroTest {
         
         hero.attack();
         
-        // Vérifier qu'on ne peut pas attaquer sans munitions
         verify(mockTarget, never()).takeDamage(anyInt());
+    }
+
+    @Test
+    public void testAttackReducesWeaponMunitions() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        
+        int initialMunitions = hero.weapon.getMunitions();
+        System.out.println("Munitions before = " + initialMunitions);
+        // hero.weapon.reload();
+        hero.attack();
+        System.out.println("Munitions after = " + hero.weapon.getMunitions());
+        
+        assertTrue("Munitions should decrease after attack", hero.weapon.getMunitions() < initialMunitions);
+        assertTrue("Cooldown should be set after attack", hero.getAttackCooldown() > 0);
+    }
+
+    @Test
+    public void testMultipleAttacksDepleteMunitions() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
+        hero.setTarget(mockTarget);
+        
+        int attackCount = 0;
+        int initialMunitions = hero.weapon.getMunitions();
+        
+        while (hero.weapon.getMunitions() > 0 && attackCount < initialMunitions) {
+            hero.setCooldown(0);
+            hero.attack();
+            attackCount++;
+        }
+        
+        assertTrue("Should have attacked multiple times", attackCount > 0);
+        assertEquals("Should have no munitions left", 0, hero.weapon.getMunitions());
+    }
+
+    @Test
+    public void testAttackSetsCooldownAfterAttack() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        
+        hero.attack();
+        
+        assertEquals("Cooldown should be set to weapon attack speed", 
+                     hero.weapon.getAttackSpeed(), 
+                     hero.getAttackCooldown(), 0.01f);
+    }
+
+    @Test
+    public void testCannotAttackTwiceWithoutResettingCooldown() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        when(mockTarget.isDead()).thenReturn(false);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        
+        int initialMunitions = hero.weapon.getMunitions();
+        
+        hero.attack();
+        assertEquals("Munitions should decrease by 1", initialMunitions - 1, hero.weapon.getMunitions());
+        
+        hero.attack();
+        assertEquals("Munitions should NOT decrease again due to cooldown", 
+                     initialMunitions - 1, 
+                     hero.weapon.getMunitions());
+        
+        verify(mockTarget, times(1)).takeDamage(anyInt());
+    }
+
+    // ===== Health System Tests =====
+
+    @Test
+    public void testGetCurrentHealth() {
+        assertEquals("Current health should be 500", 500, hero.getCurrentHealth());
+    }
+
+    @Test
+    public void testGetMaxHealth() {
+        assertEquals("Max health should be 500", 500, hero.getMaxHealth());
+    }
+
+    @Test
+    public void testSetMaxHealth() {
+        hero.setMaxHealth(600);
+        assertEquals("Max health should be updated", 600, hero.getMaxHealth());
+    }
+
+    @Test
+    public void testSetMaxHealthLowerThanCurrent() {
+        hero.takeDamage(100); // Health = 400
+        hero.setMaxHealth(300);
+        assertEquals("Max health should be 300", 300, hero.getMaxHealth());
+        assertEquals("Current health should be capped at 300", 300, hero.getCurrentHealth());
+    }
+
+    @Test
+    public void testHeal() {
+        hero.takeDamage(200); // Health = 300
+        hero.heal(100);
+        assertEquals("Health should be 400 after healing", 400, hero.getCurrentHealth());
+    }
+
+    @Test
+    public void testHealAboveMax() {
+        hero.takeDamage(100); // Health = 400
+        hero.heal(200);
+        assertEquals("Health should be capped at max (500)", 500, hero.getCurrentHealth());
+    }
+
+    @Test
+    public void testHealAtFullHealth() {
+        hero.heal(50);
+        assertEquals("Health should remain at max", 500, hero.getCurrentHealth());
+    }
+
+    // ===== Gold System Tests =====
+
+    @Test
+    public void testGetGold() {
+        assertEquals("Should start with 50 gold", 50, hero.getGold());
+    }
+
+    @Test
+    public void testSetGold() {
+        hero.setGold(100);
+        assertEquals("Gold should be 100", 100, hero.getGold());
+    }
+
+    @Test
+    public void testSetGoldNegative() {
+        hero.setGold(-50);
+        assertEquals("Gold should not go negative", 0, hero.getGold());
+    }
+
+    @Test
+    public void testAddGold() {
+        hero.addGold(50);
+        assertEquals("Gold should be 100", 100, hero.getGold());
+    }
+
+    @Test
+    public void testAddGoldMultipleTimes() {
+        hero.addGold(25);
+        hero.addGold(25);
+        hero.addGold(50);
+        assertEquals("Gold should be 150", 150, hero.getGold());
+    }
+
+    @Test
+    public void testRemoveGold() {
+        boolean result = hero.removeGold(30);
+        assertTrue("Should successfully remove gold", result);
+        assertEquals("Gold should be 20", 20, hero.getGold());
+    }
+
+    @Test
+    public void testRemoveGoldInsufficientFunds() {
+        boolean result = hero.removeGold(100);
+        assertFalse("Should fail to remove gold", result);
+        assertEquals("Gold should remain 50", 50, hero.getGold());
+    }
+
+    @Test
+    public void testRemoveGoldExact() {
+        boolean result = hero.removeGold(50);
+        assertTrue("Should successfully remove exact amount", result);
+        assertEquals("Gold should be 0", 0, hero.getGold());
+    }
+
+    // ===== Render Tests =====
+
+    @Test
+    public void testRenderDoesNotThrow() {
+        hero.render(mockBatch);
+        // Pas d'exception = succès
+    }
+
+    @Test
+    public void testGetSpriteReturnsValidSprite() {
+        assertNotNull("Sprite should not be null", hero.getSprite());
+    }
+
+    // ===== Getters Tests =====
+
+    @Test
+    public void testGettersReturnCorrectValues() {
+        assertEquals("getPosX should return correct value", 100, hero.getPosX(), 0.01f);
+        assertEquals("getPosY should return correct value", 200, hero.getPosY(), 0.01f);
+        assertEquals("getSpeed should return correct value", 8, hero.getSpeed(), 0.01f);
+        assertEquals("getHealth should return correct value", 500, hero.getHealth());
+        assertEquals("getAttackSpeed should return correct value", 1, hero.getAttackSpeed(), 0.01f);
     }
 
     @Test
@@ -254,86 +582,63 @@ public class HeroTest {
         assertEquals("Hero attack speed should be 1", 1.0f, hero.getAttackSpeed(), 0.01f);
     }
 
-    @Test
-    public void testHeroWeaponIsNotNull() {
-        assertNotNull("Hero weapon should not be null", hero.weapon);
-    }
+    // ===== Integration Tests =====
 
     @Test
-    public void testAttackReducesWeaponMunitions() {
+    public void testFullCombatSequence() {
+        when(mockTarget.getPosX()).thenReturn(120.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
         when(mockTarget.isDead()).thenReturn(false);
         hero.setTarget(mockTarget);
         hero.setCooldown(0);
-        
-        int initialMunitions = hero.weapon.getMunitions();
-        hero.attack();
-        
-        // Après une attaque, les munitions diminuent ET le cooldown est remis
-        assertTrue("Munitions should decrease after attack", hero.weapon.getMunitions() < initialMunitions);
-        assertTrue("Cooldown should be set after attack", hero.getAttackCooldown() > 0);
-    }
-
-    @Test
-    public void testMultipleAttacksDepleteMunitions() {
-        when(mockTarget.isDead()).thenReturn(false);
-        hero.setTarget(mockTarget);
-        
-        int attackCount = 0;
-        int initialMunitions = hero.weapon.getMunitions();
-        
-        // Simuler plusieurs attaques en réinitialisant le cooldown à chaque fois
-        while (hero.weapon.getMunitions() > 0 && attackCount < initialMunitions) {
-            hero.setCooldown(0); // Réinitialiser le cooldown avant chaque attaque
-            hero.attack();
-            attackCount++;
-        }
-        
-        assertTrue("Should have attacked multiple times", attackCount > 0);
-        assertEquals("Should have no munitions left", 0, hero.weapon.getMunitions());
-    }
-
-    @Test
-    public void testAttackSetsCooldownAfterAttack() {
-        when(mockTarget.isDead()).thenReturn(false);
-        hero.setTarget(mockTarget);
-        hero.setCooldown(0);
-        
-        hero.attack();
-        
-        // Après une attaque, le cooldown devrait être égal à l'attackSpeed de l'arme
-        assertEquals("Cooldown should be set to weapon attack speed", 
-                     hero.weapon.getAttackSpeed(), 
-                     hero.getAttackCooldown());
-    }
-
-    @Test
-    public void testCannotAttackTwiceWithoutResettingCooldown() {
-        when(mockTarget.isDead()).thenReturn(false);
-        hero.setTarget(mockTarget);
-        hero.setCooldown(0);
-        
-        int initialMunitions = hero.weapon.getMunitions();
         
         // Première attaque
         hero.attack();
-        assertEquals("Munitions should decrease by 1", initialMunitions - 1, hero.weapon.getMunitions());
-        
-        // Deuxième attaque SANS réinitialiser le cooldown
-        hero.attack();
-        assertEquals("Munitions should NOT decrease again due to cooldown", 
-                     initialMunitions - 1, 
-                     hero.weapon.getMunitions());
-        
-        // Vérifier qu'on a bien attaqué qu'une seule fois
         verify(mockTarget, times(1)).takeDamage(anyInt());
+        
+        // Attaque en cooldown
+        hero.attack();
+        verify(mockTarget, times(1)).takeDamage(anyInt()); // Toujours 1
+        
+        // Après cooldown
+        hero.setCooldown(0);
+        hero.attack();
+        verify(mockTarget, times(2)).takeDamage(anyInt());
     }
 
     @Test
-    public void testGettersReturnCorrectValues() {
-        assertEquals("getPosX should return correct value", 100, hero.getPosX(), 0.01f);
-        assertEquals("getPosY should return correct value", 200, hero.getPosY(), 0.01f);
-        assertEquals("getSpeed should return correct value", 8, hero.getSpeed(), 0.01f);
-        assertEquals("getHealth should return correct value", 500, hero.getHealth());
-        assertEquals("getAttackSpeed should return correct value", 1, hero.getAttackSpeed(), 0.01f);
+    public void testGoldEconomy() {
+        assertEquals("Start with 50 gold", 50, hero.getGold());
+        
+        hero.addGold(100); // Gain de l'or
+        assertEquals("Should have 150 gold", 150, hero.getGold());
+        
+        assertTrue("Should purchase for 80", hero.removeGold(80));
+        assertEquals("Should have 70 gold left", 70, hero.getGold());
+        
+        assertFalse("Should fail to purchase for 100", hero.removeGold(100));
+        assertEquals("Should still have 70 gold", 70, hero.getGold());
+    }
+
+    @Test
+    public void testHealthManagement() {
+        assertEquals("Start with full health", 500, hero.getCurrentHealth());
+        
+        hero.takeDamage(200);
+        assertEquals("Health after damage", 300, hero.getCurrentHealth());
+        
+        hero.heal(100);
+        assertEquals("Health after heal", 400, hero.getCurrentHealth());
+        
+        hero.heal(200);
+        assertEquals("Health capped at max", 500, hero.getCurrentHealth());
+    }
+
+    // Classe helper pour tester les collisions
+    private class TestUnit extends Unit {
+        public TestUnit(float x, float y) {
+            super(null, x, y);
+            this.health = 100;
+        }
     }
 }

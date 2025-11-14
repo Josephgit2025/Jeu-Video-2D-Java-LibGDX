@@ -3,13 +3,15 @@ package com.main.entities.units;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.map.Base;
 
 public class Melee extends Soldier {
 
-    public Melee(float posX, float posY) {
-        super("Melee/Walk1.png", posX, posY);
+    public static final int COST = 1;
+
+    public Melee(float posX, float posY, Base allyBase) {
+        super("Melee/Walk1.png", posX, posY, allyBase);
         this.health = 200;
         this.attackDamage = 20;
         this.speed = 100;
@@ -33,34 +35,10 @@ public class Melee extends Soldier {
     }
 
     @Override
-    public void attack() {
-        // Call base attack to apply damage/cooldown and set ATTACKING state
-        super.attack();
-        // If base set ATTACKING, override animation duration to the real animation
-        // length
-        if (currentState == UnitState.ATTACKING) {
-            attackAnimationTimer = attackAnimation.getAnimationDuration();
-            stateTime = 0f;
-        }
-    }
-
-    @Override
     protected float getAttackAnimationDuration() {
         if (this.attackAnimation != null) {
             return this.attackAnimation.getAnimationDuration();
         }
         return super.getAttackAnimationDuration();
-    }
-
-    @Override
-    public void attackBase(com.main.map.Base enemyBase) {
-        // Call super to apply damage/cooldown/state changes, then ensure the
-        // animation timer matches the melee attack animation length.
-        super.attackBase(enemyBase);
-        if (this.attackAnimation != null) {
-            this.attackAnimationTimer = this.attackAnimation.getAnimationDuration();
-            this.stateTime = 0f;
-            System.out.println("[ANIM] " + this.getClass().getSimpleName() + " base attack timer set: " + this.attackAnimationTimer);
-        }
     }
 }

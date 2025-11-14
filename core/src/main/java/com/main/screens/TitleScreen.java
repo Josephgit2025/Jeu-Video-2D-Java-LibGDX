@@ -234,7 +234,7 @@ public class TitleScreen implements Screen {
         }
     }
 
-    private void handleInput() {
+    protected void handleInput() {
         if (Gdx.input.justTouched() && selectedIndex != -1) {
             switch (menuItems[selectedIndex]) {
                 case "PLAY":

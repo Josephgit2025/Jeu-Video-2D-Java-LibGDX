@@ -22,6 +22,7 @@ import com.ui.GameOverOverlay;
 import com.ui.BaseDestroyedOverlay;
 import com.ui.BaseZombieDestroyedOverlay;
 import com.ui.PauseOverlay;
+import com.ui.UnitShop;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -46,6 +47,7 @@ public class GameScreen implements Screen {
     private BaseZombieDestroyedOverlay baseZombieDestroyedOverlay;
     private PauseOverlay pauseOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
+    private UnitShop unitShop;
     
     // Pause display (deprecated - using PauseOverlay now)
     private BitmapFont pauseFont;
@@ -95,6 +97,8 @@ public class GameScreen implements Screen {
         this.pauseFont = new BitmapFont();
         this.pauseFont.setColor(Color.WHITE);
         this.pauseFont.getData().setScale(4f);
+        // Initialize Unit Shop
+        this.unitShop = new UnitShop(playerBase, hero);
     }
 
     // Recommencer le jeu après avoir perdu
@@ -104,6 +108,9 @@ public class GameScreen implements Screen {
         this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
+        this.unitShop = new UnitShop(playerBase, hero);
+        // Resize the new unitShop to match current window size
+        this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
     }
 
@@ -156,6 +163,9 @@ public class GameScreen implements Screen {
         }
         hero.render(batch);
         batch.end();
+        
+        // Render Unit Shop buttons
+        unitShop.render(shapeRenderer, batch);
         
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
@@ -262,6 +272,14 @@ public class GameScreen implements Screen {
             }
         } else {
             pauseKeyPressed = false;
+        }
+        
+        // Handle unit shop clicks (only when playing)
+        if (gameState == GameState.PLAYING && com.badlogic.gdx.Gdx.input.justTouched()) {
+            unitShop.handleClick(
+                com.badlogic.gdx.Gdx.input.getX(),
+                com.badlogic.gdx.Gdx.input.getY()
+            );
         }
         
         // Check if hero is dead
@@ -421,7 +439,6 @@ public class GameScreen implements Screen {
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
             if (distance < 50f) {
                 enemy.setTarget(this.hero);
-                // System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
             }
         }
     }
@@ -463,6 +480,8 @@ public class GameScreen implements Screen {
         }
         if (pauseOverlay != null) {
             pauseOverlay.resize(width, height);
+        if (unitShop != null) {
+            unitShop.resize(width, height);
         }
     }
 

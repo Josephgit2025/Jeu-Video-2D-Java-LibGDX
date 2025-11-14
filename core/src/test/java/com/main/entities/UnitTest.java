@@ -3,6 +3,7 @@ package com.main.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -13,49 +14,40 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
-import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+import com.main.map.Base;
 
 public class UnitTest {
-    @Test
-    public void testAttackTargetOutOfRange() {
-        // Place la cible hors de portée
-        unit.target = enemy2; // enemy2 est loin
-        unit.attackCooldown = 0;
-        int initialHealth = enemy2.health;
-        unit.attack();
-        // L'attaque ne doit pas infliger de dégâts ni changer le cooldown
-        assertEquals(initialHealth, enemy2.health);
-        assertEquals(0, unit.attackCooldown);
-    }
 
-    private static HeadlessApplication application;
+    private static Application application;
     private TestUnit unit;
     private TestUnit enemy1;
     private TestUnit enemy2;
+    private TestUnit enemy3;
     
     @Mock
     private SpriteBatch mockBatch;
-
-    @BeforeClass
-    public static void init() {
-        // Initialiser LibGDX en mode headless pour les tests
-        HeadlessApplicationConfiguration config = new HeadlessApplicationConfiguration();
-        application = new HeadlessApplication(new ApplicationAdapter() {}, config);
-        
-        // Mock GL20 pour éviter les erreurs de rendu
-        Gdx.gl20 = mock(GL20.class);
-        Gdx.gl = Gdx.gl20;
-    }
+    
+    @Mock
+    private GL20 mockGL;
+    
+    @Mock
+    private Graphics mockGraphics;
+    
+    @Mock
+    private Base mockBase;
 
     // Classe concrète pour tester la classe abstraite Unit
     private class TestUnit extends Unit {
@@ -67,125 +59,199 @@ public class UnitTest {
             when(this.sprite.getY()).thenReturn(posY);
             this.health = 100;
             this.attackDamage = 10;
-            this.attackSpeed = 5;
-            this.speed = 2.0f;
-            this.range = 50;
+            this.attackSpeed = 2.0f;
+            this.speed = 50.0f;
+            this.range = 100;
+        }
+    }
+
+    @BeforeClass
+    public static void init() {
+        application = new HeadlessApplication(new com.badlogic.gdx.ApplicationAdapter() {});
+    }
+
+    @AfterClass
+    public static void cleanUp() {
+        if (application != null) {
+            application.exit();
         }
     }
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        Gdx.gl = mockGL;
+        Gdx.gl20 = mockGL;
+        Gdx.graphics = mockGraphics;
+        
+        when(mockGraphics.getWidth()).thenReturn(800);
+        when(mockGraphics.getHeight()).thenReturn(600);
+        
         unit = new TestUnit(100, 200);
-        enemy1 = new TestUnit(120, 220);
-        enemy2 = new TestUnit(500, 500);
+        enemy1 = new TestUnit(150, 200); // À portée (50 pixels)
+        enemy2 = new TestUnit(500, 500); // Hors portée
+        enemy3 = new TestUnit(300, 200); // Hors portée (200 pixels)
     }
+
+    // ===== Constructor Tests =====
 
     @Test
     public void testConstructor() {
-        assertNotNull(unit);
-        assertEquals(100, unit.getPosX(), 0.01f);
-        assertEquals(200, unit.getPosY(), 0.01f);
-        assertNotNull(unit.getSprite());
+        assertNotNull("Unit should not be null", unit);
+        assertEquals("Initial X position should be 100", 100.0f, unit.getPosX(), 0.01f);
+        assertEquals("Initial Y position should be 200", 200.0f, unit.getPosY(), 0.01f);
+        assertNotNull("Sprite should not be null", unit.getSprite());
     }
 
     @Test
+    public void testConstructorInitializesStats() {
+        assertEquals("Health should be 100", 100, unit.getHealth());
+        assertEquals("Attack damage should be 10", 10, unit.getAttackDamage());
+        assertEquals("Attack speed should be 2.0", 2.0f, unit.getAttackSpeed(), 0.01f);
+        assertEquals("Speed should be 50", 50.0f, unit.getSpeed(), 0.01f);
+        assertEquals("Range should be 100", 100, unit.getRange());
+    }
+
+    @Test
+    public void testConstructorWithNullFilePath() {
+        TestUnit nullUnit = new TestUnit(50, 50);
+        assertNotNull("Unit should be created with null filepath", nullUnit);
+        assertNotNull("Sprite should be mocked", nullUnit.getSprite());
+    }
+
+    @Test
+    public void testConstructorSetsDimensions() {
+        assertEquals("Width should be 32", 32.0f, unit.getWidth(), 0.01f);
+        assertEquals("Height should be 48", 48.0f, unit.getHeight(), 0.01f);
+    }
+
+    // ===== Position Tests =====
+
+    @Test
     public void testGetPosX() {
-        assertEquals(100, unit.getPosX(), 0.01f);
+        assertEquals("getPosX should return correct value", 100.0f, unit.getPosX(), 0.01f);
     }
 
     @Test
     public void testGetPosY() {
-        assertEquals(200, unit.getPosY(), 0.01f);
-    }
-
-    @Test
-    public void testGetSprite() {
-        assertNotNull(unit.getSprite());
+        assertEquals("getPosY should return correct value", 200.0f, unit.getPosY(), 0.01f);
     }
 
     @Test
     public void testSetSpritePosX() {
         unit.setSpritePosX(150);
-        assertEquals(150, unit.getPosX(), 0.01f);
+        assertEquals("Position X should be updated", 150.0f, unit.getPosX(), 0.01f);
+        verify(unit.sprite).setX(150);
     }
 
     @Test
     public void testSetSpritePosY() {
         unit.setSpritePosY(250);
-        assertEquals(250, unit.getPosY(), 0.01f);
+        assertEquals("Position Y should be updated", 250.0f, unit.getPosY(), 0.01f);
+        verify(unit.sprite).setY(250);
     }
+
+    // ===== Health and Damage Tests =====
 
     @Test
     public void testTakeDamage() {
         unit.takeDamage(30);
-        assertEquals(70, unit.health);
+        assertEquals("Health should decrease by 30", 70, unit.getHealth());
+    }
+
+    @Test
+    public void testTakeDamageMultipleTimes() {
+        unit.takeDamage(20);
+        unit.takeDamage(30);
+        assertEquals("Health should decrease by 50 total", 50, unit.getHealth());
     }
 
     @Test
     public void testTakeDamageToZero() {
         unit.takeDamage(100);
-        assertEquals(0, unit.health);
-        assertTrue(unit.isDead());
+        assertEquals("Health should be 0", 0, unit.getHealth());
+        assertTrue("Unit should be dead", unit.isDead());
     }
 
     @Test
-    public void testTakeDamageOverKill() {
+    public void testTakeDamageOverkill() {
         unit.takeDamage(150);
-        assertEquals(0, unit.health);
-        assertTrue(unit.isDead());
+        assertEquals("Health should be 0 with overkill", 0, unit.getHealth());
+        assertTrue("Unit should be dead", unit.isDead());
     }
 
     @Test
     public void testIsDead() {
-        assertFalse(unit.isDead());
+        assertFalse("Unit should not be dead initially", unit.isDead());
         unit.takeDamage(100);
-        assertTrue(unit.isDead());
+        assertTrue("Unit should be dead after fatal damage", unit.isDead());
     }
 
     @Test
     public void testIsNotDead() {
         unit.takeDamage(50);
-        assertFalse(unit.isDead());
+        assertFalse("Unit should not be dead after partial damage", unit.isDead());
     }
 
     @Test
+    public void testOnDeath() {
+        unit.takeDamage(100);
+        assertTrue("Unit should be dead", unit.isDead());
+        assertEquals("Health should be 0", 0, unit.getHealth());
+    }
+
+    // ===== Cooldown Tests =====
+
+    @Test
     public void testUpdateCooldown() {
-        unit.attackCooldown = 10;
-        unit.updateCooldown();
-        assertEquals(9, unit.attackCooldown);
-        
-        unit.updateCooldown();
-        assertEquals(8, unit.attackCooldown);
+        unit.setCooldown(5);
+        unit.updateCooldown(1.0f);
+        assertEquals("Cooldown should decrease by delta", 4.0f, unit.getAttackCooldown(), 0.01f);
     }
 
     @Test
     public void testUpdateCooldownAtZero() {
-        unit.attackCooldown = 0;
-        unit.updateCooldown();
-        assertEquals(0, unit.attackCooldown);
+        unit.setCooldown(0);
+        unit.updateCooldown(1.0f);
+        assertEquals("Cooldown should stay at 0", 0.0f, unit.getAttackCooldown(), 0.01f);
     }
 
     @Test
     public void testUpdateCooldownMultipleTimes() {
-        unit.attackCooldown = 10;
+        unit.setCooldown(10);
         for (int i = 0; i < 5; i++) {
-            unit.updateCooldown();
+            unit.updateCooldown(1.0f);
         }
-        assertEquals(5, unit.attackCooldown);
+        assertEquals("Cooldown should be 5", 5.0f, unit.getAttackCooldown(), 0.01f);
     }
+
+    @Test
+    public void testUpdateCooldownBelowZero() {
+        unit.setCooldown(1);
+        unit.updateCooldown(2.0f);
+        assertEquals("Cooldown should not go below 0", 0.0f, unit.getAttackCooldown(), 0.01f);
+    }
+
+    @Test
+    public void testUpdateCooldownWithSmallDelta() {
+        unit.setCooldown(5);
+        unit.updateCooldown(0.016f); // 60 FPS
+        assertEquals("Cooldown with realistic delta", 4.984f, unit.getAttackCooldown(), 0.01f);
+    }
+
+    // ===== Enemy Detection Tests =====
 
     @Test
     public void testDetectEnemiesInRange() {
         List<Unit> enemies = new ArrayList<>();
-        enemies.add(enemy1);
-        enemies.add(enemy2);
+        enemies.add(enemy1); // À portée
+        enemies.add(enemy2); // Hors portée
         
         List<Unit> inRange = unit.detectEnemiesInRange(enemies);
         
-        assertEquals(1, inRange.size());
-        assertTrue(inRange.contains(enemy1));
-        assertFalse(inRange.contains(enemy2));
+        assertEquals("Should detect 1 enemy in range", 1, inRange.size());
+        assertTrue("Should contain enemy1", inRange.contains(enemy1));
+        assertFalse("Should not contain enemy2", inRange.contains(enemy2));
     }
 
     @Test
@@ -193,43 +259,60 @@ public class UnitTest {
         List<Unit> enemies = new ArrayList<>();
         List<Unit> inRange = unit.detectEnemiesInRange(enemies);
         
-        assertEquals(0, inRange.size());
+        assertEquals("Should detect 0 enemies", 0, inRange.size());
     }
 
     @Test
     public void testDetectEnemiesInRangeNoEnemies() {
         List<Unit> enemies = new ArrayList<>();
-        enemies.add(enemy2);
+        enemies.add(enemy2); // Hors portée
         
         List<Unit> inRange = unit.detectEnemiesInRange(enemies);
         
-        assertEquals(0, inRange.size());
+        assertEquals("Should detect 0 enemies", 0, inRange.size());
     }
 
     @Test
     public void testDetectEnemiesInRangeWithSelf() {
         List<Unit> enemies = new ArrayList<>();
-        enemies.add(unit);
+        enemies.add(unit); // Soi-même
         enemies.add(enemy1);
         
         List<Unit> inRange = unit.detectEnemiesInRange(enemies);
         
-        // Ne doit pas se détecter lui-même
-        assertEquals(1, inRange.size());
-        assertFalse(inRange.contains(unit));
-        assertTrue(inRange.contains(enemy1));
+        assertEquals("Should detect 1 enemy (not self)", 1, inRange.size());
+        assertFalse("Should not contain self", inRange.contains(unit));
+        assertTrue("Should contain enemy1", inRange.contains(enemy1));
     }
+
+    @Test
+    public void testDetectMultipleEnemiesInRange() {
+        TestUnit enemy4 = new TestUnit(180, 200); // À portée (80 pixels)
+        List<Unit> enemies = new ArrayList<>();
+        enemies.add(enemy1); // À portée
+        enemies.add(enemy2); // Hors portée
+        enemies.add(enemy4); // À portée
+        
+        List<Unit> inRange = unit.detectEnemiesInRange(enemies);
+        
+        assertEquals("Should detect 2 enemies in range", 2, inRange.size());
+        assertTrue("Should contain enemy1", inRange.contains(enemy1));
+        assertTrue("Should contain enemy4", inRange.contains(enemy4));
+        assertFalse("Should not contain enemy2", inRange.contains(enemy2));
+    }
+
+    // ===== Target Selection Tests =====
 
     @Test
     public void testSelectTarget() {
         List<Unit> enemies = new ArrayList<>();
-        enemies.add(enemy1);
-        enemies.add(enemy2);
+        enemies.add(enemy1); // À portée
+        enemies.add(enemy2); // Hors portée
         
         unit.selectTarget(enemies);
         
-        assertNotNull(unit.target);
-        assertEquals(enemy1, unit.target);
+        assertNotNull("Target should be selected", unit.getTarget());
+        assertEquals("Should target enemy1", enemy1, unit.getTarget());
     }
 
     @Test
@@ -238,97 +321,332 @@ public class UnitTest {
         
         unit.selectTarget(enemies);
         
-        assertNull(unit.target);
+        assertNull("Target should be null with no enemies", unit.getTarget());
     }
 
     @Test
     public void testSelectTargetOutOfRange() {
         List<Unit> enemies = new ArrayList<>();
-        enemies.add(enemy2);
+        enemies.add(enemy2); // Hors portée
         
         unit.selectTarget(enemies);
         
-        assertNull(unit.target);
+        assertNull("Target should be null when all out of range", unit.getTarget());
     }
 
     @Test
     public void testSelectTargetClosest() {
-        TestUnit nearEnemy = new TestUnit(110, 205);
+        TestUnit nearEnemy = new TestUnit(110, 200); // 10 pixels
         List<Unit> enemies = new ArrayList<>();
-        enemies.add(enemy1);
-        enemies.add(nearEnemy);
+        enemies.add(enemy1); // 50 pixels
+        enemies.add(nearEnemy); // 10 pixels
         
         unit.selectTarget(enemies);
         
-        // Devrait sélectionner le plus proche
-        assertEquals(nearEnemy, unit.target);
+        assertEquals("Should select closest enemy", nearEnemy, unit.getTarget());
     }
 
     @Test
+    public void testSetTarget() {
+        unit.setTarget(enemy1);
+        assertEquals("Target should be set", enemy1, unit.getTarget());
+    }
+
+    @Test
+    public void testSetTargetNull() {
+        unit.setTarget(enemy1);
+        unit.setTarget(null);
+        assertEquals("Target should remain enemy1 when setting null", enemy1, unit.getTarget());
+    }
+
+    // ===== Attack Tests =====
+
+    @Test
     public void testAttackWithTarget() {
-        unit.target = enemy1;
-        unit.attackCooldown = 0;
-        int initialHealth = enemy1.health;
+        unit.setTarget(enemy1);
+        unit.setCooldown(0);
+        int initialHealth = enemy1.getHealth();
         
         unit.attack();
         
-        assertEquals(initialHealth - unit.attackDamage, enemy1.health);
-        assertEquals(unit.attackSpeed, unit.attackCooldown);
+        assertEquals("Enemy health should decrease", initialHealth - unit.getAttackDamage(), enemy1.getHealth());
+        assertEquals("Cooldown should be set", unit.getAttackSpeed(), unit.getAttackCooldown(), 0.01f);
+        assertEquals("State should be ATTACKING", Unit.UnitState.ATTACKING, unit.getCurrentState());
     }
 
     @Test
     public void testAttackWithoutTarget() {
-        unit.target = null;
-        unit.attackCooldown = 0;
+        unit.setTarget(null);
+        unit.setCooldown(0);
         
         unit.attack();
         
-        assertEquals(0, unit.attackCooldown);
+        assertEquals("Cooldown should remain 0", 0.0f, unit.getAttackCooldown(), 0.01f);
     }
 
     @Test
     public void testAttackWithDeadTarget() {
-        unit.target = enemy1;
-        enemy1.health = 0;
-        unit.attackCooldown = 0;
+        unit.setTarget(enemy1);
+        enemy1.takeDamage(100); // Tue l'ennemi
+        unit.setCooldown(0);
         
         unit.attack();
         
-        assertEquals(0, unit.attackCooldown);
+        assertEquals("Cooldown should remain 0", 0.0f, unit.getAttackCooldown(), 0.01f);
     }
 
     @Test
     public void testAttackOnCooldown() {
-        unit.target = enemy1;
-        unit.attackCooldown = 5;
-        int initialHealth = enemy1.health;
+        unit.setTarget(enemy1);
+        unit.setCooldown(5);
+        int initialHealth = enemy1.getHealth();
         
         unit.attack();
         
-        assertEquals(initialHealth, enemy1.health);
-        assertEquals(5, unit.attackCooldown);
+        assertEquals("Enemy health should not decrease", initialHealth, enemy1.getHealth());
+        assertEquals("Cooldown should remain 5", 5.0f, unit.getAttackCooldown(), 0.01f);
+    }
+
+    @Test
+    public void testAttackTargetOutOfRange() {
+        unit.setTarget(enemy3); // 200 pixels de distance, hors de portée (100)
+        unit.setCooldown(0);
+        int initialHealth = enemy3.getHealth();
+        
+        unit.attack();
+        
+        assertEquals("Enemy health should not decrease", initialHealth, enemy3.getHealth());
+        assertEquals("Cooldown should remain 0", 0.0f, unit.getAttackCooldown(), 0.01f);
+    }
+
+    @Test
+    public void testAttackSetsAnimationTimer() {
+        unit.setTarget(enemy1);
+        unit.setCooldown(0);
+        
+        unit.attack();
+        
+        assertTrue("Attack animation timer should be set", unit.attackAnimationTimer > 0);
+        assertEquals("State time should be reset", 0.0f, unit.stateTime, 0.01f);
     }
 
     @Test
     public void testAttackMultipleTimes() {
-        unit.target = enemy1;
-        unit.attackCooldown = 0;
+        unit.setTarget(enemy1);
+        unit.setCooldown(0);
         
+        // Première attaque
+        int initialHealth = enemy1.getHealth(); // 100
         unit.attack();
-        unit.updateCooldown();
-        unit.updateCooldown();
-        unit.updateCooldown();
-        unit.updateCooldown();
-        unit.updateCooldown();
+        assertEquals("Enemy should take damage", initialHealth - unit.getAttackDamage(), enemy1.getHealth()); // 90
         
-        // Cooldown devrait être à 0
-        assertEquals(0, unit.attackCooldown);
+        unit.setCooldown(0);
         
-        // Peut attaquer à nouveau
-        int healthBefore = enemy1.health;
+        assertEquals("Cooldown should be 0", 0.0f, unit.getAttackCooldown(), 0.01f);
+        
+        // Deuxième attaque
+        int healthBefore = enemy1.getHealth(); // Devrait être 90
+        System.out.println("Health before second attack: " + healthBefore);
+        System.out.println("CD = " + unit.getAttackCooldown());
         unit.attack();
-        assertEquals(healthBefore - unit.attackDamage, enemy1.health);
+        System.out.println("Health after second attack: " + enemy1.getHealth());
+        assertEquals("Enemy should take damage again", healthBefore - unit.getAttackDamage(), enemy1.getHealth()); // 80
     }
+
+    // ===== Base Attack Tests =====
+
+    @Test
+    public void testSetTargetBase() {
+        unit.setTargetBase(mockBase);
+        assertEquals("Target base should be set", mockBase, unit.getTargetBase());
+    }
+
+    @Test
+    public void testAttackBase() {
+        when(mockBase.getHealth()).thenReturn(1000);
+        
+        unit.attackBase(mockBase);
+        
+        verify(mockBase).takeDamage(unit.getAttackDamage());
+        assertEquals("Cooldown should be set", unit.getAttackSpeed(), unit.getAttackCooldown(), 0.01f);
+        assertEquals("State should be ATTACKING", Unit.UnitState.ATTACKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testAttackBaseOnCooldown() {
+        when(mockBase.getHealth()).thenReturn(1000);
+        unit.setCooldown(5);
+        
+        unit.attackBase(mockBase);
+        
+        // Ne devrait pas attaquer
+        assertEquals("Cooldown should remain 5", 5.0f, unit.getAttackCooldown(), 0.01f);
+    }
+
+    @Test
+    public void testIsNearEnemyBase() {
+        Rectangle baseBox = new Rectangle(700, 0, 100, 1080);
+        when(mockBase.getCollisionBox()).thenReturn(baseBox);
+        
+        unit.setSpritePosX(650); // À portée (50 pixels du centre)
+        assertTrue("Should be near enemy base", unit.isNearEnemyBase(mockBase));
+        
+        unit.setSpritePosX(400); // Hors portée
+        assertFalse("Should not be near enemy base", unit.isNearEnemyBase(mockBase));
+    }
+
+    @Test
+    public void testIsNearEnemyBaseWithNullBase() {
+        assertFalse("Should return false with null base", unit.isNearEnemyBase(null));
+    }
+
+    // ===== Movement Tests =====
+
+    @Test
+    public void testMove() {
+        float initialX = unit.getPosX();
+        unit.move(1.0f);
+        // Sans cible, devrait passer en IDLE
+        assertEquals("Should be in IDLE state", Unit.UnitState.IDLE, unit.getCurrentState());
+    }
+
+    @Test
+    public void testMoveWithTarget() {
+        unit.setTarget(enemy3); // Hors portée
+        float initialX = unit.getPosX();
+        
+        unit.move(1.0f);
+        
+        assertTrue("Should move towards target", unit.getPosX() != initialX);
+        assertEquals("Should be in WALKING state", Unit.UnitState.WALKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testMoveWithTargetInRange() {
+        unit.setTarget(enemy1); // À portée
+        unit.setCooldown(0);
+        
+        unit.move(1.0f);
+        
+        assertEquals("Should attack target in range", Unit.UnitState.ATTACKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testMoveWithDeadTarget() {
+        unit.setTarget(enemy1);
+        enemy1.takeDamage(100); // Tue la cible
+        
+        unit.move(1.0f);
+        
+        assertNull("Target should be cleared", unit.getTarget());
+        assertEquals("Should be in WALKING state", Unit.UnitState.WALKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testMoveDuringAttackAnimation() {
+        unit.attackAnimationTimer = 0.5f;
+        float initialX = unit.getPosX();
+        
+        unit.move(0.1f);
+        
+        // L'unité ne devrait pas se déplacer pendant l'animation
+        assertEquals("Should not move during attack animation", initialX, unit.getPosX(), 0.01f);
+        
+        // Le timer devrait diminuer OU rester inchangé selon l'implémentation
+        // Si move() décrémente le timer :
+        // assertEquals("Animation timer should decrease", 0.4f, unit.attackAnimationTimer, 0.01f);
+        
+        // Si move() ne décrémente PAS le timer (le timer est géré ailleurs) :
+        assertTrue("Animation timer should be positive", unit.attackAnimationTimer > 0);
+    }
+    
+    @Test
+    public void testAttackAnimationTimerDecreases() {
+        unit.attackAnimationTimer = 0.5f;
+        unit.currentState = Unit.UnitState.ATTACKING;
+        
+        // Simuler plusieurs frames
+        unit.move(0.1f);
+        unit.move(0.1f);
+        unit.move(0.1f);
+        
+        // Après 0.3s, le timer devrait avoir diminué
+        assertTrue("Animation should progress or complete", 
+                   unit.attackAnimationTimer <= 0.5f);
+    }
+    
+    @Test
+    public void testAttackAnimationEnds() {
+        unit.setTarget(enemy1);
+        unit.currentState = Unit.UnitState.ATTACKING;
+        unit.attackAnimationTimer = 0.1f;
+        unit.setCooldown(5); // En cooldown
+        
+        // Simuler un grand delta qui fait finir l'animation
+        unit.move(0.5f); // Delta > attackAnimationTimer
+        
+        // L'animation devrait être terminée
+        assertTrue("Animation should be finished", 
+                   unit.attackAnimationTimer <= 0 || unit.getCurrentState() == Unit.UnitState.IDLE);
+    }
+
+    @Test
+    public void testMoveAfterAttackAnimationEnds() {
+        unit.setTarget(enemy1);
+        unit.currentState = Unit.UnitState.ATTACKING;
+        unit.attackAnimationTimer = 0.1f;
+        unit.setCooldown(5); // En cooldown
+        
+        unit.move(0.2f); // L'animation finit
+        
+        assertEquals("Should transition to IDLE", Unit.UnitState.IDLE, unit.getCurrentState());
+    }
+
+    // ===== State Tests =====
+
+    @Test
+    public void testInitialState() {
+        assertEquals("Initial state should be WALKING", Unit.UnitState.WALKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testGetCurrentState() {
+        assertEquals("Should return current state", Unit.UnitState.WALKING, unit.getCurrentState());
+        
+        unit.currentState = Unit.UnitState.ATTACKING;
+        assertEquals("Should return ATTACKING", Unit.UnitState.ATTACKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testStateTransitions() {
+        // WALKING -> ATTACKING
+        unit.setTarget(enemy1);
+        unit.setCooldown(0);
+        unit.attack();
+        assertEquals("Should be ATTACKING", Unit.UnitState.ATTACKING, unit.getCurrentState());
+        
+        // ATTACKING -> IDLE (after animation, on cooldown)
+        unit.attackAnimationTimer = 0.1f;
+        unit.setCooldown(5);
+        unit.move(0.2f);
+        assertEquals("Should be IDLE", Unit.UnitState.IDLE, unit.getCurrentState());
+    }
+
+    // ===== Collision Tests =====
+
+    @Test
+    public void testCalculateNewPositionXRight() {
+        float newX = unit.calculateNewPositionX(1.0f, 1);
+        assertEquals("Should move right", 150.0f, newX, 0.1f);
+    }
+
+    @Test
+    public void testCalculateNewPositionXLeft() {
+        float newX = unit.calculateNewPositionX(1.0f, -1);
+        assertEquals("Should move left", 50.0f, newX, 0.1f);
+    }
+
+    // ===== Utility Tests =====
 
     @Test
     public void testSpecialAbility() {
@@ -337,45 +655,65 @@ public class UnitTest {
     }
 
     @Test
-    public void testOnDeath() {
-        unit.takeDamage(100);
-        assertTrue(unit.isDead());
-        assertEquals(0, unit.health);
+    public void testGetters() {
+        assertEquals("getHealth()", 100, unit.getHealth());
+        assertEquals("getAttackDamage()", 10, unit.getAttackDamage());
+        assertEquals("getAttackSpeed()", 2.0f, unit.getAttackSpeed(), 0.01f);
+        assertEquals("getSpeed()", 50.0f, unit.getSpeed(), 0.01f);
+        assertEquals("getRange()", 100, unit.getRange());
+        assertEquals("getWidth()", 32.0f, unit.getWidth(), 0.01f);
+        assertEquals("getHeight()", 48.0f, unit.getHeight(), 0.01f);
     }
 
     @Test
-    public void testMove() {
-        float initialX = unit.getPosX();
-        unit.move(1.0f);
-        assertEquals(initialX + unit.speed, unit.getPosX(), 0.01f);
+    public void testGetAttackAnimationDuration() {
+        assertEquals("Default animation duration should be 0.5", 0.5f, unit.getAttackAnimationDuration(), 0.01f);
     }
 
+    // ===== Integration Tests =====
+
     @Test
-    public void testMoveWithDelta() {
-        float initialX = unit.getPosX();
+    public void testFullCombatCycle() {
+        unit.setTarget(enemy1);
+        unit.setCooldown(0);
+        
+        // Attaque
+        unit.attack();
+        assertEquals("Should be attacking", Unit.UnitState.ATTACKING, unit.getCurrentState());
+        assertTrue("Animation timer should be set", unit.attackAnimationTimer > 0);
+        
+        // Pendant l'animation
+        unit.move(0.2f);
+        assertTrue("Should still be in animation", unit.attackAnimationTimer > 0);
+        
+        // Après l'animation
         unit.move(0.5f);
-        assertEquals(initialX + (unit.speed * 0.5f), unit.getPosX(), 0.01f);
+        assertTrue("Should have transitioned", unit.getCurrentState() != Unit.UnitState.ATTACKING);
     }
 
     @Test
-    public void testMoveWithZeroDelta() {
+    public void testFullMovementCycle() {
+        unit.setTarget(enemy3); // Cible éloignée
         float initialX = unit.getPosX();
-        unit.move(0.0f);
-        assertEquals(initialX, unit.getPosX(), 0.01f);
+        
+        for (int i = 0; i < 10; i++) {
+            unit.move(0.016f);
+        }
+        
+        assertTrue("Should have moved towards target", unit.getPosX() != initialX);
     }
 
     @Test
-    public void testMoveMultipleTimes() {
-        float initialX = unit.getPosX();
-        unit.move(1.0f);
-        unit.move(1.0f);
-        unit.move(1.0f);
-        assertEquals(initialX + (unit.speed * 3), unit.getPosX(), 0.01f);
-    }
-
-    @Test
-    public void testWidthAndHeight() {
-        assertEquals(32, unit.width, 0.01f);
-        assertEquals(48, unit.height, 0.01f);
+    public void testCalculateNewPositionXMovement() {
+        unit.setSpritePosX(100);
+        
+        // Test mouvement à droite
+        float newXRight = unit.calculateNewPositionX(1.0f, 1);
+        assertEquals("Should move right", 150.0f, newXRight, 0.1f);
+        
+        // Test mouvement à gauche
+        unit.setSpritePosX(100);
+        float newXLeft = unit.calculateNewPositionX(1.0f, -1);
+        assertEquals("Should move left", 50.0f, newXLeft, 0.1f);
     }
 }

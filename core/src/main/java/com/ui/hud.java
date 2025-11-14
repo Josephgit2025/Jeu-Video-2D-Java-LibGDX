@@ -80,6 +80,22 @@ public class hud implements Disposable {
     }
     
     /**
+     * Constructor for dependency injection (testing)
+     */
+    protected hud(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font,
+                  healthbar healthBar, gold goldDisplay) {
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(800, 600, camera);
+        camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
+        
+        this.batch = batch;
+        this.shapeRenderer = shapeRenderer;
+        this.font = font;
+        this.healthBar = healthBar;
+        this.goldDisplay = goldDisplay;
+    }
+    
+    /**
      * Update HUD with current player stats
      * @param currentHealth Current health of the hero
      * @param maxHealth Maximum health of the hero

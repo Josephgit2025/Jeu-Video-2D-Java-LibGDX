@@ -4,11 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.map.Base;
 
 public class WZombie extends Zombie {
 
-    public WZombie(int posX, int posY) {
-        super("zombie/women/Walk1.png", posX, posY);
+    public WZombie(int posX, int posY, Base allyBase) {
+        super("zombie/women/Walk1.png", posX, posY, allyBase);
         this.health = 350;
         this.speed = 130;
         this.attackDamage = 20;

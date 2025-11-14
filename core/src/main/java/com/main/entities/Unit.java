@@ -27,12 +27,13 @@ public abstract class Unit {
     protected float speed;
     public Unit target;
     protected Base targetBase; // Reference to enemy base
-    // protected List<Effect> modifiers = new ArrayList<>(); // TODO: Créer la
-    // classe Effect si nécessaire
+    protected Base allyBase;
     protected int range;
     protected float attackCooldown = 0f; // Current cooldown in seconds
     protected Texture texture;
     protected float width, height;
+    private int lane;
+    private int index;
 
     // State management
     protected UnitState currentState = UnitState.WALKING;
@@ -75,12 +76,24 @@ public abstract class Unit {
         return posX;
     }
 
+    public int getLane(){
+        return lane;
+    }
+
     public float getSpeed() {
         return speed;
     }
 
     public float getWidth() {
         return width;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public float getHeight() {
@@ -123,7 +136,12 @@ public abstract class Unit {
         return texture;
     }
 
-    public void setCooldown(int cd) {
+
+    public float getAttackAnimationTimer() {
+        return attackAnimationTimer;
+    }
+
+    public void setCooldown(float cd) {
         this.attackCooldown = cd;
     }
 
@@ -135,6 +153,10 @@ public abstract class Unit {
     public void setSpritePosY(float posY) {
         this.sprite.setY(posY);
         this.posY = posY;
+    }
+
+    public void setLane(int lane){
+        this.lane = lane;
     }
 
     /**
@@ -178,8 +200,8 @@ public abstract class Unit {
      * Calcule la distance entre cette unité et une autre
      */
     private double calculateDistance(Unit other) {
-        float dx = this.posX - other.posX;
-        float dy = this.posY - other.posY;
+        float dx = this.posX - other.getPosX();
+        float dy = this.posY - other.getPosY();
         return Math.sqrt(dx * dx + dy * dy);
     }
 
@@ -189,9 +211,9 @@ public abstract class Unit {
     public List<Unit> detectEnemiesInRange(List<Unit> enemies) {
         List<Unit> inRange = new ArrayList<>();
         for (Unit unit : enemies) {
-            if (unit != this) {
+            if (unit != this && !unit.isDead()) {
                 double distance = calculateDistance(unit);
-                if (distance <= this.range) {
+                if ((int)distance <= this.range) {
                     inRange.add(unit);
                 }
             }
@@ -207,7 +229,7 @@ public abstract class Unit {
         double minDistance = Double.MAX_VALUE;
         for (Unit enemy : enemies) {
             double distance = calculateDistance(enemy);
-            if (distance < minDistance) {
+            if (distance < minDistance && !enemy.isDead() && enemy.getLane() == this.lane) {
                 minDistance = distance;
                 closest = enemy;
             }
@@ -285,7 +307,16 @@ public abstract class Unit {
      * Vérifie si l'unité est morte
      */
     public boolean isDead() {
-        return this.health <= 0;
+        if (this.health <= 0){
+            if (this.allyBase.getUnitsPerLane().get(this.lane).contains(this)){
+                for (Unit elem : this.allyBase.getUnitsPerLane().get(this.lane)){
+                    elem.index--;
+                }
+                this.allyBase.getUnitsPerLane().get(this.lane).remove(this);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -373,6 +404,11 @@ public abstract class Unit {
         if (attackAnimationTimer > 0) {
             return true;
         }
+        
+        // Stop if unit in front is attacking and target not in range
+        if (this.index != 0 && target != null && !target.isDead() && calculateDistance(target) >= this.range && this.allyBase.getUnitsPerLane().get(this.lane).get(this.index - 1).currentState == UnitState.ATTACKING){
+            return true;
+        }
 
         // Stop if unit target in range
         if (target != null && !target.isDead()) {
@@ -387,6 +423,26 @@ public abstract class Unit {
             return true;
         }
 
+
+        return false;
+    }
+
+    private boolean checkUnitCollisions(float newX, float newY) {
+
+        // Calculate distance between hero and ally
+        float distance = 0;
+        if (this.index == 0){
+            return false;
+        }
+        if (this.index != 0){
+            float dx = newX - this.allyBase.getUnitsPerLane().get(this.getLane()).get(this.index - 1).getPosX();
+            float dy = newY - this.allyBase.getUnitsPerLane().get(this.getLane()).get(this.index - 1).getPosY();
+            distance = (float) Math.sqrt(dx * dx + dy * dy);
+        }
+
+        if (distance < this.getWidth()) {
+            return true;
+        }
         return false;
     }
 
@@ -402,7 +458,7 @@ public abstract class Unit {
         float newX = this.posX + (this.speed * delta * direction);
 
         // Check collision with enemy base hitbox
-        if (wouldCollideWithBase(newX)) {
+        if (wouldCollideWithBase(newX) || checkUnitCollisions(newX, posY)) {
             return this.posX; // Stay in place
         }
 
