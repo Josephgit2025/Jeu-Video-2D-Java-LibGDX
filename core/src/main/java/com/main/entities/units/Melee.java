@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Melee extends Soldier {
 
+    public static final int COST = 1; // Pour les tests
+
     public Melee(float posX, float posY) {
         super("Melee/Walk1.png", posX, posY);
         this.health = 200;
