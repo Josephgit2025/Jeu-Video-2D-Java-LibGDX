@@ -37,6 +37,8 @@ public class Base {
     private Rectangle collisionBox; // Hitbox de la base (3 tuiles de large x hauteur de la map)
     private static final int TILE_SIZE = 16; // Taille d'une tuile dans Tiled
     private static final float SCALE = 2.0f; // Scale de la map
+    private int[] spawnPointsY;
+
 
     public Base(int posX, int posY, boolean isPlayerBase, int mapHeight) {
         this.position = new Position(posX, posY);
@@ -45,6 +47,11 @@ public class Base {
         random = new Random();
         this.isPlayerBase = isPlayerBase;
         this.name = isPlayerBase ? "PLAYER BASE" : "ENEMY BASE";
+        this.spawnPointsY = new int[3];
+        this.spawnPointsY[0] = mapHeight / 4; // Haut
+        this.spawnPointsY[1] = mapHeight / 2; // Milieu
+        this.spawnPointsY[2] = (3 * mapHeight) / 4; // Bas
+        
 
         // Créer la hitbox : 3 tuiles de large * TILE_SIZE * SCALE, hauteur totale de la
         // map
@@ -57,8 +64,8 @@ public class Base {
         float boxY = 0; // Du bas de la map
 
         this.collisionBox = new Rectangle(boxX, boxY, boxWidth, boxHeight);
-        System.out.println(
-                name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
+        // System.out.println(
+        //         name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
     }
 
     public int getHealth() {
@@ -120,13 +127,13 @@ public class Base {
                 switch (type) {
                     case TANK:
                         System.out.println("Tank spawned");
-                        return new Tank(0, random.nextInt(screen.getMapHeight()));
+                        return new Tank(100, spawnPointsY[random.nextInt(3)]);
                     case MELEE:
                         System.out.println("Melee spawned");
-                        return new Melee(0, random.nextInt(screen.getMapHeight()));
+                        return new Melee(100, spawnPointsY[random.nextInt(3)]);
                     case SNIPER:
                         System.out.println("Sniper spawned");
-                        return new Sniper(0, random.nextInt(screen.getMapHeight()));
+                        return new Sniper(100, spawnPointsY[random.nextInt(3)]);
                     default:
                         return null;
                 }
@@ -137,13 +144,13 @@ public class Base {
                 switch (type) {
                     case WOMAN:
                         System.out.println("Zombie women spawned");
-                        return new WZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
+                        return new WZombie(screen.getMapWidth(), spawnPointsY[random.nextInt(3)]);
                     case CRAWL:
                         System.out.println("Zombie crawler spawned");
-                        return new CZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
+                        return new CZombie(screen.getMapWidth(), spawnPointsY[random.nextInt(3)]);
                     case FAST:
                         System.out.println("Zombie fast spawned");
-                        return new FZombie(screen.getMapWidth(), random.nextInt(screen.getMapHeight()));
+                        return new FZombie(screen.getMapWidth(), spawnPointsY[random.nextInt(3)]);
                     default:
                         return null;
                 }

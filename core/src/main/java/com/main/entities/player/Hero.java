@@ -10,9 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
-import com.main.entities.units.Sniper;
 import com.main.map.WarMap;
-import com.main.weapons.Machette;
 import com.main.weapons.SniperRifle;
 import com.main.weapons.Weapon;
 
@@ -298,11 +296,13 @@ public class Hero extends Unit {
     @Override
     public void attack() {
         if (target == null || target.isDead()) {
+            System.out.print("Target null");
             return;
         }
         double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) +
                 Math.pow(this.posY - target.getPosY(), 2));
         if (distance > weapon.getRange()) {
+            System.out.println("Out of range");
             return;
         }
         if (attackCooldown <= 0 && weapon != null) {

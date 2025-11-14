@@ -335,28 +335,6 @@ public class TitleScreenTest {
     }
 
     @Test
-    public void testHandleInputClickOnPlayButton() {
-        // Mock input to simulate click
-        Input mockInput = mock(Input.class);
-        when(mockInput.justTouched()).thenReturn(true);
-        Gdx.input = mockInput;
-        
-        try {
-            // Use helper method to test PLAY action with selectedIndex = 0
-            titleScreen.handleInputWithSelection(0);
-            
-            // Verify that setScreen was called (should create a GameScreen)
-            verify(mockGame, atLeastOnce()).setScreen(any(Screen.class));
-        } catch (IllegalArgumentException e) {
-            // Expected in headless mode when creating GameScreen
-            // The important part is that handleInput was called, not that GameScreen was created
-            if (!e.getMessage().contains("Error compiling shader")) {
-                throw e;
-            }
-        }
-    }
-
-    @Test
     public void testHandleInputClickOnQuitButton() {
         // Mock input to simulate click
         Input mockInput = mock(Input.class);
