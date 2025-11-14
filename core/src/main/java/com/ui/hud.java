@@ -2,7 +2,6 @@ package com.ui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -32,10 +31,6 @@ public class hud implements Disposable {
     private BaseHealthBar playerBaseHealthBar;
     private BaseHealthBar enemyBaseHealthBar;
     
-    // Base icons
-    private Texture playerBaseIcon;
-    private Texture enemyBaseIcon;
-    
     // Gold display
     private gold goldDisplay;
     
@@ -46,17 +41,14 @@ public class hud implements Disposable {
     private static final float GOLD_Y = 535f;
     
     // Base health bar positions and dimensions (barres verticales)
-    private static final float BASE_HEALTH_BAR_WIDTH = 25f;   // Largeur réduite pour barre verticale
-    private static final float BASE_HEALTH_BAR_HEIGHT = 200f; // Hauteur pour barre verticale
+    private static final float BASE_HEALTH_BAR_WIDTH = 5f;   // Largeur réduite pour barre verticale
+    private static final float BASE_HEALTH_BAR_HEIGHT = 100f; // Hauteur pour barre verticale
     
     // Ces valeurs seront calculées dynamiquement en fonction de la caméra et des bases
     private float playerBaseHealthBarX = 20f;
     private float playerBaseHealthBarY = 150f;  // Position verticale à côté de la base
     private float enemyBaseHealthBarX = 755f;
     private float enemyBaseHealthBarY = 150f;   // Position verticale à côté de la base
-    
-    // Base icon settings
-    private static final float BASE_ICON_SIZE = 35f;
     
     /**
      * Constructor for HUD
@@ -82,16 +74,6 @@ public class hud implements Disposable {
             BASE_HEALTH_BAR_WIDTH, BASE_HEALTH_BAR_HEIGHT);
         enemyBaseHealthBar = new BaseHealthBar(enemyBaseHealthBarX, enemyBaseHealthBarY, 
             BASE_HEALTH_BAR_WIDTH, BASE_HEALTH_BAR_HEIGHT);
-        
-        // Load base icons
-        try {
-            playerBaseIcon = new Texture("hero/Biowear All Frames Soldier idle Take Gun Shot Return Gun (11).png");
-            enemyBaseIcon = new Texture("zombie/crawl/Walk1.png");
-        } catch (Exception e) {
-            System.err.println("Could not load base icons: " + e.getMessage());
-            playerBaseIcon = null;
-            enemyBaseIcon = null;
-        }
         
         // Initialize gold display with coin icon
         goldDisplay = new gold(GOLD_X, GOLD_Y, "ui/gold.png");
@@ -132,12 +114,14 @@ public class hud implements Disposable {
     public void updateBaseHealthBarPositions(float playerBaseX, float playerBaseY,
                                               float enemyBaseX, float enemyBaseY,
                                               OrthographicCamera gameCamera) {
-        // Barres verticales fixes de chaque côté de l'écran
-        playerBaseHealthBarX = 20f;   // Fixe à gauche de l'écran
-        playerBaseHealthBarY = 150f;  // Position verticale (bas de la barre)
+        // Barres verticales fixées à côté des bases dans le monde du jeu
+        // Position à droite de la base du joueur (qui est à gauche)
+        playerBaseHealthBarX = playerBaseX + 110f;  // 110f = largeur de la base + petit espace
+        playerBaseHealthBarY = playerBaseY + 220f;  // Centré verticalement avec la base
         
-        enemyBaseHealthBarX = 755f;   // Fixe à droite de l'écran
-        enemyBaseHealthBarY = 150f;   // Position verticale (bas de la barre)
+        // Position à gauche de la base ennemie (qui est à droite)
+        enemyBaseHealthBarX = enemyBaseX - 40f;  // Espace avant la barre
+        enemyBaseHealthBarY = enemyBaseY + 220f; // Centré verticalement avec la base
         
         // Mettre à jour les positions des barres de vie verticales
         playerBaseHealthBar.setPosition(playerBaseHealthBarX, playerBaseHealthBarY);
@@ -151,40 +135,29 @@ public class hud implements Disposable {
         // Update camera
         camera.update();
         
-        // Set projection matrices
+        // Set projection matrices for UI elements (health bar, gold)
         shapeRenderer.setProjectionMatrix(camera.combined);
         batch.setProjectionMatrix(camera.combined);
         
         // Render health bar with heart icon
         healthBar.render(shapeRenderer, batch);
         
-        // Render base health bars verticales
-        playerBaseHealthBar.render(shapeRenderer);
-        enemyBaseHealthBar.render(shapeRenderer);
-        
-        // Render base icons à côté des barres verticales
-        batch.begin();
-        
-        // Player base icon (en bas de la barre)
-        if (playerBaseIcon != null) {
-            batch.draw(playerBaseIcon, 
-                playerBaseHealthBarX - 5, 
-                playerBaseHealthBarY - BASE_ICON_SIZE - 10, 
-                BASE_ICON_SIZE, BASE_ICON_SIZE);
-        }
-        
-        // Enemy base icon (en bas de la barre)
-        if (enemyBaseIcon != null) {
-            batch.draw(enemyBaseIcon, 
-                enemyBaseHealthBarX - 5, 
-                enemyBaseHealthBarY - BASE_ICON_SIZE - 10, 
-                BASE_ICON_SIZE, BASE_ICON_SIZE);
-        }
-        
-        batch.end();
-        
         // Render gold display with coin icon
         goldDisplay.render(batch);
+    }
+    
+    /**
+     * Render base health bars in game world (with game camera)
+     * @param gameCamera Camera from the game world
+     */
+    public void renderBaseHealthBars(OrthographicCamera gameCamera) {
+        // Set projection matrix to game camera for world-space rendering
+        shapeRenderer.setProjectionMatrix(gameCamera.combined);
+        batch.setProjectionMatrix(gameCamera.combined);
+        
+        // Render base health bars verticales in game world
+        playerBaseHealthBar.render(shapeRenderer);
+        enemyBaseHealthBar.render(shapeRenderer);
     }
     
     /**
@@ -239,13 +212,5 @@ public class hud implements Disposable {
         playerBaseHealthBar.dispose();
         enemyBaseHealthBar.dispose();
         goldDisplay.dispose();
-        
-        // Dispose base icons
-        if (playerBaseIcon != null) {
-            playerBaseIcon.dispose();
-        }
-        if (enemyBaseIcon != null) {
-            enemyBaseIcon.dispose();
-        }
     }
 }

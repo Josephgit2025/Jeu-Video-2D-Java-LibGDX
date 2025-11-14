@@ -168,6 +168,9 @@ public class GameScreen implements Screen {
             camera
         );
         
+        // Render base health bars in game world (with game camera)
+        hudDisplay.renderBaseHealthBars(camera);
+        
         hudDisplay.render();
         
         // Render Pause overlay if in Pause state
@@ -432,7 +435,7 @@ public class GameScreen implements Screen {
         for (Unit enemy : enemyBase.getUnits()) {
             if (enemy.isDead()) {
                 // Give gold to hero when enemy dies
-                int goldReward = 10; // 10 gold per enemy killed
+                int goldReward = 10;
                 hero.addGold(goldReward);
                 // System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
                 enemiesToRemove.add(enemy);
