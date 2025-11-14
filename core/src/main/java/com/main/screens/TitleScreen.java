@@ -15,7 +15,6 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.main.GameScreen;
 import com.main.Main;
 
 public class TitleScreen implements Screen {
@@ -106,35 +105,58 @@ public class TitleScreen implements Screen {
 
         // LOGO PRINCIPAL
         if (titleLogo != null) {
-            float logoWidth = 650f;
-            float logoHeight = 220f;
+            float logoWidth = 500f;  // Agrandi encore plus
+            float logoHeight = 500f; // Carré pour respecter les proportions originales
             float logoX = (WORLD_WIDTH - logoWidth) / 2f;
-            float logoY = WORLD_HEIGHT - logoHeight - 80f;
+            float logoY = WORLD_HEIGHT - logoHeight + 30f; // Remonté plus haut
             batch.draw(titleLogo, logoX, logoY, logoWidth, logoHeight);
         }
 
-        // ==== MENU ====
+        // ==== MENU - BOUTONS EN LIGNE ====
         if (font != null) {
-            font.getData().setScale(1.1f);
-            float startY = WORLD_HEIGHT / 2f - 120f; // position sous le logo
-            float spacing = 55f;
-
-            for (int i = 0; i < menuItems.length; i++) {
-                String item = menuItems[i];
-                Color color = (i == selectedIndex) ? Color.YELLOW : Color.WHITE;
-                drawCenteredTextShadow(item, startY - i * spacing, color);
+            font.getData().setScale(0.8f); // Taille réduite des boutons
+            
+            // Position Y avec espace entre le logo et les boutons
+            float buttonY = 60f; // Position descendue
+            
+            // Calculer les layouts pour centrer les deux boutons
+            GlyphLayout playLayout = new GlyphLayout(font, "PLAY");
+            GlyphLayout quitLayout = new GlyphLayout(font, "QUIT");
+            
+            // Espacement entre les boutons
+            float buttonSpacing = 80f;
+            
+            // Largeur totale occupée par les deux boutons
+            float totalWidth = playLayout.width + buttonSpacing + quitLayout.width;
+            
+            // Position de départ pour centrer l'ensemble
+            float startX = (WORLD_WIDTH - totalWidth) / 2f;
+            
+            // Dessiner PLAY avec effet d'inversion
+            float playX = startX;
+            if (selectedIndex == 0) {
+                drawTextWithShadowInverted("PLAY", playX, buttonY);
+            } else {
+                drawTextWithShadow("PLAY", playX, buttonY, Color.WHITE);
+            }
+            
+            // Dessiner QUIT avec effet d'inversion
+            float quitX = startX + playLayout.width + buttonSpacing;
+            if (selectedIndex == 1) {
+                drawTextWithShadowInverted("QUIT", quitX, buttonY);
+            } else {
+                drawTextWithShadow("QUIT", quitX, buttonY, Color.WHITE);
             }
         }
 
         batch.end();
     }
 
-    // Texte centré avec ombre douce
-    private void drawCenteredTextShadow(String text, float y, Color color) {
+    // Texte avec ombre douce (position manuelle)
+    private void drawTextWithShadow(String text, float x, float y, Color color) {
         if (font == null) return;
         
         GlyphLayout layout = new GlyphLayout(font, text);
-        float x = (WORLD_WIDTH - layout.width) / 2f;
 
         // Ombre
         font.setColor(0f, 0f, 0f, 0.6f);
@@ -142,6 +164,25 @@ public class TitleScreen implements Screen {
 
         // Couleur principale
         font.setColor(color);
+        font.draw(batch, layout, x, y);
+    }
+
+    // Texte avec effet d'inversion (hover) - fond jaune et texte noir
+    private void drawTextWithShadowInverted(String text, float x, float y) {
+        if (font == null) return;
+        
+        GlyphLayout layout = new GlyphLayout(font, text);
+
+        // Ombre jaune/dorée (plus épaisse pour effet de fond)
+        font.setColor(Color.YELLOW);
+        for (int offsetX = -2; offsetX <= 2; offsetX++) {
+            for (int offsetY = -2; offsetY <= 2; offsetY++) {
+                font.draw(batch, layout, x + offsetX, y + offsetY);
+            }
+        }
+
+        // Texte noir par-dessus
+        font.setColor(Color.BLACK);
         font.draw(batch, layout, x, y);
     }
 
@@ -153,26 +194,43 @@ public class TitleScreen implements Screen {
         float my = mouse.y;
 
         selectedIndex = -1;
-        float startY = WORLD_HEIGHT / 2f - 120f;
-        float spacing = 55f;
-
-        for (int i = 0; i < menuItems.length; i++) {
-            float textY = startY - i * spacing;
-            GlyphLayout layout = new GlyphLayout(font, menuItems[i]);
-            float textX = (WORLD_WIDTH - layout.width) / 2f;
-            float textHeight = layout.height;
-
-            // Créer un rectangle de collision avec des marges
-            com.badlogic.gdx.math.Rectangle buttonRect = new com.badlogic.gdx.math.Rectangle(
-                textX - 10,
-                textY - textHeight - 5,
-                layout.width + 20,
-                textHeight + 10
-            );
-            
-            if (buttonRect.contains(mx, my)) {
-                selectedIndex = i;
-            }
+        
+        // Position Y des boutons (même que dans render)
+        float buttonY = 60f;
+        
+        // Calculer les layouts
+        GlyphLayout playLayout = new GlyphLayout(font, "PLAY");
+        GlyphLayout quitLayout = new GlyphLayout(font, "QUIT");
+        
+        float buttonSpacing = 80f;
+        float totalWidth = playLayout.width + buttonSpacing + quitLayout.width;
+        float startX = (WORLD_WIDTH - totalWidth) / 2f;
+        
+        // Zone de collision PLAY
+        float playX = startX;
+        Rectangle playRect = new Rectangle(
+            playX - 10,
+            buttonY - playLayout.height - 5,
+            playLayout.width + 20,
+            playLayout.height + 10
+        );
+        
+        if (playRect.contains(mx, my)) {
+            selectedIndex = 0;
+            return;
+        }
+        
+        // Zone de collision QUIT
+        float quitX = startX + playLayout.width + buttonSpacing;
+        Rectangle quitRect = new Rectangle(
+            quitX - 10,
+            buttonY - quitLayout.height - 5,
+            quitLayout.width + 20,
+            quitLayout.height + 10
+        );
+        
+        if (quitRect.contains(mx, my)) {
+            selectedIndex = 1;
         }
     }
 

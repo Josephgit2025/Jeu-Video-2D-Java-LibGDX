@@ -125,7 +125,7 @@ public class GameOverOverlay implements Disposable {
         // Draw text
         batch.begin();
         
-        // Title: "Votre Héros est mort -Game Over"
+        // Title: "Votre Héros est mort - Game Over"
         GlyphLayout titleLayout = new GlyphLayout(titleFont, "Game Over");
         float titleX = (OVERLAY_WIDTH - titleLayout.width) / 2f;
         titleFont.draw(batch, "Game Over", 
