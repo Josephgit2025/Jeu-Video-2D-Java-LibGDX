@@ -42,19 +42,19 @@ public class hud implements Disposable {
     // UI positions and dimensions
     private static final float HEALTH_BAR_X = 50f;
     private static final float HEALTH_BAR_Y = 550f;
-    private static final float GOLD_X = 50f;
-    private static final float GOLD_Y = 550f; // Aligné avec la barre de vie (même Y que HEALTH_BAR_Y)
+    private static final float GOLD_X = 20f;
+    private static final float GOLD_Y = 535f;
     
     // Base health bar positions and dimensions
     private static final float BASE_HEALTH_BAR_WIDTH = 250f;
-    private static final float BASE_HEALTH_BAR_HEIGHT = 25f;
+    private static final float BASE_HEALTH_BAR_HEIGHT = 20f;
     private static final float BASE_HEALTH_BAR_Y = 20f;
     private static final float PLAYER_BASE_HEALTH_BAR_X = 50f;
     private static final float ENEMY_BASE_HEALTH_BAR_X = 500f;
     
     // Base icon settings
-    private static final float BASE_ICON_SIZE = 35f;
-    private static final float BASE_ICON_OFFSET = 40f;
+    private static final float BASE_ICON_SIZE = 40f;
+    private static final float BASE_ICON_OFFSET = 45f;
     
     /**
      * Constructor for HUD
@@ -73,7 +73,7 @@ public class hud implements Disposable {
         font.getData().setScale(1.5f);
         
         // Initialize health bar with heart icon
-        healthBar = new healthbar(HEALTH_BAR_X, HEALTH_BAR_Y, 200f, 25f, "ui/heart.png");
+        healthBar = new healthbar(HEALTH_BAR_X, HEALTH_BAR_Y, 200f, 20f, "ui/heart.png"); // Hauteur à 20f
         
         // Initialize base health bars (without icons)
         playerBaseHealthBar = new healthbar(PLAYER_BASE_HEALTH_BAR_X, BASE_HEALTH_BAR_Y, 
@@ -83,8 +83,8 @@ public class hud implements Disposable {
         
         // Load base icons
         try {
-            playerBaseIcon = new Texture("hero/right1.png");
-            enemyBaseIcon = new Texture("zombie/normal/Idle.png");
+            playerBaseIcon = new Texture("hero/Biowear All Frames Soldier idle Take Gun Shot Return Gun (11).png");
+            enemyBaseIcon = new Texture("zombie/crawl/Walk1.png");
         } catch (Exception e) {
             System.err.println("Could not load base icons: " + e.getMessage());
             playerBaseIcon = null;

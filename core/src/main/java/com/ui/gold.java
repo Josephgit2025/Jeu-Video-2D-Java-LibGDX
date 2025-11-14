@@ -96,7 +96,7 @@ public class gold implements Disposable {
         }
         
         // Draw gold text (sans le label "Gold:")
-        String goldText = "" + gold;
+        String goldText = ": " + gold;
         font.draw(batch, goldText, textX, y);
         
         batch.end();
