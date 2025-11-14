@@ -2,6 +2,7 @@ package com.ui;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -27,6 +28,14 @@ public class hud implements Disposable {
     // Health bar component
     private healthbar healthBar;
     
+    // Base health bars
+    private healthbar playerBaseHealthBar;
+    private healthbar enemyBaseHealthBar;
+    
+    // Base icons
+    private Texture playerBaseIcon;
+    private Texture enemyBaseIcon;
+    
     // Gold display
     private gold goldDisplay;
     
@@ -34,7 +43,18 @@ public class hud implements Disposable {
     private static final float HEALTH_BAR_X = 50f;
     private static final float HEALTH_BAR_Y = 550f;
     private static final float GOLD_X = 50f;
-    private static final float GOLD_Y = 515f;
+    private static final float GOLD_Y = 550f; // Aligné avec la barre de vie (même Y que HEALTH_BAR_Y)
+    
+    // Base health bar positions and dimensions
+    private static final float BASE_HEALTH_BAR_WIDTH = 250f;
+    private static final float BASE_HEALTH_BAR_HEIGHT = 25f;
+    private static final float BASE_HEALTH_BAR_Y = 20f;
+    private static final float PLAYER_BASE_HEALTH_BAR_X = 50f;
+    private static final float ENEMY_BASE_HEALTH_BAR_X = 500f;
+    
+    // Base icon settings
+    private static final float BASE_ICON_SIZE = 35f;
+    private static final float BASE_ICON_OFFSET = 40f;
     
     /**
      * Constructor for HUD
@@ -53,7 +73,23 @@ public class hud implements Disposable {
         font.getData().setScale(1.5f);
         
         // Initialize health bar with heart icon
-        healthBar = new healthbar(HEALTH_BAR_X, HEALTH_BAR_Y, 200f, 30f, "ui/heart.png");
+        healthBar = new healthbar(HEALTH_BAR_X, HEALTH_BAR_Y, 200f, 25f, "ui/heart.png");
+        
+        // Initialize base health bars (without icons)
+        playerBaseHealthBar = new healthbar(PLAYER_BASE_HEALTH_BAR_X, BASE_HEALTH_BAR_Y, 
+            BASE_HEALTH_BAR_WIDTH, BASE_HEALTH_BAR_HEIGHT);
+        enemyBaseHealthBar = new healthbar(ENEMY_BASE_HEALTH_BAR_X, BASE_HEALTH_BAR_Y, 
+            BASE_HEALTH_BAR_WIDTH, BASE_HEALTH_BAR_HEIGHT);
+        
+        // Load base icons
+        try {
+            playerBaseIcon = new Texture("hero/right1.png");
+            enemyBaseIcon = new Texture("zombie/normal/Idle.png");
+        } catch (Exception e) {
+            System.err.println("Could not load base icons: " + e.getMessage());
+            playerBaseIcon = null;
+            enemyBaseIcon = null;
+        }
         
         // Initialize gold display with coin icon
         goldDisplay = new gold(GOLD_X, GOLD_Y, "ui/gold.png");
@@ -71,6 +107,19 @@ public class hud implements Disposable {
     }
     
     /**
+     * Update base health bars
+     * @param playerBaseHealth Current health of player base
+     * @param playerBaseMaxHealth Maximum health of player base
+     * @param enemyBaseHealth Current health of enemy base
+     * @param enemyBaseMaxHealth Maximum health of enemy base
+     */
+    public void updateBaseHealth(int playerBaseHealth, int playerBaseMaxHealth, 
+                                  int enemyBaseHealth, int enemyBaseMaxHealth) {
+        playerBaseHealthBar.update(playerBaseHealth, playerBaseMaxHealth);
+        enemyBaseHealthBar.update(enemyBaseHealth, enemyBaseMaxHealth);
+    }
+    
+    /**
      * Render the HUD
      */
     public void render() {
@@ -83,6 +132,30 @@ public class hud implements Disposable {
         
         // Render health bar with heart icon
         healthBar.render(shapeRenderer, batch);
+        
+        // Render base health bars with icons (sans labels)
+        batch.begin();
+        
+        // Player base icon (left side, before the health bar)
+        if (playerBaseIcon != null) {
+            batch.draw(playerBaseIcon, 
+                PLAYER_BASE_HEALTH_BAR_X - BASE_ICON_OFFSET, 
+                BASE_HEALTH_BAR_Y + (BASE_HEALTH_BAR_HEIGHT - BASE_ICON_SIZE) / 2, 
+                BASE_ICON_SIZE, BASE_ICON_SIZE);
+        }
+        
+        // Enemy base icon (left side of enemy health bar)
+        if (enemyBaseIcon != null) {
+            batch.draw(enemyBaseIcon, 
+                ENEMY_BASE_HEALTH_BAR_X - BASE_ICON_OFFSET, 
+                BASE_HEALTH_BAR_Y + (BASE_HEALTH_BAR_HEIGHT - BASE_ICON_SIZE) / 2, 
+                BASE_ICON_SIZE, BASE_ICON_SIZE);
+        }
+        
+        batch.end();
+        
+        playerBaseHealthBar.render(shapeRenderer, batch);
+        enemyBaseHealthBar.render(shapeRenderer, batch);
         
         // Render gold display with coin icon
         goldDisplay.render(batch);
@@ -137,6 +210,16 @@ public class hud implements Disposable {
         shapeRenderer.dispose();
         font.dispose();
         healthBar.dispose();
+        playerBaseHealthBar.dispose();
+        enemyBaseHealthBar.dispose();
         goldDisplay.dispose();
+        
+        // Dispose base icons
+        if (playerBaseIcon != null) {
+            playerBaseIcon.dispose();
+        }
+        if (enemyBaseIcon != null) {
+            enemyBaseIcon.dispose();
+        }
     }
 }

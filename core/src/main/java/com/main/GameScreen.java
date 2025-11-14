@@ -146,6 +146,7 @@ public class GameScreen implements Screen {
         
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
+        hudDisplay.updateBaseHealth(playerBase.getHealth(), 1000, enemyBase.getHealth(), 1000);
         hudDisplay.render();
         
         // Render Pause overlay if in Pause state
