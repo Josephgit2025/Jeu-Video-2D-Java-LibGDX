@@ -123,7 +123,12 @@ public abstract class Unit {
         return texture;
     }
 
-    public void setCooldown(int cd) {
+
+    public float getAttackAnimationTimer() {
+        return attackAnimationTimer;
+    }
+
+    public void setCooldown(float cd) {
         this.attackCooldown = cd;
     }
 
@@ -178,8 +183,8 @@ public abstract class Unit {
      * Calcule la distance entre cette unité et une autre
      */
     private double calculateDistance(Unit other) {
-        float dx = this.posX - other.posX;
-        float dy = this.posY - other.posY;
+        float dx = this.posX - other.getPosX();
+        float dy = this.posY - other.getPosY();
         return Math.sqrt(dx * dx + dy * dy);
     }
 
@@ -189,9 +194,9 @@ public abstract class Unit {
     public List<Unit> detectEnemiesInRange(List<Unit> enemies) {
         List<Unit> inRange = new ArrayList<>();
         for (Unit unit : enemies) {
-            if (unit != this) {
+            if (unit != this && !unit.isDead()) {
                 double distance = calculateDistance(unit);
-                if (distance <= this.range) {
+                if ((int)distance <= this.range) {
                     inRange.add(unit);
                 }
             }
@@ -207,7 +212,7 @@ public abstract class Unit {
         double minDistance = Double.MAX_VALUE;
         for (Unit enemy : enemies) {
             double distance = calculateDistance(enemy);
-            if (distance < minDistance) {
+            if (distance < minDistance && !enemy.isDead()) {
                 minDistance = distance;
                 closest = enemy;
             }
