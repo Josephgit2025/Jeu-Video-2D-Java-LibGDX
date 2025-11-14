@@ -41,7 +41,7 @@ public class hud implements Disposable {
     private static final float GOLD_Y = 535f;
     
     // Base health bar positions and dimensions (barres verticales)
-    private static final float BASE_HEALTH_BAR_WIDTH = 15f;   // Largeur pour barre verticale
+    private static final float BASE_HEALTH_BAR_WIDTH = 8f;   // Largeur fine pour barre verticale
     private static final float BASE_HEALTH_BAR_HEIGHT = 150f; // Hauteur pour barre verticale
     
     // Ces valeurs seront calculées dynamiquement en fonction de la caméra et des bases
@@ -115,14 +115,13 @@ public class hud implements Disposable {
                                               float enemyBaseX, float enemyBaseY,
                                               OrthographicCamera gameCamera) {
         // Barres verticales centrées horizontalement sur les bases
-        // Base width = 96px (3 tiles × 16px × 2 SCALE)
         float baseWidth = 96f;
         
         // Centrer horizontalement : posX + (largeur_base / 2) - (largeur_barre / 2)
         float centerOffsetX = (baseWidth / 2) - (BASE_HEALTH_BAR_WIDTH / 2);
         
         // Centrer verticalement
-        
+
         float baseHeight = 300f;
         float centerOffsetY = (baseHeight / 2) - (BASE_HEALTH_BAR_HEIGHT / 2);
         
