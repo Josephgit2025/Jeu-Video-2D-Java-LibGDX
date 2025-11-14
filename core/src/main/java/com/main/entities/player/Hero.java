@@ -463,4 +463,18 @@ public class Hero extends Unit {
     public void addGold(int amount) {
         this.gold += amount;
     }
+
+    /**
+     * Remove gold from current amount
+     * 
+     * @param amount Amount to remove
+     * @return true if there was enough gold to remove, false otherwise
+     */
+    public boolean removeGold(int amount) {
+        if (this.gold >= amount) {
+            this.gold -= amount;
+            return true;
+        }
+        return false;
+    }
 }
