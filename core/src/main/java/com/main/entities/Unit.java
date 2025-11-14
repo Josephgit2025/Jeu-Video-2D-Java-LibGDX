@@ -441,7 +441,6 @@ public abstract class Unit {
         }
 
         if (distance < this.getWidth()) {
-            System.out.println("Index = " + this.getIndex() + " Lane = " + this.getLane() + " Distance = " + distance);
             return true;
         }
         return false;
