@@ -41,8 +41,8 @@ public class hud implements Disposable {
     private static final float GOLD_Y = 535f;
     
     // Base health bar positions and dimensions (barres verticales)
-    private static final float BASE_HEALTH_BAR_WIDTH = 5f;   // Largeur réduite pour barre verticale
-    private static final float BASE_HEALTH_BAR_HEIGHT = 100f; // Hauteur pour barre verticale
+    private static final float BASE_HEALTH_BAR_WIDTH = 15f;   // Largeur pour barre verticale
+    private static final float BASE_HEALTH_BAR_HEIGHT = 150f; // Hauteur pour barre verticale
     
     // Ces valeurs seront calculées dynamiquement en fonction de la caméra et des bases
     private float playerBaseHealthBarX = 20f;
@@ -114,14 +114,25 @@ public class hud implements Disposable {
     public void updateBaseHealthBarPositions(float playerBaseX, float playerBaseY,
                                               float enemyBaseX, float enemyBaseY,
                                               OrthographicCamera gameCamera) {
-        // Barres verticales fixées à côté des bases dans le monde du jeu
-        // Position à droite de la base du joueur (qui est à gauche)
-        playerBaseHealthBarX = playerBaseX + 110f;  // 110f = largeur de la base + petit espace
-        playerBaseHealthBarY = playerBaseY + 220f;  // Centré verticalement avec la base
+        // Barres verticales centrées horizontalement sur les bases
+        // Base width = 96px (3 tiles × 16px × 2 SCALE)
+        float baseWidth = 96f;
         
-        // Position à gauche de la base ennemie (qui est à droite)
-        enemyBaseHealthBarX = enemyBaseX - 40f;  // Espace avant la barre
-        enemyBaseHealthBarY = enemyBaseY + 220f; // Centré verticalement avec la base
+        // Centrer horizontalement : posX + (largeur_base / 2) - (largeur_barre / 2)
+        float centerOffsetX = (baseWidth / 2) - (BASE_HEALTH_BAR_WIDTH / 2);
+        
+        // Centrer verticalement
+        
+        float baseHeight = 300f;
+        float centerOffsetY = (baseHeight / 2) - (BASE_HEALTH_BAR_HEIGHT / 2);
+        
+        // Position de la barre du joueur (centrée sur la base)
+        playerBaseHealthBarX = playerBaseX + centerOffsetX;
+        playerBaseHealthBarY = playerBaseY + centerOffsetY;
+        
+        // Position de la barre ennemie (centrée sur la base)
+        enemyBaseHealthBarX = enemyBaseX + centerOffsetX;
+        enemyBaseHealthBarY = enemyBaseY + centerOffsetY;
         
         // Mettre à jour les positions des barres de vie verticales
         playerBaseHealthBar.setPosition(playerBaseHealthBarX, playerBaseHealthBarY);
