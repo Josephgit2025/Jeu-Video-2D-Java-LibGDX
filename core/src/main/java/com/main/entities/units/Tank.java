@@ -1,22 +1,22 @@
 package com.main.entities.units;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.map.Base;
 
 public class Tank extends Soldier {
 
-    public static final int COST = 1; // Pour les tests
+    public static final int COST = 1;
 
-    public Tank(float posX, float posY) {
-        super("Tank/Ride1.png", posX, posY);
+    public Tank(float posX, float posY, Base allyBase) {
+        super("Tank/Ride1.png", posX, posY, allyBase);
         this.health = 500;
         this.attackDamage = 30;
         this.speed = 15;
         this.attackSpeed = 3.0f; // 3 seconds between attacks (slow heavy weapon)
         this.range = 100; // Portée moyenne
+        this.width = 50;
 
         // Load walk animation
         TextureRegion[] walkFrames = loadFrames("Tank/Ride%d.png", 2);

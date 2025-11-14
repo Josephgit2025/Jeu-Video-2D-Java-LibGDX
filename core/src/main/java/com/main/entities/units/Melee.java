@@ -3,15 +3,15 @@ package com.main.entities.units;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.map.Base;
 
 public class Melee extends Soldier {
 
-    public static final int COST = 1; // Pour les tests
+    public static final int COST = 1;
 
-    public Melee(float posX, float posY) {
-        super("Melee/Walk1.png", posX, posY);
+    public Melee(float posX, float posY, Base allyBase) {
+        super("Melee/Walk1.png", posX, posY, allyBase);
         this.health = 200;
         this.attackDamage = 20;
         this.speed = 100;

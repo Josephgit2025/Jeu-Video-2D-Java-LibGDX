@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
+import com.main.map.Base;
 
 public class Zombie extends Unit {
     // Animation fields - shared by all zombie types
@@ -20,8 +21,9 @@ public class Zombie extends Unit {
     protected List<Texture> loadedTextures = new ArrayList<>();
     protected final float FRAME_DURATION = 0.2f;
 
-    public Zombie(String filePath, float posX, float posY) {
+    public Zombie(String filePath, float posX, float posY, Base allyBase) {
         super(filePath, posX, posY);
+        this.allyBase = allyBase;
     }
 
     @Override
