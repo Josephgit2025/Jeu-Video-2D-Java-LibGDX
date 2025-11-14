@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -22,6 +21,7 @@ import com.ui.hud;
 import com.ui.GameOverOverlay;
 import com.ui.BaseDestroyedOverlay;
 import com.ui.BaseZombieDestroyedOverlay;
+import com.ui.PauseOverlay;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -44,9 +44,10 @@ public class GameScreen implements Screen {
     private GameOverOverlay gameOverOverlay;
     private BaseDestroyedOverlay baseDestroyedOverlay;
     private BaseZombieDestroyedOverlay baseZombieDestroyedOverlay;
+    private PauseOverlay pauseOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
     
-    // Pause display
+    // Pause display (deprecated - using PauseOverlay now)
     private BitmapFont pauseFont;
 
     // Game Over state
@@ -88,7 +89,9 @@ public class GameScreen implements Screen {
         this.baseDestroyedOverlay = new BaseDestroyedOverlay();
         // Initialize Zombie Base Destroyed Overlay
         this.baseZombieDestroyedOverlay = new BaseZombieDestroyedOverlay();
-        // Initialize Pause Font
+        // Initialize Pause Overlay
+        this.pauseOverlay = new PauseOverlay();
+        // Initialize Pause Font (deprecated - using PauseOverlay now)
         this.pauseFont = new BitmapFont();
         this.pauseFont.setColor(Color.WHITE);
         this.pauseFont.getData().setScale(4f);
@@ -169,27 +172,7 @@ public class GameScreen implements Screen {
         
         // Render Pause overlay if in Pause state
         if (gameState == GameState.PAUSE) {
-            // Draw semi-transparent overlay
-            com.badlogic.gdx.Gdx.gl.glEnable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
-            com.badlogic.gdx.Gdx.gl.glBlendFunc(com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA, com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA);
-            
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(0, 0, 0, 0.5f); // Black with 50% opacity
-            shapeRenderer.rect(0, 0, com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
-            shapeRenderer.end();
-            
-            com.badlogic.gdx.Gdx.gl.glDisable(com.badlogic.gdx.graphics.GL20.GL_BLEND);
-
-            // Draw "PAUSED" texte centré
-            batch.begin();
-            GlyphLayout pauseLayout = new GlyphLayout(pauseFont, "PAUSED");
-            
-            // Draw with camera projection for game world coordinates (centered on camera)
-            batch.setProjectionMatrix(camera.combined);
-            pauseFont.draw(batch, "PAUSED", 
-                camera.position.x - pauseLayout.width / 2f, 
-                camera.position.y + pauseLayout.height / 2f);
-            batch.end();
+            pauseOverlay.render();
         }
         
         // Render Game Over Overlay if in Game Over state
@@ -307,8 +290,8 @@ public class GameScreen implements Screen {
                 System.out.println("Replay clicked!");
                 reset();
             } else if ("quit".equals(action)) {
-                System.out.println("Quit clicked!");
-                game.setScreen(new com.main.screens.TitleScreen(game));
+                System.out.println("Quit clicked - Returning to Title Screen!");
+                com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
         
@@ -323,8 +306,8 @@ public class GameScreen implements Screen {
                 System.out.println("Replay clicked from Base Destroyed!");
                 reset();
             } else if ("quit".equals(action)) {
-                System.out.println("Quit clicked from Base Destroyed!");
-                game.setScreen(new com.main.screens.TitleScreen(game));
+                System.out.println("Quit clicked from Base Destroyed - Returning to Title Screen!");
+                com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
         
@@ -339,8 +322,30 @@ public class GameScreen implements Screen {
                 System.out.println("Replay clicked from Zombie Base Destroyed!");
                 reset();
             } else if ("quit".equals(action)) {
-                System.out.println("Quit clicked from Zombie Base Destroyed!");
-                game.setScreen(new com.main.screens.TitleScreen(game));
+                System.out.println("Quit clicked from Zombie Base Destroyed - Returning to Title Screen!");
+                com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
+            }
+        }
+        
+        // Handle Pause clicks
+        if (gameState == GameState.PAUSE && com.badlogic.gdx.Gdx.input.justTouched()) {
+            String action = pauseOverlay.handleClick(
+                com.badlogic.gdx.Gdx.input.getX(), 
+                com.badlogic.gdx.Gdx.input.getY()
+            );
+            
+            if ("resume".equals(action)) {
+                System.out.println("Resume clicked!");
+                gameState = GameState.PLAYING;
+                pauseOverlay.resetConfirmation();
+            } else if ("quit".equals(action)) {
+                System.out.println("Quit to menu confirmed - Returning to Title Screen!");
+                pauseOverlay.resetConfirmation();
+                com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
+            } else if ("confirm".equals(action)) {
+                System.out.println("Showing quit confirmation...");
+            } else if ("cancel".equals(action)) {
+                System.out.println("Quit cancelled, back to pause menu");
             }
         }
         
@@ -453,6 +458,9 @@ public class GameScreen implements Screen {
         if (baseZombieDestroyedOverlay != null) {
             baseZombieDestroyedOverlay.resize(width, height);
         }
+        if (pauseOverlay != null) {
+            pauseOverlay.resize(width, height);
+        }
     }
 
     @Override
@@ -487,6 +495,8 @@ public class GameScreen implements Screen {
             baseDestroyedOverlay.dispose();
         if (baseZombieDestroyedOverlay != null)
             baseZombieDestroyedOverlay.dispose();
+        if (pauseOverlay != null)
+            pauseOverlay.dispose();
         if (pauseFont != null)
             pauseFont.dispose();
     }

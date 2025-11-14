@@ -57,7 +57,7 @@ public class BaseZombieDestroyedOverlay implements Disposable {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PressStart2P.ttf"));
             FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
             parameter.size = 36;
-            parameter.color = Color.RED;
+            parameter.color = Color.GREEN;
             parameter.borderWidth = 3f;
             parameter.borderColor = Color.BLACK;
             parameter.shadowOffsetX = 3;
@@ -69,7 +69,7 @@ public class BaseZombieDestroyedOverlay implements Disposable {
         } catch (Exception e) {
             System.err.println("Could not load PressStart2P font: " + e.getMessage());
             titleFont = new BitmapFont();
-            titleFont.setColor(Color.RED);
+            titleFont.setColor(Color.GREEN);
             titleFont.getData().setScale(3f);
         }
         
