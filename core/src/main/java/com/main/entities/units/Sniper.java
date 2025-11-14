@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Sniper extends Soldier {
 
+    public static final int COST = 1; // Pour les tests
+
     public Sniper(int posX, int posY) {
         super("Sniper/Walk1.png", posX, posY);
         this.health = 150;

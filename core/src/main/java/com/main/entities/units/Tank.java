@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Tank extends Soldier {
 
+    public static final int COST = 1; // Pour les tests
+
     public Tank(float posX, float posY) {
         super("Tank/Ride1.png", posX, posY);
         this.health = 500;
@@ -67,45 +69,46 @@ public class Tank extends Soldier {
 
     // @Override
     // public void move(float delta) {
-    //     // Update attack animation timer
-    //     if (attackAnimationTimer > 0) {
-    //         attackAnimationTimer -= delta;
-    //         this.stateTime += delta;
-    //         if (attackAnimationTimer <= 0) {
-    //             currentState = UnitState.WALKING;
-    //             this.stateTime = 0;
-    //         }
-    //         return;
-    //     }
-    //     // If there's a living unit target, handle engagement
-    //     if (target != null && !target.isDead()) {
-    //         double distance = Math
-    //                 .sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY - target.getPosY(), 2));
-    //         if (distance <= this.range) {
-    //             // In range: use shared attack logic so damage, cooldown and attack animation
-    //             // timer are applied
-    //             if (attackCooldown <= 0f) {
-    //                 attack();
-    //                 this.stateTime = 0f;
-    //             } else {
-    //                 currentState = UnitState.IDLE;
-    //                 this.stateTime += delta;
-    //             }
-    //             return;
-    //         }
-    //     }
+    // // Update attack animation timer
+    // if (attackAnimationTimer > 0) {
+    // attackAnimationTimer -= delta;
+    // this.stateTime += delta;
+    // if (attackAnimationTimer <= 0) {
+    // currentState = UnitState.WALKING;
+    // this.stateTime = 0;
+    // }
+    // return;
+    // }
+    // // If there's a living unit target, handle engagement
+    // if (target != null && !target.isDead()) {
+    // double distance = Math
+    // .sqrt(Math.pow(this.posX - target.getPosX(), 2) + Math.pow(this.posY -
+    // target.getPosY(), 2));
+    // if (distance <= this.range) {
+    // // In range: use shared attack logic so damage, cooldown and attack animation
+    // // timer are applied
+    // if (attackCooldown <= 0f) {
+    // attack();
+    // this.stateTime = 0f;
+    // } else {
+    // currentState = UnitState.IDLE;
+    // this.stateTime += delta;
+    // }
+    // return;
+    // }
+    // }
 
-    //     // If attack animation or cooldown stopped us, check generic stop condition
-    //     if (shouldStopMoving()) {
-    //         currentState = UnitState.IDLE;
-    //         this.stateTime += delta;
-    //         return;
-    //     }
+    // // If attack animation or cooldown stopped us, check generic stop condition
+    // if (shouldStopMoving()) {
+    // currentState = UnitState.IDLE;
+    // this.stateTime += delta;
+    // return;
+    // }
 
-    //     // Default movement: move right (soldier direction) with collision check
-    //     currentState = UnitState.WALKING;
-    //     float newX = calculateNewPositionX(delta, 1);
-    //     this.setSpritePosX(newX);
-    //     this.stateTime += delta;
+    // // Default movement: move right (soldier direction) with collision check
+    // currentState = UnitState.WALKING;
+    // float newX = calculateNewPositionX(delta, 1);
+    // this.setSpritePosX(newX);
+    // this.stateTime += delta;
     // }
 }

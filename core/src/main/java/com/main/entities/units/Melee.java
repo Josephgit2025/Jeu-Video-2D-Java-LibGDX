@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Melee extends Soldier {
 
+    public static final int COST = 1; // Pour les tests
+
     public Melee(float posX, float posY) {
         super("Melee/Walk1.png", posX, posY);
         this.health = 200;
@@ -60,7 +62,8 @@ public class Melee extends Soldier {
         if (this.attackAnimation != null) {
             this.attackAnimationTimer = this.attackAnimation.getAnimationDuration();
             this.stateTime = 0f;
-            System.out.println("[ANIM] " + this.getClass().getSimpleName() + " base attack timer set: " + this.attackAnimationTimer);
+            System.out.println("[ANIM] " + this.getClass().getSimpleName() + " base attack timer set: "
+                    + this.attackAnimationTimer);
         }
     }
 }
