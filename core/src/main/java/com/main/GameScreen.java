@@ -21,6 +21,7 @@ import com.main.map.WarMap;
 import com.ui.hud;
 import com.ui.GameOverOverlay;
 import com.ui.BaseDestroyedOverlay;
+import com.ui.BaseZombieDestroyedOverlay;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -42,6 +43,7 @@ public class GameScreen implements Screen {
     private hud hudDisplay;
     private GameOverOverlay gameOverOverlay;
     private BaseDestroyedOverlay baseDestroyedOverlay;
+    private BaseZombieDestroyedOverlay baseZombieDestroyedOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
     
     // Pause display
@@ -52,7 +54,8 @@ public class GameScreen implements Screen {
         PLAYING,
         PAUSE,
         GAME_OVER,
-        BASE_DESTROYED
+        BASE_DESTROYED,
+        ZOMBIE_BASE_DESTROYED
     }
     private GameState gameState = GameState.PLAYING;
     private boolean pauseKeyPressed = false;
@@ -83,6 +86,8 @@ public class GameScreen implements Screen {
         this.gameOverOverlay = new GameOverOverlay();
         // Initialize Base Destroyed Overlay
         this.baseDestroyedOverlay = new BaseDestroyedOverlay();
+        // Initialize Zombie Base Destroyed Overlay
+        this.baseZombieDestroyedOverlay = new BaseZombieDestroyedOverlay();
         // Initialize Pause Font
         this.pauseFont = new BitmapFont();
         this.pauseFont.setColor(Color.WHITE);
@@ -152,6 +157,14 @@ public class GameScreen implements Screen {
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
         hudDisplay.updateBaseHealth(playerBase.getHealth(), 1000, enemyBase.getHealth(), 1000);
+        
+        // Mettre à jour les positions des barres de vie des bases
+        hudDisplay.updateBaseHealthBarPositions(
+            playerBase.getPosX(), playerBase.getPosition().getPosY(),
+            enemyBase.getPosX(), enemyBase.getPosition().getPosY(),
+            camera
+        );
+        
         hudDisplay.render();
         
         // Render Pause overlay if in Pause state
@@ -187,6 +200,11 @@ public class GameScreen implements Screen {
         // Render Base Destroyed Overlay if player base is destroyed
         if (gameState == GameState.BASE_DESTROYED) {
             baseDestroyedOverlay.render();
+        }
+        
+        // Render Zombie Base Destroyed Overlay if enemy base is destroyed (Victory!)
+        if (gameState == GameState.ZOMBIE_BASE_DESTROYED) {
+            baseZombieDestroyedOverlay.render();
         }
         
         // Draw range circles if enabled
@@ -272,6 +290,12 @@ public class GameScreen implements Screen {
             System.out.println("BASE DESTROYED - Player base has been destroyed!");
         }
         
+        // Check if enemy base is destroyed (Victory!)
+        if (enemyBase.isDestroyed() && gameState == GameState.PLAYING) {
+            gameState = GameState.ZOMBIE_BASE_DESTROYED;
+            System.out.println("VICTORY - Enemy base has been destroyed!");
+        }
+        
         // Handle Game Over clicks
         if (gameState == GameState.GAME_OVER && com.badlogic.gdx.Gdx.input.justTouched()) {
             String action = gameOverOverlay.handleClick(
@@ -288,8 +312,41 @@ public class GameScreen implements Screen {
             }
         }
         
-        // Don't update game if Game Over or Paused
-        if (gameState == GameState.GAME_OVER || gameState == GameState.PAUSE) {
+        // Handle Base Destroyed clicks
+        if (gameState == GameState.BASE_DESTROYED && com.badlogic.gdx.Gdx.input.justTouched()) {
+            String action = baseDestroyedOverlay.handleClick(
+                com.badlogic.gdx.Gdx.input.getX(), 
+                com.badlogic.gdx.Gdx.input.getY()
+            );
+            
+            if ("replay".equals(action)) {
+                System.out.println("Replay clicked from Base Destroyed!");
+                reset();
+            } else if ("quit".equals(action)) {
+                System.out.println("Quit clicked from Base Destroyed!");
+                game.setScreen(new com.main.screens.TitleScreen(game));
+            }
+        }
+        
+        // Handle Zombie Base Destroyed clicks
+        if (gameState == GameState.ZOMBIE_BASE_DESTROYED && com.badlogic.gdx.Gdx.input.justTouched()) {
+            String action = baseZombieDestroyedOverlay.handleClick(
+                com.badlogic.gdx.Gdx.input.getX(), 
+                com.badlogic.gdx.Gdx.input.getY()
+            );
+            
+            if ("replay".equals(action)) {
+                System.out.println("Replay clicked from Zombie Base Destroyed!");
+                reset();
+            } else if ("quit".equals(action)) {
+                System.out.println("Quit clicked from Zombie Base Destroyed!");
+                game.setScreen(new com.main.screens.TitleScreen(game));
+            }
+        }
+        
+        // Don't update game if Game Over, Base Destroyed, or Paused
+        if (gameState == GameState.GAME_OVER || gameState == GameState.PAUSE || 
+            gameState == GameState.BASE_DESTROYED || gameState == GameState.ZOMBIE_BASE_DESTROYED) {
             return;
         }
         
@@ -393,6 +450,9 @@ public class GameScreen implements Screen {
         if (baseDestroyedOverlay != null) {
             baseDestroyedOverlay.resize(width, height);
         }
+        if (baseZombieDestroyedOverlay != null) {
+            baseZombieDestroyedOverlay.resize(width, height);
+        }
     }
 
     @Override
@@ -425,6 +485,8 @@ public class GameScreen implements Screen {
             gameOverOverlay.dispose();
         if (baseDestroyedOverlay != null)
             baseDestroyedOverlay.dispose();
+        if (baseZombieDestroyedOverlay != null)
+            baseZombieDestroyedOverlay.dispose();
         if (pauseFont != null)
             pauseFont.dispose();
     }
