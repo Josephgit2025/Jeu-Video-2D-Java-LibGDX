@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
- * Overlay affiché quand la base du joueur est détruite
+ * Overlay affiché quand la base des zombies est détruite
  */
 public class BaseZombieDestroyedOverlay implements Disposable {
     
