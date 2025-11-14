@@ -16,16 +16,17 @@ import com.main.entities.units.Sniper;
 import com.main.entities.units.Tank;
 import com.main.utils.Position;
 
-enum Type {
-    MELEE,
-    TANK,
-    SNIPER,
-    WOMAN,
-    CRAWL,
-    FAST,
-}
-
 public class Base {
+    
+    public enum Type {
+        MELEE,
+        TANK,
+        SNIPER,
+        WOMAN,
+        CRAWL,
+        FAST
+    }
+    
     private int health = 1000;
     private Position position;
     private int attackPower = 50;
@@ -39,7 +40,6 @@ public class Base {
     private static final int TILE_SIZE = 16; // Taille d'une tuile dans Tiled
     private static final float SCALE = 2.0f; // Scale de la map
     private int[] spawnPointsY;
-
 
     public Base(int posX, int posY, boolean isPlayerBase, int mapHeight) {
         this.position = new Position(posX, posY);
@@ -56,7 +56,6 @@ public class Base {
         this.spawnPointsY[0] = mapHeight / 4; // Haut
         this.spawnPointsY[1] = mapHeight / 2; // Milieu
         this.spawnPointsY[2] = (3 * mapHeight) / 4; // Bas
-        
 
         // Créer la hitbox : 3 tuiles de large * TILE_SIZE * SCALE, hauteur totale de la
         // map
@@ -123,6 +122,63 @@ public class Base {
 
     public List<Unit> getUnits() {
         return this.units;
+    }
+
+    public Unit buyUnit(Type unitType, int spawnIndex, Hero hero) {
+        // spawnIndex = 0, 1 ou 2 (pour les 3 points Y)
+        // Vérifie le coût selon le type
+        // Vérifie si hero a assez d'or
+        // Retire l'or et crée l'unité
+        int spawnY = spawnPointsY[spawnIndex];
+        switch (unitType) {
+            case MELEE:
+                if (hero.getGold() >= Melee.COST) {
+                    hero.removeGold(Melee.COST);
+                    System.out.println(
+                            "Melee unit bought for " + Melee.COST + " gold. Hero gold left: " + hero.getGold());
+                    Unit melee = new Melee(100, spawnY, this);
+                    this.unitsPerLane.get(spawnIndex).add(melee);
+                    melee.setLane(spawnIndex);
+                    melee.setIndex(this.unitsPerLane.get(spawnIndex).size()- 1);
+                    return melee;
+                } else {
+                    System.out.println("Not enough gold to buy Melee unit.");
+                }
+                break;
+            case TANK:
+                if (hero.getGold() >= Tank.COST) {
+                    hero.removeGold(Tank.COST);
+                    System.out
+                            .println("Tank unit bought for " + Tank.COST + " gold. Hero gold left: " + hero.getGold());
+                    Unit tank = new Tank(100, spawnY, this);
+                    this.unitsPerLane.get(spawnIndex).add(tank);
+                    tank.setLane(spawnIndex);
+                    tank.setIndex(this.unitsPerLane.get(spawnIndex).size() - 1);
+                    return tank;
+                } else {
+                    System.out.println("Not enough gold to buy Tank unit.");
+                }
+                break;
+            case SNIPER:
+                if (hero.getGold() >= Sniper.COST) {
+                    hero.removeGold(Sniper.COST);
+                    System.out
+                            .println("Sniper unit bought for " + Sniper.COST + " gold. Hero gold left: "
+                                    + hero.getGold());
+                    Unit sniper = new Sniper(100, spawnY, this);
+                    this.unitsPerLane.get(spawnIndex).add(sniper);
+                    sniper.setLane(spawnIndex);
+                    sniper.setIndex(this.unitsPerLane.get(spawnIndex).size() - 1);
+                    return sniper;
+                } else {
+                    System.out.println("Not enough gold to buy Sniper unit.");
+                }
+                break;
+            default:
+                System.out.println("Unknown unit type.");
+                break;
+        }
+        return null;
     }
 
     public Unit spawnUnit(GameScreen screen, float delta) {

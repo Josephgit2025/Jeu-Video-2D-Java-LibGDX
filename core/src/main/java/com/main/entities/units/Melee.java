@@ -8,6 +8,8 @@ import com.main.map.Base;
 
 public class Melee extends Soldier {
 
+    public static final int COST = 1;
+
     public Melee(float posX, float posY, Base allyBase) {
         super("Melee/Walk1.png", posX, posY, allyBase);
         this.health = 200;

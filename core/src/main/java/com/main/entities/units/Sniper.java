@@ -6,6 +6,8 @@ import com.main.map.Base;
 
 public class Sniper extends Soldier {
 
+    public static final int COST = 1;
+
     public Sniper(int posX, int posY, Base allyBase) {
         super("Sniper/Walk1.png", posX, posY, allyBase);
         this.health = 150;
