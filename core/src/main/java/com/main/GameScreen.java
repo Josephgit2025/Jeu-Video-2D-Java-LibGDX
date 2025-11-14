@@ -355,7 +355,6 @@ public class GameScreen implements Screen {
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
             if (distance < 50f) {
                 enemy.setTarget(this.hero);
-                // System.out.println("Hero hit! HP: " + hero.getCurrentHealth() + "/" + hero.getMaxHealth());
             }
         }
     }

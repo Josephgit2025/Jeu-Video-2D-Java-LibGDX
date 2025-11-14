@@ -144,7 +144,10 @@ public class gold implements Disposable {
      * @param amount Amount to add
      */
     public void addGold(int amount) {
-        this.gold += amount;
+        // this.gold += amount;
+        // if (this.gold <= 0)
+        //     this.gold = 0;
+        this.setGold(this.gold + amount);
     }
     
     /**
@@ -189,7 +192,8 @@ public class gold implements Disposable {
      * @param scale Font scale
      */
     public void setFontScale(float scale) {
-        font.getData().setScale(scale);
+        if (scale > 0f)
+            font.getData().setScale(scale);
     }
     
     @Override

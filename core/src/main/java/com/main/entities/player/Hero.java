@@ -10,16 +10,29 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
-import com.main.entities.units.Sniper;
 import com.main.map.WarMap;
-import com.main.weapons.Machette;
 import com.main.weapons.SniperRifle;
 import com.main.weapons.Weapon;
 
 public class Hero extends Unit {
 
     private enum Direction {
-        UP, DOWN, LEFT, RIGHT
+        UP, DOWN, LEFT, RIGHT, ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT
+    }
+
+    private float getCurrentAttackAnimationDuration() {
+        switch (direction) {
+            case ATTACKRIGHT:
+                return (AttackRight != null) ? AttackRight.getAnimationDuration() : 0f;
+            case ATTACKLEFT:
+                return (AttackLeft != null) ? AttackLeft.getAnimationDuration() : 0f;
+            case ATTACKUP:
+                return (AttackUp != null) ? AttackUp.getAnimationDuration() : 0f;
+            case ATTACKDOWN:
+                return (AttackDown != null) ? AttackDown.getAnimationDuration() : 0f;
+            default:
+                return 0f;
+        }
     }
 
     protected int xp;
@@ -35,10 +48,13 @@ public class Hero extends Unit {
     protected int maxHealth = 500;
     private WarMap map;
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
+    private Animation<TextureRegion> AttackRight, AttackLeft, AttackUp, AttackDown;
 
     // uses inherited stateTime from Unit
     private boolean moving = false;
     private Direction direction = Direction.DOWN;
+    // previous facing (non-attack) to revert to after attack animation finishes
+    private Direction prevDirection = Direction.DOWN;
     private List<Texture> loadedTextures = new ArrayList<>();
     private final float FRAME_DURATION = 0.12f;
     private final float FRAME_DURATIONW = 0.12f;
@@ -64,6 +80,26 @@ public class Hero extends Unit {
                 8);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
+
+        TextureRegion[] rightAttack = loadFrames("sold/AttackR%d.png", 4);
+        AttackRight = new Animation<>(FRAME_DURATION, rightAttack);
+        AttackRight.setPlayMode(Animation.PlayMode.NORMAL);
+
+        TextureRegion[] leftAttack = loadFrames("sold/AttackL%d.png",
+                4);
+        AttackLeft = new Animation<>(FRAME_DURATION, leftAttack);
+        AttackLeft.setPlayMode(Animation.PlayMode.NORMAL);
+
+        TextureRegion[] upAttack = loadFrames("sold/AttackU%d.png",
+                4);
+        AttackUp = new Animation<>(FRAME_DURATIONW, upAttack);
+        AttackUp.setPlayMode(Animation.PlayMode.NORMAL);
+
+        TextureRegion[] downAttack = loadFrames("sold/AttackD%d.png",
+                4);
+        AttackDown = new Animation<>(FRAME_DURATIONW, downAttack);
+        AttackDown.setPlayMode(Animation.PlayMode.NORMAL);
+
         this.health = 500;
         this.weapon = new SniperRifle();
         this.speed = 8;
@@ -95,7 +131,8 @@ public class Hero extends Unit {
         // Cache closest enemy calculation to avoid 4 calls per frame
         Unit closestEnemy = this.findClosestEnemy(units);
 
-        // Auto-ciblage : si la cible actuelle est morte ou hors de portée, trouver une nouvelle cible
+        // Auto-ciblage : si la cible actuelle est morte ou hors de portée, trouver une
+        // nouvelle cible
         if (target == null || target.isDead()) {
             // Chercher l'ennemi le plus proche dans la portée
             Unit enemyInRange = findClosestEnemyInRange(units, weapon.getRange());
@@ -142,9 +179,24 @@ public class Hero extends Unit {
         }
 
         if (moving) {
+            // Advance animation time while moving
             stateTime += delta;
         } else {
-            stateTime = 0f;
+            // If currently in an attack-facing state, advance animation time so
+            // attack frames play even when the hero is stationary
+            if (direction == Direction.ATTACKDOWN || direction == Direction.ATTACKLEFT
+                    || direction == Direction.ATTACKRIGHT || direction == Direction.ATTACKUP) {
+                stateTime += delta;
+                // When the attack animation finishes, revert to the previous facing
+                float attackDur = getCurrentAttackAnimationDuration();
+                if (attackDur > 0f && stateTime >= attackDur) {
+                    direction = prevDirection;
+                    stateTime = 0f; // reset to idle timing
+                }
+            } else {
+                // Not moving and not attacking: reset animation timer
+                stateTime = 0f;
+            }
         }
     }
 
@@ -192,6 +244,7 @@ public class Hero extends Unit {
 
     /**
      * Find the closest enemy within attack range
+     * 
      * @param units List of all enemy units
      * @param range Attack range
      * @return Closest enemy in range, or null if none found
@@ -199,21 +252,21 @@ public class Hero extends Unit {
     private Unit findClosestEnemyInRange(List<Unit> units, int range) {
         Unit closest = null;
         double minDistance = range;
-        
+
         for (Unit unit : units) {
-            if (unit.isDead()) continue;
-            
+            if (unit.isDead())
+                continue;
+
             double distance = Math.sqrt(
-                Math.pow(this.posX - unit.getPosX(), 2) +
-                Math.pow(this.posY - unit.getPosY(), 2)
-            );
-            
+                    Math.pow(this.posX - unit.getPosX(), 2) +
+                            Math.pow(this.posY - unit.getPosY(), 2));
+
             if (distance <= range && distance < minDistance) {
                 minDistance = distance;
                 closest = unit;
             }
         }
-        
+
         return closest;
     }
 
@@ -243,20 +296,40 @@ public class Hero extends Unit {
     @Override
     public void attack() {
         if (target == null || target.isDead()) {
+            System.out.print("Target null");
             return;
         }
         double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) +
                 Math.pow(this.posY - target.getPosY(), 2));
         if (distance > weapon.getRange()) {
+            System.out.println("Out of range");
             return;
         }
         if (attackCooldown <= 0 && weapon != null) {
             if (weapon.getMunitions() > 0 || weapon.getMaxMunitions() == -1) {
+                // Save current non-attack facing so we can revert after animation
+                if (direction == Direction.RIGHT || direction == Direction.LEFT || direction == Direction.UP
+                        || direction == Direction.DOWN) {
+                    prevDirection = direction;
+                }
+                if (direction == Direction.RIGHT) {
+                    direction = Direction.ATTACKRIGHT;
+                } else if (direction == Direction.LEFT) {
+                    direction = Direction.ATTACKLEFT;
+                } else if (direction == Direction.UP) {
+                    direction = Direction.ATTACKUP;
+                } else if (direction == Direction.DOWN) {
+                    direction = Direction.ATTACKDOWN;
+                }
+                stateTime = 0f;
+
                 weapon.attack();
                 int totalDamage = weapon.getDamage();
-                System.out.println("Hero attacks " + target.getClass().getSimpleName() + " for " + totalDamage + " damage");
+                System.out.println(
+                        "Hero attacks " + target.getClass().getSimpleName() + " for " + totalDamage + " damage");
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
+
             } else {
                 weapon.reload();
             }
@@ -284,6 +357,26 @@ public class Hero extends Unit {
                 visualWidth = 30;
                 visualHeight = 50;
                 break;
+            case ATTACKDOWN:
+                currentFrame = AttackDown.getKeyFrame(stateTime, false);
+                visualWidth = 30;
+                visualHeight = 50;
+                break;
+            case ATTACKRIGHT:
+                currentFrame = AttackRight.getKeyFrame(stateTime, false);
+                visualWidth = 40;
+                visualHeight = 50;
+                break;
+            case ATTACKLEFT:
+                currentFrame = AttackLeft.getKeyFrame(stateTime, false);
+                visualWidth = 40;
+                visualHeight = 50;
+                break;
+            case ATTACKUP:
+                currentFrame = AttackUp.getKeyFrame(stateTime, false);
+                visualWidth = 30;
+                visualHeight = 50;
+                break;
             default:
                 currentFrame = walkDown.getKeyFrame(stateTime, true);
                 visualWidth = 30;
@@ -299,12 +392,6 @@ public class Hero extends Unit {
         float offsetY = 0; // Aligner le bas du sprite avec le bas de la hitbox (pieds alignés)
 
         batch.draw(currentFrame, this.posX + offsetX, this.posY + offsetY, visualWidth, visualHeight);
-    }
-
-    @Override
-    public void move(float delta) {
-        // Hero movement is handled via specific methods (moveUp/moveDown/etc.)
-        // This default implementation does nothing.
     }
 
     // === HEALTH SYSTEM ===
@@ -376,19 +463,4 @@ public class Hero extends Unit {
     public void addGold(int amount) {
         this.gold += amount;
     }
-
-    /**
-     * Remove gold from current amount
-     * 
-     * @param amount Amount to remove
-     * @return true if successful, false if not enough gold
-     */
-    public boolean removeGold(int amount) {
-        if (this.gold >= amount) {
-            this.gold -= amount;
-            return true;
-        }
-        return false;
-    }
-
 }
