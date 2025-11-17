@@ -1,8 +1,5 @@
 package com.main;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -79,11 +76,12 @@ public class GameScreen implements Screen {
         viewport.update(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight(), true);
 
         map = new WarMap();
-        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.mapWidth = map.getMapWidthInPixels();
         this.mapHeight = map.getMapHeightInPixels();
         this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
+        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
+        this.playerBase.setHero(hero);
         // Initialize HUD
         this.hudDisplay = new hud();
         // Initialize Game Over Overlay
@@ -106,10 +104,11 @@ public class GameScreen implements Screen {
     public void reset() {
         // Reset game state
         this.map = new WarMap();
-        this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
         this.unitShop = new UnitShop(playerBase, hero);
+        this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
+        this.playerBase.setHero(hero);
         // Resize the new unitShop to match current window size
         this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
@@ -378,9 +377,6 @@ public class GameScreen implements Screen {
             System.out.println("Range display: " + (showRanges ? "ON" : "OFF"));
         }
 
-        // vérifier collision entre héros et ennemis
-        checkHeroEnemyCollisions(delta);
-
         // Remove dead enemies and give gold to hero
         removeDeadEnemiesAndGiveGold();
 
@@ -410,47 +406,17 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * vérifier collision entre héros et ennemis et appliquer des dégâts sur lui
-     */
-    private void checkHeroEnemyCollisions(float delta) {
-        for (Unit enemy : enemyBase.getUnits()) {
-            if (enemy.isDead())
-                continue;
-
-            // Simple collision detection using bounding boxes
-            float heroX = hero.getPosX();
-            float heroY = hero.getPosY();
-            float enemyX = enemy.getPosX();
-            float enemyY = enemy.getPosY();
-
-            // Calculate distance between hero and enemy
-            float dx = heroX - enemyX;
-            float dy = heroY - enemyY;
-            float distance = (float) Math.sqrt(dx * dx + dy * dy);
-            if (distance < 50f) {
-                enemy.setTarget(this.hero);
-            }
-        }
-    }
-
-    /**
      * Remove dead enemies from the list and give gold to hero
      */
     private void removeDeadEnemiesAndGiveGold() {
-        List<Unit> enemiesToRemove = new ArrayList<>();
-
         for (Unit enemy : enemyBase.getUnits()) {
             if (enemy.isDead()) {
                 // Give gold to hero when enemy dies
                 int goldReward = 10;
                 hero.addGold(goldReward);
                 // System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
-                enemiesToRemove.add(enemy);
             }
         }
-
-        // Remove dead enemies
-        enemyBase.getUnits().removeAll(enemiesToRemove);
     }
 
     @Override
