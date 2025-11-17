@@ -27,14 +27,28 @@ public class hud implements Disposable {
     // Health bar component
     private healthbar healthBar;
     
+    // Base health bars (verticales)
+    private BaseHealthBar playerBaseHealthBar;
+    private BaseHealthBar enemyBaseHealthBar;
+    
     // Gold display
     private gold goldDisplay;
     
     // UI positions and dimensions
     private static final float HEALTH_BAR_X = 50f;
     private static final float HEALTH_BAR_Y = 550f;
-    private static final float GOLD_X = 50f;
-    private static final float GOLD_Y = 515f;
+    private static final float GOLD_X = 20f;
+    private static final float GOLD_Y = 535f;
+    
+    // Base health bar positions and dimensions (barres verticales)
+    private static final float BASE_HEALTH_BAR_WIDTH = 8f;   // Largeur fine pour barre verticale
+    private static final float BASE_HEALTH_BAR_HEIGHT = 150f; // Hauteur pour barre verticale
+    
+    // Ces valeurs seront calculées dynamiquement en fonction de la caméra et des bases
+    private float playerBaseHealthBarX = 20f;
+    private float playerBaseHealthBarY = 150f;  // Position verticale à côté de la base
+    private float enemyBaseHealthBarX = 755f;
+    private float enemyBaseHealthBarY = 150f;   // Position verticale à côté de la base
     
     /**
      * Constructor for HUD
@@ -53,7 +67,13 @@ public class hud implements Disposable {
         font.getData().setScale(1.5f);
         
         // Initialize health bar with heart icon
-        healthBar = new healthbar(HEALTH_BAR_X, HEALTH_BAR_Y, 200f, 30f, "ui/heart.png");
+        healthBar = new healthbar(HEALTH_BAR_X, HEALTH_BAR_Y, 200f, 20f, "ui/heart.png"); // Hauteur à 20f
+        
+        // Initialize base health bars (verticales)
+        playerBaseHealthBar = new BaseHealthBar(playerBaseHealthBarX, playerBaseHealthBarY, 
+            BASE_HEALTH_BAR_WIDTH, BASE_HEALTH_BAR_HEIGHT);
+        enemyBaseHealthBar = new BaseHealthBar(enemyBaseHealthBarX, enemyBaseHealthBarY, 
+            BASE_HEALTH_BAR_WIDTH, BASE_HEALTH_BAR_HEIGHT);
         
         // Initialize gold display with coin icon
         goldDisplay = new gold(GOLD_X, GOLD_Y, "ui/gold.png");
@@ -87,13 +107,61 @@ public class hud implements Disposable {
     }
     
     /**
+     * Update base health bars
+     * @param playerBaseHealth Current health of player base
+     * @param playerBaseMaxHealth Maximum health of player base
+     * @param enemyBaseHealth Current health of enemy base
+     * @param enemyBaseMaxHealth Maximum health of enemy base
+     */
+    public void updateBaseHealth(int playerBaseHealth, int playerBaseMaxHealth, 
+                                  int enemyBaseHealth, int enemyBaseMaxHealth) {
+        playerBaseHealthBar.update(playerBaseHealth, playerBaseMaxHealth);
+        enemyBaseHealthBar.update(enemyBaseHealth, enemyBaseMaxHealth);
+    }
+    
+    /**
+     * Update base health bar positions (appelé depuis GameScreen avec positions des bases)
+     * @param playerBaseX Position X de la base du joueur (dans le monde)
+     * @param playerBaseY Position Y de la base du joueur
+     * @param enemyBaseX Position X de la base ennemie
+     * @param enemyBaseY Position Y de la base ennemie
+     * @param gameCamera Caméra du jeu pour convertir les coordonnées monde en UI
+     */
+    public void updateBaseHealthBarPositions(float playerBaseX, float playerBaseY,
+                                              float enemyBaseX, float enemyBaseY,
+                                              OrthographicCamera gameCamera) {
+        // Barres verticales centrées horizontalement sur les bases
+        float baseWidth = 96f;
+        
+        // Centrer horizontalement : posX + (largeur_base / 2) - (largeur_barre / 2)
+        float centerOffsetX = (baseWidth / 2) - (BASE_HEALTH_BAR_WIDTH / 2);
+        
+        // Centrer verticalement
+
+        float baseHeight = 300f;
+        float centerOffsetY = (baseHeight / 2) - (BASE_HEALTH_BAR_HEIGHT / 2);
+        
+        // Position de la barre du joueur (centrée sur la base)
+        playerBaseHealthBarX = playerBaseX + centerOffsetX;
+        playerBaseHealthBarY = playerBaseY + centerOffsetY;
+        
+        // Position de la barre ennemie (centrée sur la base)
+        enemyBaseHealthBarX = enemyBaseX + centerOffsetX;
+        enemyBaseHealthBarY = enemyBaseY + centerOffsetY;
+        
+        // Mettre à jour les positions des barres de vie verticales
+        playerBaseHealthBar.setPosition(playerBaseHealthBarX, playerBaseHealthBarY);
+        enemyBaseHealthBar.setPosition(enemyBaseHealthBarX, enemyBaseHealthBarY);
+    }
+    
+    /**
      * Render the HUD
      */
     public void render() {
         // Update camera
         camera.update();
         
-        // Set projection matrices
+        // Set projection matrices for UI elements (health bar, gold)
         shapeRenderer.setProjectionMatrix(camera.combined);
         batch.setProjectionMatrix(camera.combined);
         
@@ -102,6 +170,20 @@ public class hud implements Disposable {
         
         // Render gold display with coin icon
         goldDisplay.render(batch);
+    }
+    
+    /**
+     * Render base health bars in game world (with game camera)
+     * @param gameCamera Camera from the game world
+     */
+    public void renderBaseHealthBars(OrthographicCamera gameCamera) {
+        // Set projection matrix to game camera for world-space rendering
+        shapeRenderer.setProjectionMatrix(gameCamera.combined);
+        batch.setProjectionMatrix(gameCamera.combined);
+        
+        // Render base health bars verticales in game world
+        playerBaseHealthBar.render(shapeRenderer);
+        enemyBaseHealthBar.render(shapeRenderer);
     }
     
     /**
@@ -153,6 +235,8 @@ public class hud implements Disposable {
         shapeRenderer.dispose();
         font.dispose();
         healthBar.dispose();
+        playerBaseHealthBar.dispose();
+        enemyBaseHealthBar.dispose();
         goldDisplay.dispose();
     }
 }

@@ -1,16 +1,15 @@
 package com.main.entities.units;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.map.Base;
 
 public class Sniper extends Soldier {
 
-    public static final int COST = 1; // Pour les tests
+    public static final int COST = 1;
 
-    public Sniper(int posX, int posY) {
-        super("Sniper/Walk1.png", posX, posY);
+    public Sniper(int posX, int posY, Base allyBase) {
+        super("Sniper/Walk1.png", posX, posY, allyBase);
         this.health = 150;
         this.attackDamage = 40;
         this.speed = 30;
