@@ -1,15 +1,16 @@
 package com.ui;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.main.map.Base;
 
@@ -60,7 +61,7 @@ public class UnitShopButton {
                 break;
         }
 
-        Texture idleTex = new Texture(Gdx.files.internal("Frames/" + this.label +".png"));
+        Texture idleTex = new Texture(Gdx.files.internal("Frames/Melee.png"));
         this.idleFrame = new TextureRegion(idleTex);
     }
 
@@ -84,6 +85,19 @@ public class UnitShopButton {
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
 
         TextureRegion currentFrame = idleFrame;
+
+        if (label == "Melee") {
+            currentFrame = idleFrame;
+        }
+        else if(label == "Sniper"){
+            Texture idleTex = new Texture(Gdx.files.internal("Frames/Sniper.png"));
+            currentFrame = new TextureRegion(idleTex);
+        }
+        else if(label == "Tank"){
+            Texture idleTex = new Texture(Gdx.files.internal("Frames/Tank.png"));
+            currentFrame = new TextureRegion(idleTex);
+        }
+
         float imgW = currentFrame.getRegionWidth();
         float imgH = currentFrame.getRegionHeight();
 
