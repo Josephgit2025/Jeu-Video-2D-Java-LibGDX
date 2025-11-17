@@ -10,10 +10,14 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
+import com.main.entities.units.Sniper;
 import com.main.map.Base;
 import com.main.map.WarMap;
 import com.main.weapons.SniperRifle;
+import com.main.weapons.AssaultRifle;
+import com.main.weapons.Pistol;
 import com.main.weapons.SMG;
+import com.main.weapons.Shotgun;
 import com.main.weapons.Weapon;
 
 public class Hero extends Unit {
@@ -106,7 +110,7 @@ public class Hero extends Unit {
         AttackDown.setPlayMode(Animation.PlayMode.NORMAL);
 
         this.health = 500;
-        this.weapon = new SMG();
+        this.weapon = new Pistol();
         this.speed = 8;
         this.attackSpeed = 1;
         this.map = map;
@@ -157,7 +161,77 @@ public class Hero extends Unit {
     }
     this.updateCooldown(delta);
 
+    // Changing weapon
+    // Pistol
+    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
+        if (this.gold >= 50 && !(this.weapon instanceof Pistol)){
+            this.weapon = new Pistol();
+            this.removeGold(50);
+            System.out.println("Changed weapon to Pistol : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        }
+        else if (this.weapon instanceof Pistol){
+            System.out.println("You already have a Pistol.");
+        }
+        else {
+            System.out.println("Not enough gold : 50 gold required to buy a Pistol -> You only have " + this.gold);
+        }
+    }
 
+    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)){
+        if (this.gold >= 70 && !(this.weapon instanceof Shotgun)){
+            this.weapon = new Shotgun();
+            this.removeGold(70);
+            System.out.println("Changed weapon to Shotgun : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        }
+        else if (this.weapon instanceof Shotgun){
+            System.out.println("You already have a Shotgun.");
+        }
+        else {
+            System.out.println("Not enough gold : 70 gold required to buy a Shotgun -> You only have " + this.gold);
+        }
+    }
+
+    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)){
+        if (this.gold >= 100 && !(this.weapon instanceof SMG)){
+            this.weapon = new SMG();
+            this.removeGold(100);
+            System.out.println("Changed weapon to SMG : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        }
+        else if (this.weapon instanceof SMG){
+            System.out.println("You already have a SMG.");
+        }
+        else {
+            System.out.println("Not enough gold : 100 gold required to buy a SMG -> You only have " + this.gold);
+        }
+    }
+
+    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)){
+        if (this.gold >= 150 && !(this.weapon instanceof AssaultRifle)){
+            this.weapon = new AssaultRifle();
+            this.removeGold(150);
+            System.out.println("Changed weapon to Assault Rifle : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        }
+        else if (this.weapon instanceof AssaultRifle){
+            System.out.println("You already have a Assault Rifle.");
+        }
+        else {
+            System.out.println("Not enough gold : 150 gold required to buy an Assault Rifle -> You only have " + this.gold);
+        }
+    }
+
+    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)){
+        if (this.gold >= 200 && !(this.weapon instanceof SniperRifle)){
+            this.weapon = new SniperRifle();
+            this.removeGold(200);
+            System.out.println("Changed weapon to Sniper Rifle : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        }
+        else if (this.weapon instanceof SniperRifle){
+            System.out.println("You already have a Sniper Rifle.");
+        }
+        else {
+            System.out.println("Not enough gold : 200 gold required to buy a Sniper Rifle -> You only have " + this.gold);
+        }
+    }
     // --- DÉPLACEMENT ---
     moving = false;
 
