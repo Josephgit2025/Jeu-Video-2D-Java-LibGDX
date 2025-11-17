@@ -40,6 +40,7 @@ public class Base {
     private static final int TILE_SIZE = 16; // Taille d'une tuile dans Tiled
     private static final float SCALE = 2.0f; // Scale de la map
     private int[] spawnPointsY;
+    private Hero player = null;
 
     public Base(int posX, int posY, boolean isPlayerBase, int mapHeight) {
         this.position = new Position(posX, posY);
@@ -86,6 +87,14 @@ public class Base {
 
     public int getAttackPower() {
         return attackPower;
+    }
+
+    public void setHero(Hero player){
+        this.player = player;
+    }
+
+    public Hero getHero(){
+        return player;
     }
 
     public void takeDamage(int damage) {
