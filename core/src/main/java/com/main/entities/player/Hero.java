@@ -133,7 +133,7 @@ public class Hero extends Unit {
 
         // Auto-ciblage : si la cible actuelle est morte ou hors de portée, trouver une
         // nouvelle cible
-        if (target == null || target.isDead()) {
+        if (target == null || target.isDead() || closestEnemy != target ) {
             // Chercher l'ennemi le plus proche dans la portée
             Unit enemyInRange = findClosestEnemyInRange(units);
             if (enemyInRange != null) {
@@ -144,7 +144,7 @@ public class Hero extends Unit {
         // Attaque avec la touche ESPACE (maintenue ou appuyée)
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             // Si pas de cible ou cible morte, chercher une nouvelle cible
-            if (target == null || target.isDead()) {
+            if (target == null || target.isDead() || closestEnemy != target) {
                 Unit enemyInRange = findClosestEnemyInRange(units);
                 if (enemyInRange != null) {
                     System.out.println("New target acquired: " + enemyInRange.getClass().getSimpleName());
