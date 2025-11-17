@@ -48,7 +48,7 @@ public class GameScreen implements Screen {
     private PauseOverlay pauseOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
     private UnitShop unitShop;
-    
+
     // Pause display (deprecated - using PauseOverlay now)
     private BitmapFont pauseFont;
 
@@ -60,6 +60,7 @@ public class GameScreen implements Screen {
         BASE_DESTROYED,
         ZOMBIE_BASE_DESTROYED
     }
+
     private GameState gameState = GameState.PLAYING;
     private boolean pauseKeyPressed = false;
 
@@ -155,106 +156,106 @@ public class GameScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         // Render toutes les unités
-        for (Unit elem : enemyBase.getUnits()){
+        for (Unit elem : enemyBase.getUnits()) {
             elem.render(batch);
         }
-        for (Unit elem : playerBase.getUnits()){
+        for (Unit elem : playerBase.getUnits()) {
             elem.render(batch);
         }
         hero.render(batch);
         batch.end();
-        
+
         // Render Unit Shop buttons
         unitShop.render(shapeRenderer, batch);
-        
+
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
         hudDisplay.updateBaseHealth(playerBase.getHealth(), 1000, enemyBase.getHealth(), 1000);
-        
+
         // Mettre à jour les positions des barres de vie des bases
         hudDisplay.updateBaseHealthBarPositions(
-            playerBase.getPosX(), playerBase.getPosition().getPosY(),
-            enemyBase.getPosX(), enemyBase.getPosition().getPosY(),
-            camera
-        );
-        
+                playerBase.getPosX(), playerBase.getPosition().getPosY(),
+                enemyBase.getPosX(), enemyBase.getPosition().getPosY(),
+                camera);
+
         // Render base health bars in game world (with game camera)
         hudDisplay.renderBaseHealthBars(camera);
-        
+
         hudDisplay.render();
-        
+
         // Render Pause overlay if in Pause state
         if (gameState == GameState.PAUSE) {
             pauseOverlay.render();
         }
-        
+
         // Render Game Over Overlay if in Game Over state
         if (gameState == GameState.GAME_OVER) {
             gameOverOverlay.render();
         }
-        
+
         // Render Base Destroyed Overlay if player base is destroyed
         if (gameState == GameState.BASE_DESTROYED) {
             baseDestroyedOverlay.render();
         }
-        
+
         // Render Zombie Base Destroyed Overlay if enemy base is destroyed (Victory!)
         if (gameState == GameState.ZOMBIE_BASE_DESTROYED) {
             baseZombieDestroyedOverlay.render();
         }
-        
+
         // Draw range circles if enabled
         if (showRanges) {
             shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            
+
             // Draw player units ranges in green
             shapeRenderer.setColor(0, 1, 0, 0.5f); // Green with transparency
             for (Unit unit : playerBase.getUnits()) {
                 if (!unit.isDead()) {
-                    shapeRenderer.circle(unit.getPosX() + unit.getWidth()/2, 
-                                        unit.getPosY() + unit.getHeight()/2, 
-                                        unit.getRange());
+                    shapeRenderer.circle(unit.getPosX() + unit.getWidth() / 2,
+                            unit.getPosY() + unit.getHeight() / 2,
+                            unit.getRange());
                 }
             }
-            
+
             // Draw enemy units ranges in red
             shapeRenderer.setColor(1, 0, 0, 0.5f); // Red with transparency
             for (Unit unit : enemyBase.getUnits()) {
                 if (!unit.isDead()) {
-                    shapeRenderer.circle(unit.getPosX() + unit.getWidth()/2, 
-                                        unit.getPosY() + unit.getHeight()/2, 
-                                        unit.getRange());
+                    shapeRenderer.circle(unit.getPosX() + unit.getWidth() / 2,
+                            unit.getPosY() + unit.getHeight() / 2,
+                            unit.getRange());
                 }
             }
-            
+
             // Draw base collision hitboxes (purple for player, yellow for enemy)
             shapeRenderer.setColor(0.5f, 0, 0.5f, 0.5f); // Purple for player base hitbox
             com.badlogic.gdx.math.Rectangle playerBox = playerBase.getCollisionBox();
             shapeRenderer.rect(playerBox.x, playerBox.y, playerBox.width, playerBox.height);
-            
+
             shapeRenderer.setColor(1, 1, 0, 0.5f); // Yellow for enemy base hitbox
             com.badlogic.gdx.math.Rectangle enemyBox = enemyBase.getCollisionBox();
             shapeRenderer.rect(enemyBox.x, enemyBox.y, enemyBox.width, enemyBox.height);
-            
+
             shapeRenderer.end();
         }
-        
+
         // DEBUG: Dessiner les rectangles de collision (décommenter pour debug)
         /*
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(1, 0, 0, 1); // Rouge
-        for (Rectangle rect : map.getCollisionRects()) {
-            shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
-        }
-        
-        // DEBUG: Dessiner le rectangle du héro en vert
-        shapeRenderer.setColor(0, 1, 0, 1); // Vert
-        shapeRenderer.rect(hero.getPosX(), hero.getPosY(), hero.getWidth(), hero.getHeight());
-        
-        shapeRenderer.end();
-        */
+         * shapeRenderer.setProjectionMatrix(camera.combined);
+         * shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+         * shapeRenderer.setColor(1, 0, 0, 1); // Rouge
+         * for (Rectangle rect : map.getCollisionRects()) {
+         * shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
+         * }
+         * 
+         * // DEBUG: Dessiner le rectangle du héro en vert
+         * shapeRenderer.setColor(0, 1, 0, 1); // Vert
+         * shapeRenderer.rect(hero.getPosX(), hero.getPosY(), hero.getWidth(),
+         * hero.getHeight());
+         * 
+         * shapeRenderer.end();
+         */
     }
 
     private void update(float delta) {
@@ -273,40 +274,38 @@ public class GameScreen implements Screen {
         } else {
             pauseKeyPressed = false;
         }
-        
+
         // Handle unit shop clicks (only when playing)
         if (gameState == GameState.PLAYING && com.badlogic.gdx.Gdx.input.justTouched()) {
             unitShop.handleClick(
-                com.badlogic.gdx.Gdx.input.getX(),
-                com.badlogic.gdx.Gdx.input.getY()
-            );
+                    com.badlogic.gdx.Gdx.input.getX(),
+                    com.badlogic.gdx.Gdx.input.getY());
         }
-        
+
         // Check if hero is dead
         if (hero.getCurrentHealth() <= 0 && gameState == GameState.PLAYING) {
             gameState = GameState.GAME_OVER;
             System.out.println("GAME OVER - Hero died!");
         }
-        
+
         // Check if player base is destroyed
         if (playerBase.isDestroyed() && gameState == GameState.PLAYING) {
             gameState = GameState.BASE_DESTROYED;
             System.out.println("BASE DESTROYED - Player base has been destroyed!");
         }
-        
+
         // Check if enemy base is destroyed (Victory!)
         if (enemyBase.isDestroyed() && gameState == GameState.PLAYING) {
             gameState = GameState.ZOMBIE_BASE_DESTROYED;
             System.out.println("VICTORY - Enemy base has been destroyed!");
         }
-        
+
         // Handle Game Over clicks
         if (gameState == GameState.GAME_OVER && com.badlogic.gdx.Gdx.input.justTouched()) {
             String action = gameOverOverlay.handleClick(
-                com.badlogic.gdx.Gdx.input.getX(), 
-                com.badlogic.gdx.Gdx.input.getY()
-            );
-            
+                    com.badlogic.gdx.Gdx.input.getX(),
+                    com.badlogic.gdx.Gdx.input.getY());
+
             if ("replay".equals(action)) {
                 System.out.println("Replay clicked!");
                 reset();
@@ -315,14 +314,13 @@ public class GameScreen implements Screen {
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
-        
+
         // Handle Base Destroyed clicks
         if (gameState == GameState.BASE_DESTROYED && com.badlogic.gdx.Gdx.input.justTouched()) {
             String action = baseDestroyedOverlay.handleClick(
-                com.badlogic.gdx.Gdx.input.getX(), 
-                com.badlogic.gdx.Gdx.input.getY()
-            );
-            
+                    com.badlogic.gdx.Gdx.input.getX(),
+                    com.badlogic.gdx.Gdx.input.getY());
+
             if ("replay".equals(action)) {
                 System.out.println("Replay clicked from Base Destroyed!");
                 reset();
@@ -331,14 +329,13 @@ public class GameScreen implements Screen {
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
-        
+
         // Handle Zombie Base Destroyed clicks
         if (gameState == GameState.ZOMBIE_BASE_DESTROYED && com.badlogic.gdx.Gdx.input.justTouched()) {
             String action = baseZombieDestroyedOverlay.handleClick(
-                com.badlogic.gdx.Gdx.input.getX(), 
-                com.badlogic.gdx.Gdx.input.getY()
-            );
-            
+                    com.badlogic.gdx.Gdx.input.getX(),
+                    com.badlogic.gdx.Gdx.input.getY());
+
             if ("replay".equals(action)) {
                 System.out.println("Replay clicked from Zombie Base Destroyed!");
                 reset();
@@ -347,14 +344,13 @@ public class GameScreen implements Screen {
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
-        
+
         // Handle Pause clicks
         if (gameState == GameState.PAUSE && com.badlogic.gdx.Gdx.input.justTouched()) {
             String action = pauseOverlay.handleClick(
-                com.badlogic.gdx.Gdx.input.getX(), 
-                com.badlogic.gdx.Gdx.input.getY()
-            );
-            
+                    com.badlogic.gdx.Gdx.input.getX(),
+                    com.badlogic.gdx.Gdx.input.getY());
+
             if ("resume".equals(action)) {
                 System.out.println("Resume clicked!");
                 gameState = GameState.PLAYING;
@@ -369,44 +365,43 @@ public class GameScreen implements Screen {
                 System.out.println("Quit cancelled, back to pause menu");
             }
         }
-        
+
         // Don't update game if Game Over, Base Destroyed, or Paused
-        if (gameState == GameState.GAME_OVER || gameState == GameState.PAUSE || 
-            gameState == GameState.BASE_DESTROYED || gameState == GameState.ZOMBIE_BASE_DESTROYED) {
+        if (gameState == GameState.GAME_OVER || gameState == GameState.PAUSE ||
+                gameState == GameState.BASE_DESTROYED || gameState == GameState.ZOMBIE_BASE_DESTROYED) {
             return;
         }
-        
+
         // Toggle range display with 'R' key
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.R)) {
             showRanges = !showRanges;
             System.out.println("Range display: " + (showRanges ? "ON" : "OFF"));
         }
 
-        
         // vérifier collision entre héros et ennemis
         checkHeroEnemyCollisions(delta);
-        
+
         // Remove dead enemies and give gold to hero
         removeDeadEnemiesAndGiveGold();
-        
+
         hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
-        
+
         // Spawn des ennemis
         Unit tmpEnemy = enemyBase.spawnUnit(this, delta);
-        if (tmpEnemy != null){
+        if (tmpEnemy != null) {
             enemyBase.addUnit(tmpEnemy);
         }
-        
+
         // Spawn des alliés
         Unit tmpAlly = playerBase.spawnUnit(this, delta);
-        if (tmpAlly != null){
+        if (tmpAlly != null) {
             playerBase.addUnit(tmpAlly);
         }
-        
+
         // Update : les ennemis attaquent les alliés (et leur base) et vice-versa
         enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase, this.hero);
         playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase, null);
-        
+
         // Check for game over conditions
         if (playerBase.isDestroyed()) {
             // System.out.println("GAME OVER - Player base destroyed!");
@@ -416,23 +411,24 @@ public class GameScreen implements Screen {
             // System.out.println("VICTORY - Enemy base destroyed!");
             // TODO: Implement victory screen
         }
-        
+
         camera.position.set(hero.getPosX(), hero.getPosY(), 0);
     }
-    
+
     /**
      * vérifier collision entre héros et ennemis et appliquer des dégâts sur lui
      */
     private void checkHeroEnemyCollisions(float delta) {
         for (Unit enemy : enemyBase.getUnits()) {
-            if (enemy.isDead()) continue;
-            
+            if (enemy.isDead())
+                continue;
+
             // Simple collision detection using bounding boxes
             float heroX = hero.getPosX();
             float heroY = hero.getPosY();
             float enemyX = enemy.getPosX();
             float enemyY = enemy.getPosY();
-            
+
             // Calculate distance between hero and enemy
             float dx = heroX - enemyX;
             float dy = heroY - enemyY;
@@ -442,13 +438,13 @@ public class GameScreen implements Screen {
             }
         }
     }
-    
+
     /**
      * Remove dead enemies from the list and give gold to hero
      */
     private void removeDeadEnemiesAndGiveGold() {
         List<Unit> enemiesToRemove = new ArrayList<>();
-        
+
         for (Unit enemy : enemyBase.getUnits()) {
             if (enemy.isDead()) {
                 // Give gold to hero when enemy dies
@@ -458,7 +454,7 @@ public class GameScreen implements Screen {
                 enemiesToRemove.add(enemy);
             }
         }
-        
+
         // Remove dead enemies
         enemyBase.getUnits().removeAll(enemiesToRemove);
     }
@@ -480,8 +476,9 @@ public class GameScreen implements Screen {
         }
         if (pauseOverlay != null) {
             pauseOverlay.resize(width, height);
-        if (unitShop != null) {
-            unitShop.resize(width, height);
+            if (unitShop != null) {
+                unitShop.resize(width, height);
+            }
         }
     }
 
