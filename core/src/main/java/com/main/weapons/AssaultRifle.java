@@ -2,6 +2,6 @@ package com.main.weapons;
 
 public class AssaultRifle extends Weapon{
     public AssaultRifle(){
-        super(30, 150, 15, 30);
+        super(30, 200, 1f, 30);
     }
 }
