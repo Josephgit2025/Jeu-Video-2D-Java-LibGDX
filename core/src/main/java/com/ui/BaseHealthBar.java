@@ -25,13 +25,13 @@ public class BaseHealthBar implements Disposable {
     
     // Couleurs (style 2D pixel art)
     private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1f);      // Fond gris foncé
-    private static final Color BORDER_COLOR = new Color(0f, 0f, 0f, 1f);                // Noir
+    private static final Color BORDER_COLOR = new Color(0f, 0f, 0f, 1f);          //  Noir
     private static final Color HEALTH_COLOR = new Color(0.1f, 0.9f, 0.1f, 1f);          // Vert vif
     private static final Color LOW_HEALTH_COLOR = new Color(0.9f, 0.1f, 0.1f, 1f);      // Rouge vif
     private static final Color MEDIUM_HEALTH_COLOR = new Color(1f, 0.6f, 0f, 1f);       // Orange vif
     
     // Épaisseur de la bordure
-    private static final float BORDER_THICKNESS = 3f;
+    private static final float BORDER_THICKNESS = 4f;
     
     /**
      * Constructeur

@@ -136,7 +136,7 @@ public class BaseZombieDestroyedOverlay implements Disposable {
         batch.begin();
         
         // Titre "destruction de la base des zombies"
-        String title = "CONGRATULATIONS! YOU HAVE DESTROYED THE ZOMBIES BASE";
+        String title = "YOU WIN";
         titleLayout.setText(titleFont, title);
         
         // Adapter l'échelle de la font si le texte est trop large
