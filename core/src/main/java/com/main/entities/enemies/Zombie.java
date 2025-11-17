@@ -12,6 +12,10 @@ import com.main.entities.Unit;
 import com.main.map.Base;
 
 public class Zombie extends Unit {
+        // Valeurs de base pour l’équilibrage
+        public static final int HP_BASE = 200;
+        public static final float DAMAGE_BASE = 30f;
+        public static final float ATTACK_SPEED_BASE = 1.5f;
     // Animation fields - shared by all zombie types
     protected Animation<TextureRegion> walkLeft;
     protected Animation<TextureRegion> attackAnimation;

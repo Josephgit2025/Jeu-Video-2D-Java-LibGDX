@@ -1,5 +1,5 @@
 package com.main.entities.enemies;
-
+import com.main.entities.Unit;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -10,10 +10,10 @@ public class WZombie extends Zombie {
 
     public WZombie(int posX, int posY, Base allyBase) {
         super("zombie/women/Walk1.png", posX, posY, allyBase);
-        this.health = 350;
-        this.speed = 130;
-        this.attackDamage = 20;
-        this.attackSpeed = 0.8f; // 0.8 seconds between attacks (fast zombie)
+        this.health = (int)(0.6f * Unit.HP_BASE);
+        this.speed = 60;
+        this.attackDamage = 0.9f * Unit.DAMAGE_BASE;
+        this.attackSpeed = 1.2f * Unit.ATTACK_SPEED_BASE;
         this.range = 50;
         
         // Load walk animation
