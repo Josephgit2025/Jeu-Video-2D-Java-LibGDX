@@ -136,7 +136,7 @@ public class BaseDestroyedOverlay implements Disposable {
         batch.begin();
         
         // Titre "VOTRE BASE A ÉTÉ DÉTRUITE"
-        String title = "YOUR BASE HAS BEEN DESTROYED";
+        String title = "GAME OVER";
         titleLayout.setText(titleFont, title);
         
         // Adapter l'échelle de la font si le texte est trop large
