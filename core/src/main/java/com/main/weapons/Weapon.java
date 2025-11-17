@@ -3,11 +3,11 @@ package com.main.weapons;
 public abstract class Weapon {
     protected int damage;
     protected int range;
-    protected int attackSpeed;
+    protected float attackSpeed;
     protected int munitions;
     protected int maxMunition;
     
-    protected Weapon(int damage, int range, int as, int maxMun){
+    protected Weapon(int damage, int range, float as, int maxMun){
         this.damage = damage;
         this.range = range;
         this.attackSpeed = as;
@@ -30,7 +30,7 @@ public abstract class Weapon {
     public int getRange() {
         return range;
     }
-    public int getAttackSpeed() {
+    public float getAttackSpeed() {
         return attackSpeed;
     }
     public int getMunitions() {

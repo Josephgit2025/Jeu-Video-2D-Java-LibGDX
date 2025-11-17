@@ -103,8 +103,8 @@ public class GameScreen implements Screen {
     // Recommencer le jeu après avoir perdu
     public void reset() {
         this.map = new WarMap();
-        this.enemyBase = new Base(20, 300, false, this.mapHeight); // false = spawn zombies
-        this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
+        this.enemyBase = new Base(1350, 300, false, this.mapHeight); // false = spawn zombies
+        this.playerBase = new Base(-22, 300, true, this.mapHeight); // true = spawn soldiers
         this.unitShop = new UnitShop(playerBase, hero);
         this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
         this.playerBase.setHero(hero);
