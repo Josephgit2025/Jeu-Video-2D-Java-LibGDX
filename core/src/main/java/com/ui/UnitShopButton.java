@@ -61,7 +61,7 @@ public class UnitShopButton {
                 break;
         }
 
-        Texture idleTex = new Texture(Gdx.files.internal("Frames/Melee.png"));
+        Texture idleTex = new Texture(Gdx.files.internal("Frames/"+ this.label + ".png"));
         this.idleFrame = new TextureRegion(idleTex);
     }
 
@@ -85,18 +85,6 @@ public class UnitShopButton {
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
 
         TextureRegion currentFrame = idleFrame;
-
-        if (label == "Melee") {
-            currentFrame = idleFrame;
-        }
-        else if(label == "Sniper"){
-            Texture idleTex = new Texture(Gdx.files.internal("Frames/Sniper.png"));
-            currentFrame = new TextureRegion(idleTex);
-        }
-        else if(label == "Tank"){
-            Texture idleTex = new Texture(Gdx.files.internal("Frames/Tank.png"));
-            currentFrame = new TextureRegion(idleTex);
-        }
 
         float imgW = currentFrame.getRegionWidth();
         float imgH = currentFrame.getRegionHeight();
