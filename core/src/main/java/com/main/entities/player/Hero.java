@@ -135,7 +135,7 @@ public class Hero extends Unit {
         // nouvelle cible
         if (target == null || target.isDead()) {
             // Chercher l'ennemi le plus proche dans la portée
-            Unit enemyInRange = findClosestEnemyInRange(units, weapon.getRange());
+            Unit enemyInRange = findClosestEnemyInRange(units);
             if (enemyInRange != null) {
                 this.setTarget(enemyInRange);
             }
@@ -145,7 +145,7 @@ public class Hero extends Unit {
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             // Si pas de cible ou cible morte, chercher une nouvelle cible
             if (target == null || target.isDead()) {
-                Unit enemyInRange = findClosestEnemyInRange(units, weapon.getRange());
+                Unit enemyInRange = findClosestEnemyInRange(units);
                 if (enemyInRange != null) {
                     System.out.println("New target acquired: " + enemyInRange.getClass().getSimpleName());
                     this.setTarget(enemyInRange);
@@ -242,6 +242,7 @@ public class Hero extends Unit {
         return false;
     }
 
+    @Override
     /**
      * Find the closest enemy within attack range
      * 
@@ -249,24 +250,33 @@ public class Hero extends Unit {
      * @param range Attack range
      * @return Closest enemy in range, or null if none found
      */
-    private Unit findClosestEnemyInRange(List<Unit> units, int range) {
+    protected Unit findClosestEnemy(List<Unit> enemies) {
         Unit closest = null;
-        double minDistance = range;
-
-        for (Unit unit : units) {
-            if (unit.isDead())
-                continue;
-
-            double distance = Math.sqrt(
-                    Math.pow(this.posX - unit.getPosX(), 2) +
-                            Math.pow(this.posY - unit.getPosY(), 2));
-
-            if (distance <= range && distance < minDistance) {
+        double minDistance = Double.MAX_VALUE;
+        for (Unit enemy : enemies) {
+            double distance = calculateDistance(enemy);
+            if (distance < minDistance && !enemy.isDead()) {
                 minDistance = distance;
-                closest = unit;
+                closest = enemy;
             }
         }
+        return closest;
+    }
 
+    /**
+     * Find the closest enemy within attack range
+     * 
+     * @param units List of all enemy units
+     * @return Closest enemy in range, or null if none found
+     */
+    protected Unit findClosestEnemyInRange(List<Unit> enemies) {
+        Unit closest = null;
+        for (Unit enemy : enemies) {
+            double distance = calculateDistance(enemy);
+            if (distance < this.weapon.getRange() && !enemy.isDead()) {
+                closest = enemy;
+            }
+        }
         return closest;
     }
 

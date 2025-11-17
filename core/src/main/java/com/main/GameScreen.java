@@ -17,12 +17,12 @@ import com.main.entities.Unit;
 import com.main.entities.player.Hero;
 import com.main.map.Base;
 import com.main.map.WarMap;
-import com.ui.hud;
-import com.ui.GameOverOverlay;
 import com.ui.BaseDestroyedOverlay;
 import com.ui.BaseZombieDestroyedOverlay;
+import com.ui.GameOverOverlay;
 import com.ui.PauseOverlay;
 import com.ui.UnitShop;
+import com.ui.hud;
 
 public class GameScreen implements Screen {
     private SpriteBatch batch;
@@ -387,17 +387,11 @@ public class GameScreen implements Screen {
         hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
 
         // Spawn des ennemis
-        Unit tmpEnemy = enemyBase.spawnUnit(this, delta);
-        if (tmpEnemy != null) {
-            enemyBase.addUnit(tmpEnemy);
-        }
-
+        enemyBase.spawnUnit(this, delta);
+        
         // Spawn des alliés
-        Unit tmpAlly = playerBase.spawnUnit(this, delta);
-        if (tmpAlly != null) {
-            playerBase.addUnit(tmpAlly);
-        }
-
+        playerBase.spawnUnit(this, delta);
+        
         // Update : les ennemis attaquent les alliés (et leur base) et vice-versa
         enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase, this.hero);
         playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase, null);
