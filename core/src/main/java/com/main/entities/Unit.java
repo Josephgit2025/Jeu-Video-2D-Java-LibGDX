@@ -308,7 +308,17 @@ public abstract class Unit {
      * Vérifie si l'unité est morte
      */
     public boolean isDead() {
-        return this.health <= 0;
+        if (this.health <= 0){
+            // Only update allyBase units if allyBase exists (Hero doesn't have allyBase)
+            if (this.allyBase != null && this.allyBase.getUnitsPerLane().get(this.lane).contains(this)){
+                for (Unit elem : this.allyBase.getUnitsPerLane().get(this.lane)){
+                    elem.index--;
+                }
+                this.allyBase.getUnitsPerLane().get(this.lane).remove(this);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
