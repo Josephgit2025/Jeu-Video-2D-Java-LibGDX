@@ -1,4 +1,5 @@
 package com.main.entities.units;
+import com.main.entities.Unit;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -6,16 +7,20 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.map.Base;
 
 public class Tank extends Soldier {
+        protected int cost;
+
 
     public static final int COST = 1;
 
     public Tank(float posX, float posY, Base allyBase) {
         super("Tank/Ride1.png", posX, posY, allyBase);
-        this.health = 500;
-        this.attackDamage = 30;
-        this.speed = 15;
-        this.attackSpeed = 3.0f; // 3 seconds between attacks (slow heavy weapon)
-        this.range = 100; // Portée moyenne
+        // Stats calculées
+        this.health = (int)(2.0f * Unit.HP_BASE);
+        this.attackDamage = 0.3f * Unit.DAMAGE_BASE;
+        this.attackSpeed = 0.6f * Unit.ATTACK_SPEED_BASE;
+        this.cost = 60;
+        this.speed = 40;
+        this.range = 100;
 
         // Load walk animation
         TextureRegion[] walkFrames = loadFrames("Tank/Ride%d.png", 2);

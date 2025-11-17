@@ -1,4 +1,5 @@
 package com.main.entities.units;
+import com.main.entities.Unit;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -7,16 +8,20 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.map.Base;
 
 public class Melee extends Soldier {
+        protected int cost;
+
 
     public static final int COST = 1;
 
     public Melee(float posX, float posY, Base allyBase) {
         super("Melee/Walk1.png", posX, posY, allyBase);
-        this.health = 200;
-        this.attackDamage = 20;
-        this.speed = 100;
-        this.attackSpeed = 1.0f; // 1 second between attacks
-        this.range = 50; // Portée courte pour mêlée
+        // Stats calculées
+        this.health = (int)(0.7f * Unit.HP_BASE);
+        this.attackDamage = 0.5f * Unit.DAMAGE_BASE;
+        this.attackSpeed = 0.8f * Unit.ATTACK_SPEED_BASE;
+        this.cost = 30;
+        this.speed = 60;
+        this.range = 50;
 
         // Load walk animation
         TextureRegion[] walkFrames = loadFrames("Melee/Walk%d.png", 8);
