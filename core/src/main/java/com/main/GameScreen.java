@@ -421,8 +421,8 @@ public class GameScreen implements Screen {
     }
     
     /**
-     * vérifier collision entre héros et ennemis et appliquer des dégâts sur lui
-     */
+     vérifier collision entre héros et ennemis et appliquer des dégâts sur lui
+    */
     private void checkHeroEnemyCollisions(float delta) {
         for (Unit enemy : enemyBase.getUnits()) {
             if (enemy.isDead()) continue;
@@ -480,6 +480,7 @@ public class GameScreen implements Screen {
         }
         if (pauseOverlay != null) {
             pauseOverlay.resize(width, height);
+        }
         if (unitShop != null) {
             unitShop.resize(width, height);
         }
