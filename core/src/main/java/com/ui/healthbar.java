@@ -30,15 +30,15 @@ public class healthbar implements Disposable {
     private static final float ICON_SIZE = 26f;
     private static final float ICON_OFFSET = 32f;
     
-    // Colors
-    private static final Color BACKGROUND_COLOR = new Color(0.3f, 0.3f, 0.3f, 0.8f);    // Dark gray
-    private static final Color BORDER_COLOR = new Color(0.1f, 0.1f, 0.1f, 1f);          // Dark border
-    private static final Color HEALTH_COLOR = new Color(0.2f, 0.8f, 0.2f, 1f);          // Green
-    private static final Color LOW_HEALTH_COLOR = new Color(0.8f, 0.2f, 0.2f, 1f);      // Red
-    private static final Color MEDIUM_HEALTH_COLOR = new Color(0.9f, 0.7f, 0.2f, 1f);   // Orange
+    // Colors (style jeu 2D)
+    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1f);      // Fond gris foncé (style 2D)
+    private static final Color BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f, 1f);          // Gris foncé
+    private static final Color HEALTH_COLOR = new Color(0.1f, 0.9f, 0.1f, 1f);          // Vert vif
+    private static final Color LOW_HEALTH_COLOR = new Color(0.9f, 0.1f, 0.1f, 1f);      // Rouge vif
+    private static final Color MEDIUM_HEALTH_COLOR = new Color(1f, 0.6f, 0f, 1f);       // Orange vif
     
-    // Border thickness
-    private static final float BORDER_THICKNESS = 2f;
+    // Border thickness (plus épais pour style isométrique)
+    private static final float BORDER_THICKNESS = 4f;
     
     /**
      * Constructor for HealthBar without icon
@@ -105,20 +105,19 @@ public class healthbar implements Disposable {
         // Commencer le rendu des formes
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         
-        // Draw background
+        // Draw thick black border (outer rectangle) - style pixel art
+        shapeRenderer.setColor(BORDER_COLOR);
+        shapeRenderer.rect(x - BORDER_THICKNESS, y - BORDER_THICKNESS, 
+            width + BORDER_THICKNESS * 2, height + BORDER_THICKNESS * 2);
+        
+        // Draw white/gray background
         shapeRenderer.setColor(BACKGROUND_COLOR);
         shapeRenderer.rect(x, y, width, height);
         
-        // Draw health fill
+        // Draw health fill (yellow/orange/red/green)
         shapeRenderer.setColor(fillColor);
         shapeRenderer.rect(x, y, fillWidth, height);
         
-        shapeRenderer.end();
-        
-        // Draw border
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(BORDER_COLOR);
-        shapeRenderer.rect(x, y, width, height);
         shapeRenderer.end();
     }
     

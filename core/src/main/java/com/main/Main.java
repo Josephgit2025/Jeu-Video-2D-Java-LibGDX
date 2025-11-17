@@ -23,6 +23,8 @@ public class Main extends Game {
     }
 
     public void showGameScreen() {
+        // Réinitialiser la partie avant de l'afficher
+        gameScreen.reset();
         setScreen(gameScreen);
     }
 
