@@ -1,38 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="45" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="18" nextobjectid="117">
- <tileset firstgid="1" source="../tilesets/Background_Dark-Green_TileSet.tsx"/>
- <tileset firstgid="409" source="../tilesets/Buildings_dark_TileSet.tsx"/>
- <tileset firstgid="578" source="../tilesets/Garbage_TileSet.tsx"/>
- <tileset firstgid="610" source="../tilesets/Wire-Fence_TileSet.tsx"/>
- <tileset firstgid="625" source="../tilesets/Brick-Wall_TileSet.tsx"/>
- <tileset firstgid="643" source="../tilesets/Iron-Fence_TileSet.tsx"/>
- <tileset firstgid="655" source="../tilesets/Car_1_Overgrown_Dark-Green_Gray.tsx"/>
- <tileset firstgid="657" source="../tilesets/Street-Light_1_Side.tsx"/>
- <tileset firstgid="658" source="../tilesets/Street-Light_5_Up_Overgrown_Dark-Green.tsx"/>
- <tileset firstgid="659" source="../tilesets/Stop-sign_Down_2_Overgrown_Dark-Green.tsx"/>
- <tileset firstgid="660" source="../tilesets/Garbage-Bin_1.tsx"/>
- <tileset firstgid="661" source="../tilesets/Garbage-Bin_3.tsx"/>
- <tileset firstgid="662" source="../tilesets/Barrel_blue_2.tsx"/>
- <tileset firstgid="663" source="../tilesets/Barrel_rust_red_2.tsx"/>
- <tileset firstgid="664" source="../tilesets/Traffic-cone.tsx"/>
- <tileset firstgid="665" source="../tilesets/Bench_6_up_Overgrown_Dark-Green.tsx"/>
- <tileset firstgid="666" source="../tilesets/Grass_3_Stepping-On-Animation_Dark-Green-Sheet2.tsx"/>
- <tileset firstgid="667" source="../tilesets/Tree_9_Small-oak_Dark-Green.tsx"/>
- <tileset firstgid="668" source="../tilesets/Tree_8_Birch_Dark-Green.tsx"/>
- <tileset firstgid="669" source="../tilesets/Tree-trunk_2_grass_Dark-Green.tsx"/>
- <tileset firstgid="670" source="../tilesets/Tree_2_Spruce-Sparse_Dark-Green.tsx"/>
- <tileset firstgid="671" source="../tilesets/Car_6_Rust_Dark-Blue_Scrap.tsx"/>
- <tileset firstgid="672" source="../tilesets/Car_5_Overgrown_Dark-Green_Tractor_Side.tsx"/>
- <tileset firstgid="673" source="../tilesets/Car_9_Overgrown_Bleak-Yellow_Green_Motorcycle_Side.tsx"/>
- <tileset firstgid="674" source="../tilesets/Container_8_Red_Horizontal_Overgrown_Dark-Green.tsx"/>
- <tileset firstgid="675" source="../tilesets/Tire_2_Grass_Bleak-Yellow.tsx"/>
- <tileset firstgid="676" source="../tilesets/Vending-machine_Blue_Overgrown_Dark-Green.tsx"/>
- <tileset firstgid="677" source="../tilesets/Hydrant_1_yellow.tsx"/>
- <tileset firstgid="678" source="../tilesets/Barrel_rust_red_1.tsx"/>
- <tileset firstgid="679" source="../tilesets/Flowers_2_purple.tsx"/>
- <tileset firstgid="680" source="../tilesets/Flowers_3_yellow.tsx"/>
- <tileset firstgid="681" source="../tilesets/Stump_1.tsx"/>
- <tileset firstgid="682" source="../tilesets/Car_6_Overgrown_Dark-Green_Orange_Scrap.tsx"/>
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="45" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="19" nextobjectid="117">
+ <tileset firstgid="1" source="../../../../tiled tilesets/Background_Dark-Green_TileSet.tsx"/>
+ <tileset firstgid="409" source="../../../../tiled tilesets/Buildings_dark_TileSet.tsx"/>
+ <tileset firstgid="578" source="../../../../tiled tilesets/Garbage_TileSet.tsx"/>
+ <tileset firstgid="610" source="../../../../tiled tilesets/Wire-Fence_TileSet.tsx"/>
+ <tileset firstgid="625" source="../../../../tiled tilesets/Brick-Wall_TileSet.tsx"/>
+ <tileset firstgid="643" source="../../../../tiled tilesets/Iron-Fence_TileSet.tsx"/>
+ <tileset firstgid="655" source="../../../../tiled tilesets/Car_1_Overgrown_Dark-Green_Gray.tsx"/>
+ <tileset firstgid="657" source="../../../../tiled tilesets/Street-Light_1_Side.tsx"/>
+ <tileset firstgid="658" source="../../../../tiled tilesets/Street-Light_5_Up_Overgrown_Dark-Green.tsx"/>
+ <tileset firstgid="659" source="../../../../tiled tilesets/Stop-sign_Down_2_Overgrown_Dark-Green.tsx"/>
+ <tileset firstgid="660" source="../../../../tiled tilesets/Garbage-Bin_1.tsx"/>
+ <tileset firstgid="661" source="../../../../tiled tilesets/Garbage-Bin_3.tsx"/>
+ <tileset firstgid="662" source="../../../../tiled tilesets/Barrel_blue_2.tsx"/>
+ <tileset firstgid="663" source="../../../../tiled tilesets/Barrel_rust_red_2.tsx"/>
+ <tileset firstgid="664" source="../../../../tiled tilesets/Traffic-cone.tsx"/>
+ <tileset firstgid="665" source="../../../../tiled tilesets/Bench_6_up_Overgrown_Dark-Green.tsx"/>
+ <tileset firstgid="666" source="../../../../tiled tilesets/Grass_3_Stepping-On-Animation_Dark-Green-Sheet2.tsx"/>
+ <tileset firstgid="667" source="../../../../tiled tilesets/Tree_9_Small-oak_Dark-Green.tsx"/>
+ <tileset firstgid="668" source="../../../../tiled tilesets/Tree_8_Birch_Dark-Green.tsx"/>
+ <tileset firstgid="669" source="../../../../tiled tilesets/Tree-trunk_2_grass_Dark-Green.tsx"/>
+ <tileset firstgid="670" source="../../../../tiled tilesets/Tree_2_Spruce-Sparse_Dark-Green.tsx"/>
+ <tileset firstgid="671" source="../../../../tiled tilesets/Car_6_Rust_Dark-Blue_Scrap.tsx"/>
+ <tileset firstgid="672" source="../../../../tiled tilesets/Car_5_Overgrown_Dark-Green_Tractor_Side.tsx"/>
+ <tileset firstgid="673" source="../../../../tiled tilesets/Car_9_Overgrown_Bleak-Yellow_Green_Motorcycle_Side.tsx"/>
+ <tileset firstgid="674" source="../../../../tiled tilesets/Container_8_Red_Horizontal_Overgrown_Dark-Green.tsx"/>
+ <tileset firstgid="675" source="../../../../tiled tilesets/Tire_2_Grass_Bleak-Yellow.tsx"/>
+ <tileset firstgid="676" source="../../../../tiled tilesets/Vending-machine_Blue_Overgrown_Dark-Green.tsx"/>
+ <tileset firstgid="677" source="../../../../tiled tilesets/Hydrant_1_yellow.tsx"/>
+ <tileset firstgid="678" source="../../../../tiled tilesets/Barrel_rust_red_1.tsx"/>
+ <tileset firstgid="679" source="../../../../tiled tilesets/Flowers_2_purple.tsx"/>
+ <tileset firstgid="680" source="../../../../tiled tilesets/Flowers_3_yellow.tsx"/>
+ <tileset firstgid="681" source="../../../../tiled tilesets/Stump_1.tsx"/>
+ <tileset firstgid="682" source="../../../../tiled tilesets/Car_6_Overgrown_Dark-Green_Orange_Scrap.tsx"/>
+ <tileset firstgid="683" source="../../../../tiled tilesets/buttons.tsx"/>
+ <tileset firstgid="684" source="../../../../tiled tilesets/buttons (1).tsx"/>
+ <tileset firstgid="685" source="../../../../tiled tilesets/buttons (2).tsx"/>
  <layer id="1" name="FOND" width="45" height="20" locked="1">
   <data encoding="base64" compression="zlib">
    eJztk0sKwCAMRGMX3sP7e40uum/vI1kEpR8q2cwEHHhIXD2GJItIDoIF7bGcuaipYzPaaYayPXs+yN0taA+Pt74neb8Re75H//QGd9Ku38K8G19Be3l7ZmcM6078dY328bijPWa5UkfnaDuC9ljOfFga76gegw==
@@ -90,6 +93,11 @@
  <layer id="17" name="BASEZOMBISUP" width="45" height="20" locked="1">
   <data encoding="base64" compression="zlib">
    eJxjYBhcYAUTdc1bjsW8lVS2YxSMAmoDaucDaoB7jAwM94H4MeNAu2ToglWDMF5HwSgYBZjgMR3LOlLLe2ztmlEwCkbByALU7ssAAC2zCb4=
+  </data>
+ </layer>
+ <layer id="18" name="NUMERO" width="45" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzt1MENACAIADHC/psoO7qCfDAm7QT3uggmrXxdAPxm+wbQVL4BXDoqqQIL
   </data>
  </layer>
 </map>
