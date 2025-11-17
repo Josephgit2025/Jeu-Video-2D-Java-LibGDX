@@ -60,6 +60,8 @@ public class Hero extends Unit {
     private List<Texture> loadedTextures = new ArrayList<>();
     private final float FRAME_DURATION = 0.12f;
     private final float FRAME_DURATIONW = 0.12f;
+    private float retargetTimer = 0;
+    private final float retargetInterval = 0.1f; // 100ms
 
     public Hero(float posX, float posY, WarMap map, Base allyBase) {
         super("sold/Idle.png", posX, posY);
@@ -131,77 +133,78 @@ public class Hero extends Unit {
      * @param mapHeight Hauteur de la map en pixels
      */
     public void update(float delta, float mapWidth, float mapHeight, List<Unit> units) {
-        // Cache closest enemy calculation to avoid 4 calls per frame
-        Unit closestEnemy = this.findClosestEnemy(units);
 
-        // Auto-ciblage : si la cible actuelle est morte ou hors de portée, trouver une
-        // nouvelle cible
-        if (target == null || target.isDead()) {
-            // Chercher l'ennemi le plus proche dans la portée
-            Unit enemyInRange = findClosestEnemyInRange(units);
-            if (enemyInRange != null) {
-                this.setTarget(enemyInRange);
-            }
-        }
+    // --- RETARGET SYSTEM (toutes les 100 ms) ---
+    retargetTimer += delta;
+    if (retargetTimer >= retargetInterval) {
+        retargetTimer = 0;
 
-        // Attaque avec la touche ESPACE (maintenue ou appuyée)
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            // Si pas de cible ou cible morte, chercher une nouvelle cible
-            if (target == null || target.isDead()) {
-                Unit enemyInRange = findClosestEnemyInRange(units);
-                if (enemyInRange != null) {
-                    System.out.println("New target acquired: " + enemyInRange.getClass().getSimpleName());
-                    this.setTarget(enemyInRange);
-                }
-            }
-            // Attaquer si on a une cible valide
-            if (target != null && !target.isDead()) {
-                this.attack();
-            }
-        }
-        this.updateCooldown(delta);
+        Unit closest = findClosestEnemy(units);
 
-        // Déplacement avec les touches WASD ou flèches
-        moving = false;
-        if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            tryMove(speed * delta * 60, 0, mapWidth, mapHeight, closestEnemy);
-            moving = true;
-            direction = Direction.RIGHT;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            tryMove(0, speed * delta * 60, mapWidth, mapHeight, closestEnemy);
-            moving = true;
-            direction = Direction.UP;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            tryMove(-speed * delta * 60, 0, mapWidth, mapHeight, closestEnemy);
-            moving = true;
-            direction = Direction.LEFT;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            tryMove(0, -speed * delta * 60, mapWidth, mapHeight, closestEnemy);
-            moving = true;
-            direction = Direction.DOWN;
-        }
+        // Si pas de cible, ou morte, ou qu’un autre ennemi est plus proche → switch
+        if (target == null || target.isDead() ||
+            (closest != null && calculateDistance(closest) < calculateDistance(target))) {
 
-        if (moving) {
-            // Advance animation time while moving
-            stateTime += delta;
-        } else {
-            // If currently in an attack-facing state, advance animation time so
-            // attack frames play even when the hero is stationary
-            if (direction == Direction.ATTACKDOWN || direction == Direction.ATTACKLEFT
-                    || direction == Direction.ATTACKRIGHT || direction == Direction.ATTACKUP) {
-                stateTime += delta;
-                // When the attack animation finishes, revert to the previous facing
-                float attackDur = getCurrentAttackAnimationDuration();
-                if (attackDur > 0f && stateTime >= attackDur) {
-                    direction = prevDirection;
-                    stateTime = 0f; // reset to idle timing
-                }
-            } else {
-                // Not moving and not attacking: reset animation timer
-                stateTime = 0f;
-            }
+            target = closest;
         }
     }
+
+    // --- ATTAQUE ---
+    if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+        if (target != null && !target.isDead()) {
+            this.attack();
+        }
+    }
+    this.updateCooldown(delta);
+
+
+    // --- DÉPLACEMENT ---
+    moving = false;
+
+    if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+        tryMove(speed * delta * 60, 0, mapWidth, mapHeight, target);
+        moving = true;
+        direction = Direction.RIGHT;
+    }
+    else if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
+        tryMove(0, speed * delta * 60, mapWidth, mapHeight, target);
+        moving = true;
+        direction = Direction.UP;
+    }
+    else if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+        tryMove(-speed * delta * 60, 0, mapWidth, mapHeight, target);
+        moving = true;
+        direction = Direction.LEFT;
+    }
+    else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+        tryMove(0, -speed * delta * 60, mapWidth, mapHeight, target);
+        moving = true;
+        direction = Direction.DOWN;
+    }
+
+
+    // --- ANIMATION ---
+    if (moving) {
+        stateTime += delta;
+    } else {
+        if (direction == Direction.ATTACKDOWN || direction == Direction.ATTACKLEFT
+            || direction == Direction.ATTACKRIGHT || direction == Direction.ATTACKUP) {
+
+            stateTime += delta;
+
+            // Si animation d'attaque finie → retour direction précédente
+            float attackDur = getCurrentAttackAnimationDuration();
+            if (attackDur > 0f && stateTime >= attackDur) {
+                direction = prevDirection;
+                stateTime = 0f;
+            }
+
+        } else {
+            stateTime = 0f;
+        }
+    }
+}
+
 
     /**
      * Unified movement method - replaces moveUp/Down/Left/Right
@@ -218,7 +221,8 @@ public class Hero extends Unit {
 
         // Check map collision and enemy collision
         if (!map.isCollisionRect(newX, newY, this.width, this.height) &&
-                !checkHeroEnemyCollisions(newX, newY, closestEnemy) && !checkHeroSoldierCollisions(newX, newY, findClosestSoldier(this.allyBase.getUnits()))) {
+                !checkHeroEnemyCollisions(newX, newY, closestEnemy)
+                && !checkHeroSoldierCollisions(newX, newY, findClosestSoldier(this.allyBase.getUnits()))) {
 
             // Apply boundaries and set position
             newX = Math.max(0, Math.min(newX, mapWidth - this.width));
@@ -303,9 +307,15 @@ public class Hero extends Unit {
      */
     protected Unit findClosestEnemyInRange(List<Unit> enemies) {
         Unit closest = null;
+        double bestDist = Double.MAX_VALUE;
+
         for (Unit enemy : enemies) {
+            if (enemy.isDead())
+                continue;
+
             double distance = calculateDistance(enemy);
-            if (distance < this.weapon.getRange() && !enemy.isDead()) {
+            if (distance < this.weapon.getRange() && distance < bestDist) {
+                bestDist = distance;
                 closest = enemy;
             }
         }
