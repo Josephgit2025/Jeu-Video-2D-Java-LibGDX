@@ -308,7 +308,8 @@ public abstract class Unit {
      */
     public boolean isDead() {
         if (this.health <= 0){
-            if (this.allyBase.getUnitsPerLane().get(this.lane).contains(this)){
+            // Only update allyBase units if allyBase exists (Hero doesn't have allyBase)
+            if (this.allyBase != null && this.allyBase.getUnitsPerLane().get(this.lane).contains(this)){
                 for (Unit elem : this.allyBase.getUnitsPerLane().get(this.lane)){
                     elem.index--;
                 }
