@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -62,6 +63,9 @@ public class Hero extends Unit {
     private final float FRAME_DURATIONW = 0.12f;
     private float retargetTimer = 0;
     private final float retargetInterval = 0.1f; // 100ms
+    
+    // Audio
+    private Sound shootSound;
 
     public Hero(float posX, float posY, WarMap map, Base allyBase) {
         super("sold/Idle.png", posX, posY);
@@ -381,6 +385,14 @@ public class Hero extends Unit {
                         "Hero attacks " + target.getClass().getSimpleName() + " for " + totalDamage + " damage");
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
+                
+                // Jouer le son de tir
+                if (shootSound != null) {
+                    System.out.println("🔊 SON DE TIR: Lecture du son...");
+                    shootSound.play(0.7f); // Volume à 70%
+                } else {
+                    System.out.println("❌ ERREUR: shootSound est NULL!");
+                }
 
             } else {
                 weapon.reload();
@@ -528,5 +540,16 @@ public class Hero extends Unit {
             return true;
         }
         return false;
+    }
+    
+    // === AUDIO SYSTEM ===
+    
+    /**
+     * Set the shoot sound effect
+     * 
+     * @param shootSound Sound to play when hero shoots
+     */
+    public void setShootSound(Sound shootSound) {
+        this.shootSound = shootSound;
     }
 }
