@@ -308,7 +308,17 @@ public abstract class Unit {
      * Vérifie si l'unité est morte
      */
     public boolean isDead() {
-        return this.health <= 0;
+        if (this.health <= 0){
+            // Only update allyBase units if allyBase exists (Hero doesn't have allyBase)
+            if (this.allyBase != null && this.allyBase.getUnitsPerLane().get(this.lane).contains(this)){
+                for (Unit elem : this.allyBase.getUnitsPerLane().get(this.lane)){
+                    elem.index--;
+                }
+                this.allyBase.getUnitsPerLane().get(this.lane).remove(this);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -417,9 +427,17 @@ public abstract class Unit {
 
     private boolean checkUnitCollisions(float newX, float newY) {
 
-        // Calculate distance between hero and ally
         float distance = 0;
+        float distanceHero = 0;
         if (this.index == 0){
+            if (this.allyBase.getHero() != null){
+                float dxH = newX - this.allyBase.getHero().getPosX();
+                float dyH = newY - this.allyBase.getHero().getPosY();
+                distanceHero = (float) Math.sqrt(dxH * dxH + dyH * dyH);
+                if (distanceHero <= this.allyBase.getHero().getWidth()) {
+                    return true;
+                }
+            }
             return false;
         }
         if (this.index != 0){
@@ -428,7 +446,14 @@ public abstract class Unit {
             distance = (float) Math.sqrt(dx * dx + dy * dy);
         }
 
-        if (distance < this.getWidth()) {
+        if (this.allyBase.getHero() != null){
+            float dxH = newX - this.allyBase.getHero().getPosX();
+            float dyH = newY - this.allyBase.getHero().getPosY();
+            distanceHero = (float) Math.sqrt(dxH * dxH + dyH * dyH);
+            distance = Math.min(distance, distanceHero);
+        }
+
+        if (distance <= this.getWidth()) {
             return true;
         }
         return false;

@@ -10,8 +10,10 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
+import com.main.map.Base;
 import com.main.map.WarMap;
 import com.main.weapons.SniperRifle;
+import com.main.weapons.SMG;
 import com.main.weapons.Weapon;
 
 public class Hero extends Unit {
@@ -59,8 +61,9 @@ public class Hero extends Unit {
     private final float FRAME_DURATION = 0.12f;
     private final float FRAME_DURATIONW = 0.12f;
 
-    public Hero(float posX, float posY, WarMap map) {
+    public Hero(float posX, float posY, WarMap map, Base allyBase) {
         super("sold/Idle.png", posX, posY);
+        this.allyBase = allyBase;
 
         TextureRegion[] rightFrames = loadFrames("sold/RIght%d.png", 8);
         walkRight = new Animation<>(FRAME_DURATION, rightFrames);
@@ -101,7 +104,7 @@ public class Hero extends Unit {
         AttackDown.setPlayMode(Animation.PlayMode.NORMAL);
 
         this.health = 500;
-        this.weapon = new SniperRifle();
+        this.weapon = new SMG();
         this.speed = 8;
         this.attackSpeed = 1;
         this.map = map;
@@ -215,7 +218,7 @@ public class Hero extends Unit {
 
         // Check map collision and enemy collision
         if (!map.isCollisionRect(newX, newY, this.width, this.height) &&
-                !checkHeroEnemyCollisions(newX, newY, closestEnemy)) {
+                !checkHeroEnemyCollisions(newX, newY, closestEnemy) && !checkHeroSoldierCollisions(newX, newY, findClosestSoldier(this.allyBase.getUnits()))) {
 
             // Apply boundaries and set position
             newX = Math.max(0, Math.min(newX, mapWidth - this.width));
@@ -236,7 +239,23 @@ public class Hero extends Unit {
         float dy = newY - enemy.getPosY();
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < 50f) {
+        if (distance < this.getWidth()) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean checkHeroSoldierCollisions(float newX, float newY, Unit soldier) {
+        if (soldier == null || soldier.isDead()) {
+            return false;
+        }
+
+        // Calculate distance between hero and soldier
+        float dx = newX - soldier.getPosX();
+        float dy = newY - soldier.getPosY();
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < this.getWidth()) {
             return true;
         }
         return false;
@@ -258,6 +277,19 @@ public class Hero extends Unit {
             if (distance < minDistance && !enemy.isDead()) {
                 minDistance = distance;
                 closest = enemy;
+            }
+        }
+        return closest;
+    }
+
+    protected Unit findClosestSoldier(List<Unit> units) {
+        Unit closest = null;
+        double minDistance = Double.MAX_VALUE;
+        for (Unit soldier : units) {
+            double distance = calculateDistance(soldier);
+            if (distance < minDistance && !soldier.isDead()) {
+                minDistance = distance;
+                closest = soldier;
             }
         }
         return closest;

@@ -79,11 +79,12 @@ public class GameScreen implements Screen {
         viewport.update(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight(), true);
 
         map = new WarMap();
-        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.mapWidth = map.getMapWidthInPixels();
         this.mapHeight = map.getMapHeightInPixels();
         this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
+        hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
+        this.playerBase.setHero(hero);
         // Initialize HUD
         this.hudDisplay = new hud();
         // Initialize Game Over Overlay
@@ -106,10 +107,11 @@ public class GameScreen implements Screen {
     public void reset() {
         // Reset game state
         this.map = new WarMap();
-        this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map);
         this.enemyBase = new Base(this.mapWidth, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(0, 300, true, this.mapHeight); // true = spawn soldiers
         this.unitShop = new UnitShop(playerBase, hero);
+        this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
+        this.playerBase.setHero(hero);
         // Resize the new unitShop to match current window size
         this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
@@ -410,8 +412,8 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * vérifier collision entre héros et ennemis et appliquer des dégâts sur lui
-     */
+     vérifier collision entre héros et ennemis et appliquer des dégâts sur lui
+    */
     private void checkHeroEnemyCollisions(float delta) {
         for (Unit enemy : enemyBase.getUnits()) {
             if (enemy.isDead())
