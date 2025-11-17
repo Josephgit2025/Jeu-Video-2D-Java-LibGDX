@@ -53,9 +53,9 @@ public class Base {
         this.isPlayerBase = isPlayerBase;
         this.name = isPlayerBase ? "PLAYER BASE" : "ENEMY BASE";
         this.spawnPointsY = new int[3];
-        this.spawnPointsY[0] = mapHeight / 4; // Haut
+        this.spawnPointsY[0] = mapHeight / 4 - (int)(TILE_SIZE * SCALE); // Haut (descendu d'une tuile)
         this.spawnPointsY[1] = mapHeight / 2; // Milieu
-        this.spawnPointsY[2] = (3 * mapHeight) / 4; // Bas
+        this.spawnPointsY[2] = (3 * mapHeight) / 4 + (int)(TILE_SIZE * SCALE); // Bas (remonté d'une tuile)
 
         // Créer la hitbox : 3 tuiles de large * TILE_SIZE * SCALE, hauteur totale de la
         // map
@@ -198,6 +198,7 @@ public class Base {
                         this.unitsPerLane.get(rand).add(tank);
                         tank.setLane(rand);
                         tank.setIndex(this.unitsPerLane.get(rand).size()- 1);
+                        this.units.add(tank);
                         return tank;
                     case MELEE:
                         System.out.println("Melee spawned");
@@ -205,6 +206,7 @@ public class Base {
                         this.unitsPerLane.get(rand).add(melee);
                         melee.setLane(rand);
                         melee.setIndex(this.unitsPerLane.get(rand).size()- 1);
+                        this.units.add(melee);
                         return melee;
                     case SNIPER:
                         System.out.println("Sniper spawned");
@@ -212,6 +214,7 @@ public class Base {
                         this.unitsPerLane.get(rand).add(sniper);
                         sniper.setLane(rand);
                         sniper.setIndex(this.unitsPerLane.get(rand).size()- 1);
+                        this.units.add(sniper);
                         return sniper;
                     default:
                         return null;
@@ -229,6 +232,7 @@ public class Base {
                         this.unitsPerLane.get(rand).add(wzombie);
                         wzombie.setLane(rand);
                         wzombie.setIndex(this.unitsPerLane.get(rand).size()- 1);
+                        this.units.add(wzombie);
                         return wzombie;
                     case CRAWL:
                         System.out.println("Zombie crawler spawned");
@@ -236,6 +240,7 @@ public class Base {
                         this.unitsPerLane.get(rand).add(czombie);
                         czombie.setLane(rand);
                         czombie.setIndex(this.unitsPerLane.get(rand).size()- 1);
+                        this.units.add(czombie);
                         return czombie;
                     case FAST:
                         System.out.println("Zombie fast spawned");
@@ -243,6 +248,7 @@ public class Base {
                         this.unitsPerLane.get(rand).add(fzombie);
                         fzombie.setLane(rand);
                         fzombie.setIndex(this.unitsPerLane.get(rand).size()- 1);
+                        this.units.add(fzombie);
                         return fzombie;
                     default:
                         return null;
@@ -251,6 +257,15 @@ public class Base {
         }
         lastSpawn += delta;
         return null;
+    }
+
+    private void updateIndexes(){
+        for (List<Unit> list : unitsPerLane){
+            int newIndex = 0;
+            for (Unit unit : list){
+                unit.setIndex(newIndex++);
+            }
+        }
     }
 
     /**
@@ -263,16 +278,19 @@ public class Base {
     public void updateUnits(float delta, List<Unit> enemies, Base enemyBase, Hero hero) {
         // Supprime les unités mortes
         units.removeIf(Unit::isDead);
+        for (List<Unit> list : unitsPerLane)
+            list.removeIf(Unit::isDead);
+        updateIndexes();
 
         // Met à jour chaque unité
         for (Unit unit : units) {
             // Set enemy base as target
             unit.setTargetBase(enemyBase);
-
+            
             // Filtre uniquement les ennemis vivants
             List<Unit> liveEnemies = new ArrayList<>();
             if (enemies != null) {
-                for (Unit enemy : enemies) {
+                for (Unit enemy : enemies){
                     if (!enemy.isDead()) {
                         liveEnemies.add(enemy);
                     }

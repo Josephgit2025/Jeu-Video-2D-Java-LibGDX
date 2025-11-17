@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.main.entities.player.Hero;
 import com.main.map.Base;
 
 public abstract class Unit {
@@ -199,7 +200,7 @@ public abstract class Unit {
     /**
      * Calcule la distance entre cette unité et une autre
      */
-    private double calculateDistance(Unit other) {
+    protected double calculateDistance(Unit other) {
         float dx = this.posX - other.getPosX();
         float dy = this.posY - other.getPosY();
         return Math.sqrt(dx * dx + dy * dy);
@@ -229,7 +230,7 @@ public abstract class Unit {
         double minDistance = Double.MAX_VALUE;
         for (Unit enemy : enemies) {
             double distance = calculateDistance(enemy);
-            if (distance < minDistance && !enemy.isDead() && enemy.getLane() == this.lane) {
+            if (distance < minDistance && ((!enemy.isDead() && enemy.getLane() == this.lane) || enemy instanceof Hero)) {
                 minDistance = distance;
                 closest = enemy;
             }
@@ -359,16 +360,12 @@ public abstract class Unit {
     // Méthode pour attaquer la base
     public void attackBase(Base enemyBase) {
         if (enemyBase != null && attackCooldown <= 0) {
-            System.out.println(">>> " + this.getClass().getSimpleName() + " at (" + (int) posX + "," + (int) posY +
-                    ") ATTACKS " + enemyBase.getName() +
-                    " (BASE HP: " + enemyBase.getHealth() + " -> " + (enemyBase.getHealth() - attackDamage) + ")");
             enemyBase.takeDamage(this.attackDamage);
             attackCooldown = attackSpeed;
             // Use subclass-specific attack animation duration when available
             attackAnimationTimer = getAttackAnimationDuration();
             currentState = UnitState.ATTACKING;
             this.stateTime = 0f;
-            System.out.println("[ANIM] " + this.getClass().getSimpleName() + " base attack timer set: " + attackAnimationTimer);
         }
     }
 
