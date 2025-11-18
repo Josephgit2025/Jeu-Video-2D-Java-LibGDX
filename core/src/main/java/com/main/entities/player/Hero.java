@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
-import com.main.entities.units.Sniper;
 import com.main.map.Base;
 import com.main.map.WarMap;
 import com.main.weapons.SniperRifle;
@@ -24,7 +23,9 @@ import com.main.weapons.Weapon;
 public class Hero extends Unit {
 
     private enum Direction {
-        UP, DOWN, LEFT, RIGHT, ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT
+        UP, DOWN, LEFT, RIGHT,
+        UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT,
+        ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT
     }
 
     private float getCurrentAttackAnimationDuration() {
@@ -55,6 +56,8 @@ public class Hero extends Unit {
     protected int maxHealth = 500;
     private WarMap map;
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
+    private Animation<TextureRegion> walkUR, walkUL, walkDR, walkDL;
+    private TextureRegion idle, idleR, idleL, idleU, idleD, idleUR, idleUL, idleDR, idleDL;
     private Animation<TextureRegion> AttackRight, AttackLeft, AttackUp, AttackDown;
 
     // uses inherited stateTime from Unit
@@ -67,7 +70,7 @@ public class Hero extends Unit {
     private final float FRAME_DURATIONW = 0.12f;
     private float retargetTimer = 0;
     private final float retargetInterval = 0.1f; // 100ms
-    
+
     // Audio
     private Sound shootSound;
 
@@ -93,6 +96,34 @@ public class Hero extends Unit {
                 8);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
+
+        // Diagonal walk animations (if provided in assets)
+        TextureRegion[] urFrames = loadFrames("sold/WalkUR%d.png", 8);
+        walkUR = new Animation<>(FRAME_DURATION, urFrames);
+        walkUR.setPlayMode(Animation.PlayMode.LOOP);
+
+        TextureRegion[] ulFrames = loadFrames("sold/WalkUL%d.png", 8);
+        walkUL = new Animation<>(FRAME_DURATION, ulFrames);
+        walkUL.setPlayMode(Animation.PlayMode.LOOP);
+
+        TextureRegion[] drFrames = loadFrames("sold/WalkDR%d.png", 8);
+        walkDR = new Animation<>(FRAME_DURATION, drFrames);
+        walkDR.setPlayMode(Animation.PlayMode.LOOP);
+
+        TextureRegion[] dlFrames = loadFrames("sold/WalkDL%d.png", 8);
+        walkDL = new Animation<>(FRAME_DURATION, dlFrames);
+        walkDL.setPlayMode(Animation.PlayMode.LOOP);
+
+        // Load single-frame idle textures (cardinal + diagonal)
+        idle = loadSingle("sold/Idle.png");
+        idleR = loadSingle("sold/IdleR.png");
+        idleL = loadSingle("sold/IdleL.png");
+        idleU = loadSingle("sold/IdleU.png");
+        idleD = loadSingle("sold/IdleD.png");
+        idleUR = loadSingle("sold/IdleUR.png");
+        idleUL = loadSingle("sold/IdleUL.png");
+        idleDR = loadSingle("sold/IdleDR.png");
+        idleDL = loadSingle("sold/IdleDL.png");
 
         TextureRegion[] rightAttack = loadFrames("sold/AttackR%d.png", 4);
         AttackRight = new Animation<>(FRAME_DURATION, rightAttack);
@@ -133,6 +164,12 @@ public class Hero extends Unit {
         return frames;
     }
 
+    private TextureRegion loadSingle(String path) {
+        Texture tex = new Texture(Gdx.files.internal(path));
+        loadedTextures.add(tex);
+        return new TextureRegion(tex);
+    }
+
     /**
      * Met à jour le Hero (déplacements avec LibGDX)
      * 
@@ -142,147 +179,166 @@ public class Hero extends Unit {
      */
     public void update(float delta, float mapWidth, float mapHeight, List<Unit> units) {
 
-    // --- RETARGET SYSTEM (toutes les 100 ms) ---
-    retargetTimer += delta;
-    if (retargetTimer >= retargetInterval) {
-        retargetTimer = 0;
+        // --- RETARGET SYSTEM (toutes les 100 ms) ---
+        retargetTimer += delta;
+        if (retargetTimer >= retargetInterval) {
+            retargetTimer = 0;
 
-        Unit closest = findClosestEnemy(units);
+            Unit closest = findClosestEnemy(units);
 
-        // Si pas de cible, ou morte, ou qu’un autre ennemi est plus proche → switch
-        if (target == null || target.isDead() ||
-            (closest != null && calculateDistance(closest) < calculateDistance(target))) {
+            // Si pas de cible, ou morte, ou qu’un autre ennemi est plus proche → switch
+            if (target == null || target.isDead() ||
+                    (closest != null && calculateDistance(closest) < calculateDistance(target))) {
 
-            target = closest;
+                target = closest;
+            }
         }
-    }
 
-    // --- ATTAQUE ---
-    if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-        if (target != null && !target.isDead()) {
-            this.attack();
+        // --- ATTAQUE ---
+        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            if (target != null && !target.isDead()) {
+                this.attack();
+            }
         }
-    }
-    this.updateCooldown(delta);
+        this.updateCooldown(delta);
 
-    // Changing weapon
-    // Pistol
-    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)){
-        if (this.gold >= 50 && !(this.weapon instanceof Pistol)){
-            this.weapon = new Pistol();
-            this.removeGold(50);
-            System.out.println("Changed weapon to Pistol : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        // Changing weapon
+        // Pistol
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            if (this.gold >= 50 && !(this.weapon instanceof Pistol)) {
+                this.weapon = new Pistol();
+                this.removeGold(50);
+                System.out.println("Changed weapon to Pistol : " + this.weapon.getDamage() + " damage, "
+                        + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, "
+                        + this.weapon.getMaxMunitions() + " munitions.");
+            } else if (this.weapon instanceof Pistol) {
+                System.out.println("You already have a Pistol.");
+            } else {
+                System.out.println("Not enough gold : 50 gold required to buy a Pistol -> You only have " + this.gold);
+            }
         }
-        else if (this.weapon instanceof Pistol){
-            System.out.println("You already have a Pistol.");
-        }
-        else {
-            System.out.println("Not enough gold : 50 gold required to buy a Pistol -> You only have " + this.gold);
-        }
-    }
 
-    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)){
-        if (this.gold >= 70 && !(this.weapon instanceof Shotgun)){
-            this.weapon = new Shotgun();
-            this.removeGold(70);
-            System.out.println("Changed weapon to Shotgun : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+            if (this.gold >= 70 && !(this.weapon instanceof Shotgun)) {
+                this.weapon = new Shotgun();
+                this.removeGold(70);
+                System.out.println("Changed weapon to Shotgun : " + this.weapon.getDamage() + " damage, "
+                        + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, "
+                        + this.weapon.getMaxMunitions() + " munitions.");
+            } else if (this.weapon instanceof Shotgun) {
+                System.out.println("You already have a Shotgun.");
+            } else {
+                System.out.println("Not enough gold : 70 gold required to buy a Shotgun -> You only have " + this.gold);
+            }
         }
-        else if (this.weapon instanceof Shotgun){
-            System.out.println("You already have a Shotgun.");
-        }
-        else {
-            System.out.println("Not enough gold : 70 gold required to buy a Shotgun -> You only have " + this.gold);
-        }
-    }
 
-    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)){
-        if (this.gold >= 100 && !(this.weapon instanceof SMG)){
-            this.weapon = new SMG();
-            this.removeGold(100);
-            System.out.println("Changed weapon to SMG : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+            if (this.gold >= 100 && !(this.weapon instanceof SMG)) {
+                this.weapon = new SMG();
+                this.removeGold(100);
+                System.out.println("Changed weapon to SMG : " + this.weapon.getDamage() + " damage, "
+                        + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, "
+                        + this.weapon.getMaxMunitions() + " munitions.");
+            } else if (this.weapon instanceof SMG) {
+                System.out.println("You already have a SMG.");
+            } else {
+                System.out.println("Not enough gold : 100 gold required to buy a SMG -> You only have " + this.gold);
+            }
         }
-        else if (this.weapon instanceof SMG){
-            System.out.println("You already have a SMG.");
-        }
-        else {
-            System.out.println("Not enough gold : 100 gold required to buy a SMG -> You only have " + this.gold);
-        }
-    }
 
-    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)){
-        if (this.gold >= 150 && !(this.weapon instanceof AssaultRifle)){
-            this.weapon = new AssaultRifle();
-            this.removeGold(150);
-            System.out.println("Changed weapon to Assault Rifle : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
+            if (this.gold >= 150 && !(this.weapon instanceof AssaultRifle)) {
+                this.weapon = new AssaultRifle();
+                this.removeGold(150);
+                System.out.println("Changed weapon to Assault Rifle : " + this.weapon.getDamage() + " damage, "
+                        + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, "
+                        + this.weapon.getMaxMunitions() + " munitions.");
+            } else if (this.weapon instanceof AssaultRifle) {
+                System.out.println("You already have a Assault Rifle.");
+            } else {
+                System.out.println(
+                        "Not enough gold : 150 gold required to buy an Assault Rifle -> You only have " + this.gold);
+            }
         }
-        else if (this.weapon instanceof AssaultRifle){
-            System.out.println("You already have a Assault Rifle.");
-        }
-        else {
-            System.out.println("Not enough gold : 150 gold required to buy an Assault Rifle -> You only have " + this.gold);
-        }
-    }
 
-    if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)){
-        if (this.gold >= 200 && !(this.weapon instanceof SniperRifle)){
-            this.weapon = new SniperRifle();
-            this.removeGold(200);
-            System.out.println("Changed weapon to Sniper Rifle : " + this.weapon.getDamage() + " damage, " + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, " + this.weapon.getMaxMunitions() + " munitions.");
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
+            if (this.gold >= 200 && !(this.weapon instanceof SniperRifle)) {
+                this.weapon = new SniperRifle();
+                this.removeGold(200);
+                System.out.println("Changed weapon to Sniper Rifle : " + this.weapon.getDamage() + " damage, "
+                        + this.weapon.getAttackSpeed() + " attacks/sec, " + this.weapon.getRange() + " range, "
+                        + this.weapon.getMaxMunitions() + " munitions.");
+            } else if (this.weapon instanceof SniperRifle) {
+                System.out.println("You already have a Sniper Rifle.");
+            } else {
+                System.out.println(
+                        "Not enough gold : 200 gold required to buy a Sniper Rifle -> You only have " + this.gold);
+            }
         }
-        else if (this.weapon instanceof SniperRifle){
-            System.out.println("You already have a Sniper Rifle.");
+        // --- DÉPLACEMENT ---
+        moving = false;
+
+        // Support diagonal movement by reading keys independently
+        float base = speed * delta * 60f;
+        float dx = 0f, dy = 0f;
+        boolean pressRight = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+        boolean pressLeft = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
+        boolean pressUp = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP);
+        boolean pressDown = Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN);
+
+        if (pressRight && !pressLeft)
+            dx += base;
+        if (pressLeft && !pressRight)
+            dx -= base;
+        if (pressUp && !pressDown)
+            dy += base;
+        if (pressDown && !pressUp)
+            dy -= base;
+
+        if (dx != 0f || dy != 0f) {
+            tryMove(dx, dy, mapWidth, mapHeight, target);
+            moving = true;
+            // determine facing based on dx/dy signs
+            if (dx > 0 && dy > 0) {
+                direction = Direction.UP_RIGHT;
+            } else if (dx < 0 && dy > 0) {
+                direction = Direction.UP_LEFT;
+            } else if (dx > 0 && dy < 0) {
+                direction = Direction.DOWN_RIGHT;
+            } else if (dx < 0 && dy < 0) {
+                direction = Direction.DOWN_LEFT;
+            } else if (dx > 0) {
+                direction = Direction.RIGHT;
+            } else if (dx < 0) {
+                direction = Direction.LEFT;
+            } else if (dy > 0) {
+                direction = Direction.UP;
+            } else if (dy < 0) {
+                direction = Direction.DOWN;
+            }
         }
-        else {
-            System.out.println("Not enough gold : 200 gold required to buy a Sniper Rifle -> You only have " + this.gold);
-        }
-    }
-    // --- DÉPLACEMENT ---
-    moving = false;
 
-    if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-        tryMove(speed * delta * 60, 0, mapWidth, mapHeight, target);
-        moving = true;
-        direction = Direction.RIGHT;
-    }
-    else if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-        tryMove(0, speed * delta * 60, mapWidth, mapHeight, target);
-        moving = true;
-        direction = Direction.UP;
-    }
-    else if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-        tryMove(-speed * delta * 60, 0, mapWidth, mapHeight, target);
-        moving = true;
-        direction = Direction.LEFT;
-    }
-    else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-        tryMove(0, -speed * delta * 60, mapWidth, mapHeight, target);
-        moving = true;
-        direction = Direction.DOWN;
-    }
-
-
-    // --- ANIMATION ---
-    if (moving) {
-        stateTime += delta;
-    } else {
-        if (direction == Direction.ATTACKDOWN || direction == Direction.ATTACKLEFT
-            || direction == Direction.ATTACKRIGHT || direction == Direction.ATTACKUP) {
-
+        // --- ANIMATION ---
+        if (moving) {
             stateTime += delta;
+        } else {
+            if (direction == Direction.ATTACKDOWN || direction == Direction.ATTACKLEFT
+                    || direction == Direction.ATTACKRIGHT || direction == Direction.ATTACKUP) {
 
-            // Si animation d'attaque finie → retour direction précédente
-            float attackDur = getCurrentAttackAnimationDuration();
-            if (attackDur > 0f && stateTime >= attackDur) {
-                direction = prevDirection;
+                stateTime += delta;
+
+                // Si animation d'attaque finie → retour direction précédente
+                float attackDur = getCurrentAttackAnimationDuration();
+                if (attackDur > 0f && stateTime >= attackDur) {
+                    direction = prevDirection;
+                    stateTime = 0f;
+                }
+
+            } else {
                 stateTime = 0f;
             }
-
-        } else {
-            stateTime = 0f;
         }
     }
-}
-
 
     /**
      * Unified movement method - replaces moveUp/Down/Left/Right
@@ -439,7 +495,9 @@ public class Hero extends Unit {
             if (weapon.getMunitions() > 0 || weapon.getMaxMunitions() == -1) {
                 // Save current non-attack facing so we can revert after animation
                 if (direction == Direction.RIGHT || direction == Direction.LEFT || direction == Direction.UP
-                        || direction == Direction.DOWN) {
+                        || direction == Direction.DOWN || direction == Direction.UP_RIGHT
+                        || direction == Direction.UP_LEFT || direction == Direction.DOWN_RIGHT
+                        || direction == Direction.DOWN_LEFT) {
                     prevDirection = direction;
                 }
                 if (direction == Direction.RIGHT) {
@@ -459,7 +517,7 @@ public class Hero extends Unit {
                         "Hero attacks " + target.getClass().getSimpleName() + " for " + totalDamage + " damage");
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
-                
+
                 // Jouer le son de tir
                 if (shootSound != null) {
                     System.out.println("🔊 SON DE TIR: Lecture du son...");
@@ -481,18 +539,70 @@ public class Hero extends Unit {
 
         switch (direction) {
             case RIGHT:
-                currentFrame = walkRight.getKeyFrame(stateTime, true);
-                visualWidth = 50;
-                visualHeight = 50;
+                if (moving) {
+                    currentFrame = walkRight.getKeyFrame(stateTime, true);
+                    visualWidth = 50;
+                    visualHeight = 50;
+                } else {
+                    currentFrame = (idleR != null) ? idleR : idle;
+                    visualWidth = 30;
+                    visualHeight = 50;
+                }
                 break;
             case LEFT:
-                currentFrame = walkLeft.getKeyFrame(stateTime, true);
-                visualWidth = 50;
-                visualHeight = 50;
+                if (moving) {
+                    currentFrame = walkLeft.getKeyFrame(stateTime, true);
+                    visualWidth = 50;
+                    visualHeight = 50;
+                } else {
+                    currentFrame = (idleL != null) ? idleL : idle;
+                    visualWidth = 30;
+                    visualHeight = 50;
+                }
                 break;
             case UP:
-                currentFrame = walkUp.getKeyFrame(stateTime, true);
+                if (moving) {
+                    currentFrame = walkUp.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = (idleU != null) ? idleU : idle;
+                }
                 visualWidth = 30;
+                visualHeight = 50;
+                break;
+            case UP_RIGHT:
+                if (moving) {
+                    currentFrame = walkUR.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = (idleUR != null) ? idleUR : idle;
+                }
+                visualWidth = 40;
+                visualHeight = 50;
+                break;
+            case UP_LEFT:
+                if (moving) {
+                    currentFrame = walkUL.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = (idleUL != null) ? idleUL : idle;
+                }
+                visualWidth = 40;
+                visualHeight = 50;
+                break;
+            case DOWN_RIGHT:
+                if (moving) {
+                    currentFrame = walkDR.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = (idleDR != null) ? idleDR : idle;
+                }
+                visualWidth = 40;
+                visualHeight = 50;
+                break;
+            case DOWN_LEFT:
+                if (moving) {
+                    currentFrame = walkDL.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = (idleDL != null) ? idleDL : idle;
+                }
+                visualWidth = 40;
                 visualHeight = 50;
                 break;
             case ATTACKDOWN:
@@ -516,7 +626,11 @@ public class Hero extends Unit {
                 visualHeight = 50;
                 break;
             default:
-                currentFrame = walkDown.getKeyFrame(stateTime, true);
+                if (moving) {
+                    currentFrame = walkDown.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = (idleD != null) ? idleD : idle;
+                }
                 visualWidth = 30;
                 visualHeight = 50;
                 break;
@@ -615,9 +729,9 @@ public class Hero extends Unit {
         }
         return false;
     }
-    
+
     // === AUDIO SYSTEM ===
-    
+
     /**
      * Set the shoot sound effect
      * 
