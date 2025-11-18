@@ -23,6 +23,7 @@ public class UnitShop {
     private List<UnitShopButton> spawnPointButtons;
     private Base playerBase;
     private Hero hero;
+    private gold goldDisplay;
 
     // UI Camera and Viewport (same as HUD)
     private Viewport viewport;
@@ -37,7 +38,7 @@ public class UnitShop {
     private static final float BUTTON_SPACING = 10f;
     private static final float START_X = 540f; // À droite (800 - 3*60 - 2*10 - 20)
     private static final float UNIT_BUTTONS_Y = 520f; // En haut
-    private static final float SPAWN_BUTTONS_Y = 470f; // Juste en dessous
+    private static final float SPAWN_BUTTONS_Y = 460f; // Juste en dessous
     protected List<Texture> loadedTextures = new ArrayList<>();
     // protected TextureRegion idleFrame;
 
@@ -45,11 +46,12 @@ public class UnitShop {
     private static final float UI_WIDTH = 800f;
     private static final float UI_HEIGHT = 600f;
 
-    public UnitShop(Base playerBase, Hero hero) {
+    public UnitShop(Base playerBase, Hero hero, gold goldDisplay) {
         this.playerBase = playerBase;
         this.hero = hero;
         this.unitTypeButtons = new ArrayList<>();
         this.spawnPointButtons = new ArrayList<>();
+        this.goldDisplay = goldDisplay;
 
         // Initialize UI camera and viewport
         camera = new OrthographicCamera();
@@ -61,11 +63,15 @@ public class UnitShop {
         createButtons();
     }
 
+    // Ajout d'un constructeur rétrocompatible pour ne pas casser l'ancien code
+    public UnitShop(Base playerBase, Hero hero) {
+        this(playerBase, hero, null);
+    }
+
     private void createButtons() {
 
         Base.Type[] types = { Base.Type.MELEE, Base.Type.SNIPER, Base.Type.TANK };
 
-        // Créer les 3 boutons de type d'unité (en haut)
         for (int i = 0; i < types.length; i++) {
             float buttonX = START_X + i * (BUTTON_WIDTH + BUTTON_SPACING);
             unitTypeButtons.add(new UnitShopButton(
@@ -142,6 +148,9 @@ public class UnitShop {
                 Unit newUnit = playerBase.buyUnit(button.getUnitType(), selectedSpawnPoint, hero);
                 if (newUnit != null) {
                     playerBase.addUnit(newUnit);
+                    if (goldDisplay != null) {
+                        goldDisplay.update(hero.getGold());
+                    }
                 }
                 return true;
             }

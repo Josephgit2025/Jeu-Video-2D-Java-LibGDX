@@ -49,6 +49,9 @@ public class TankTest {
     
     @Mock
     private Unit mockEnemy;
+
+    @Mock
+    private Base mockBase;
     
     private List<Unit> enemies;
 

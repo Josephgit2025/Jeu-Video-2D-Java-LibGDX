@@ -54,9 +54,9 @@ public class Base {
         this.isPlayerBase = isPlayerBase;
         this.name = isPlayerBase ? "PLAYER BASE" : "ENEMY BASE";
         this.spawnPointsY = new int[3];
-        this.spawnPointsY[0] = mapHeight / 4 - (int)(TILE_SIZE * SCALE); // Haut (descendu d'une tuile)
+        this.spawnPointsY[2] = mapHeight / 4 - (int)(TILE_SIZE * SCALE); // Haut (descendu d'une tuile)
         this.spawnPointsY[1] = mapHeight / 2; // Milieu
-        this.spawnPointsY[2] = (3 * mapHeight) / 4 + (int)(TILE_SIZE * SCALE); // Bas (remonté d'une tuile)
+        this.spawnPointsY[0] = (3 * mapHeight) / 4 + (int)(TILE_SIZE * SCALE); // Bas (remonté d'une tuile)
 
         // Créer la hitbox : 3 tuiles de large * TILE_SIZE * SCALE, hauteur totale de la
         // map

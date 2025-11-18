@@ -1,6 +1,8 @@
 package com.main;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -44,6 +46,10 @@ public class GameScreen implements Screen {
     private PauseOverlay pauseOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
     private UnitShop unitShop;
+
+    // Audio
+    private Music backgroundMusic;
+    private Sound shootSound;
 
     // Pause display (deprecated - using PauseOverlay now)
     private BitmapFont pauseFont;
@@ -92,7 +98,46 @@ public class GameScreen implements Screen {
         this.pauseFont.setColor(Color.WHITE);
         this.pauseFont.getData().setScale(4f);
         // Initialize Unit Shop
+        this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         this.unitShop = new UnitShop(playerBase, hero);
+        
+        // Load audio
+        loadSounds();
+    }
+    
+    /**
+     * Charge les sons et la musique du jeu
+     */
+    private void loadSounds() {
+        try {
+            System.out.println("🎵 CHARGEMENT DES SONS...");
+            
+            // Musique de fond
+            backgroundMusic = com.badlogic.gdx.Gdx.audio.newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
+            backgroundMusic.setLooping(true);
+            backgroundMusic.setVolume(0.4f);
+            backgroundMusic.play();
+            System.out.println("✅ Musique de fond chargée et démarrée");
+            
+            // Son de tir
+            shootSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/coup de feu heros.mp3"));
+            System.out.println("✅ Son de tir chargé: " + (shootSound != null ? "OK" : "NULL"));
+            
+            // Passer le son au héros
+            hero.setShootSound(shootSound);
+            System.out.println("✅ Son assigné au héros");
+            
+            // TEST: Jouer le son une fois au démarrage pour vérifier
+            System.out.println("🔊 TEST: Lecture du son de tir au démarrage...");
+            shootSound.play(1.0f);
+            
+        } catch (Exception e) {
+            System.out.println("Erreur lors du chargement des sons : " + e.getMessage());
+            System.out.println("Assurez-vous d'avoir les fichiers :");
+            System.out.println("  - assets/sounds/debut.mp3");
+            System.out.println("  - assets/sounds/coup de feu heros.mp3");
+            e.printStackTrace();
+        }
     }
 
     // Recommencer le jeu après avoir perdu
@@ -100,9 +145,19 @@ public class GameScreen implements Screen {
         this.map = new WarMap();
         this.enemyBase = new Base(1350, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(-22, 300, true, this.mapHeight); // true = spawn soldiers
-        this.unitShop = new UnitShop(playerBase, hero);
         this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
         this.playerBase.setHero(hero);
+        this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
+        
+        // ✅ IMPORTANT: Réassigner le son au nouveau héros
+        System.out.println("🔄 RESET: Réassignation du son au nouveau héros...");
+        if (shootSound != null) {
+            hero.setShootSound(shootSound);
+            System.out.println("✅ Son réassigné après reset");
+        } else {
+            System.out.println("❌ ERREUR: shootSound est NULL dans reset()!");
+        }
+        
         // Resize the new unitShop to match current window size
         this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
@@ -439,11 +494,17 @@ public class GameScreen implements Screen {
     @Override
     public void pause() {
         // Jeu en pause
+        if (backgroundMusic != null && backgroundMusic.isPlaying()) {
+            backgroundMusic.pause();
+        }
     }
 
     @Override
     public void resume() {
         // Reprendre le jeu
+        if (backgroundMusic != null && !backgroundMusic.isPlaying() && gameState == GameState.PLAYING) {
+            backgroundMusic.play();
+        }
     }
 
     @Override
@@ -472,6 +533,12 @@ public class GameScreen implements Screen {
             pauseOverlay.dispose();
         if (pauseFont != null)
             pauseFont.dispose();
+        
+        // Dispose audio resources
+        if (backgroundMusic != null)
+            backgroundMusic.dispose();
+        if (shootSound != null)
+            shootSound.dispose();
     }
 
     public SpriteBatch getBatch() {
