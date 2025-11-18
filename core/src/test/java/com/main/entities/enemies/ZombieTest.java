@@ -31,13 +31,14 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
+import com.main.entities.Unit.UnitState;
 import com.main.map.Base;
 
 public class ZombieTest {
 
     private static Application application;
     private TestZombie zombie;
-    
+
     @Mock
     private SpriteBatch mockBatch;
     
@@ -54,8 +55,10 @@ public class ZombieTest {
 
     // Classe pour tester sans charger de texture
     private class TestZombie extends Zombie {
+        private boolean forceShouldStop = false;
+
         public TestZombie(float posX, float posY) {
-            super(null, posX, posY);
+            super(null, posX, posY, mockBase);
             this.texture = mock(Texture.class);
             this.sprite = mock(Sprite.class);
             this.health = 100;
@@ -63,6 +66,16 @@ public class ZombieTest {
             this.attackDamage = 10;
             this.attackSpeed = 2.0f;
             this.range = 50;
+        }
+
+        public void setForceShouldStop(boolean value) {
+            this.forceShouldStop = value;
+        }
+        
+        @Override
+        protected boolean shouldStopMoving() {
+            if (forceShouldStop) return true;
+            return super.shouldStopMoving();
         }
     }
 
@@ -154,6 +167,35 @@ public class ZombieTest {
         float initialX = zombie.getPosX();
         zombie.move(1.0f);
         assertTrue("X position should decrease (move left)", zombie.getPosX() < initialX);
+    }
+
+    @Test
+    public void testMoveAfterAttack() {
+        Unit target = mock(Unit.class);
+        when(target.getPosX()).thenReturn(100.0f);
+        when(target.getPosY()).thenReturn(200.0f);
+        when(target.isDead()).thenReturn(false);
+        float initialX = zombie.getPosX();
+        zombie.setTarget(target);
+        zombie.attack();
+        zombie.move(1.0f);
+        assertEquals("X position not decrease", initialX, zombie.getPosX(), 0.01f);
+    }
+
+    @Test
+    public void testIdle(){
+        Unit target = mock(Unit.class);
+        when(target.getPosX()).thenReturn(100.0f);
+        when(target.getPosY()).thenReturn(200.0f);
+        when(target.isDead()).thenReturn(false);
+        zombie.setForceShouldStop(true); // ✅ Utiliser la méthode publique
+        zombie.move(1.0f);
+        assertEquals("Zombie should be idle", UnitState.IDLE, zombie.getCurrentState());
+    }
+
+    @Test
+    public void testGetAttackAnimationDuration(){
+        assertEquals("Animation should be 0.5", 0.5f, zombie.getAttackAnimationDuration(), 0.01f);
     }
 
     @Test

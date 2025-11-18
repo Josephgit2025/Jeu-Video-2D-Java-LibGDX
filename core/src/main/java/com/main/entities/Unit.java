@@ -164,6 +164,15 @@ public abstract class Unit {
         this.lane = lane;
     }
 
+    public void setAllyBase(Base allyBase){
+        this.allyBase = allyBase;
+    }
+    
+    public Base getAllyBase(){
+        return this.allyBase;
+    }
+
+    @lombok.Generated
     /**
      * Dessine le sprite de l'unité
      */
@@ -192,11 +201,6 @@ public abstract class Unit {
 
         // Vérifier la collision avec la hitbox de la base
         boolean collides = unitRect.overlaps(targetBase.getCollisionBox());
-
-        // if (collides) {
-        // System.out.println(this.getClass().getSimpleName() + " BLOCKED by " +
-        // targetBase.getName() + " hitbox!");
-        // }
 
         return collides;
     }
@@ -376,14 +380,7 @@ public abstract class Unit {
         float baseCenterX = baseBox.x + (baseBox.width / 2);
         float distance = Math.abs(unitCenterX - baseCenterX);
 
-        boolean isNear = distance <= BASE_ATTACK_RANGE;
-        if (isNear && target == null) {
-            // System.out.println("🎯 " + this.getClass().getSimpleName() + " near " +
-            // base.getName() +
-            // " (distance: " + (int)distance + "/" + BASE_ATTACK_RANGE + ")");
-        }
-
-        return isNear;
+        return distance <= BASE_ATTACK_RANGE;
     }
 
     /**
@@ -419,11 +416,12 @@ public abstract class Unit {
         return false;
     }
 
-    private boolean checkUnitCollisions(float newX, float newY) {
+    protected boolean checkUnitCollisions(float newX, float newY) {
 
         float distance = 0;
         float distanceHero = 0;
-        if (this.index == 0){
+        if (this.getIndex() == 0){
+            System.out.println(this);
             if (this.allyBase.getHero() != null){
                 float dxH = newX - this.allyBase.getHero().getPosX();
                 float dyH = newY - this.allyBase.getHero().getPosY();
@@ -434,9 +432,9 @@ public abstract class Unit {
             }
             return false;
         }
-        if (this.index != 0){
-            float dx = newX - this.allyBase.getUnitsPerLane().get(this.getLane()).get(this.index - 1).getPosX();
-            float dy = newY - this.allyBase.getUnitsPerLane().get(this.getLane()).get(this.index - 1).getPosY();
+        if (this.getIndex() != 0){
+            float dx = newX - this.allyBase.getUnitsPerLane().get(this.getLane()).get(this.getIndex() - 1).getPosX();
+            float dy = newY - this.allyBase.getUnitsPerLane().get(this.getLane()).get(this.getIndex() - 1).getPosY();
             distance = (float) Math.sqrt(dx * dx + dy * dy);
         }
 

@@ -26,7 +26,7 @@ public class WeaponTest {
         assertNotNull(weapon);
         assertEquals(50, weapon.getDamage());
         assertEquals(200, weapon.getRange());
-        assertEquals(10, weapon.getAttackSpeed());
+        assertEquals(10, weapon.getAttackSpeed(), 0.01f);
         assertEquals(30, weapon.getMaxMunitions());
         assertEquals(30, weapon.getMunitions());
     }
@@ -43,7 +43,7 @@ public class WeaponTest {
 
     @Test
     public void testGetAttackSpeed() {
-        assertEquals(10, weapon.getAttackSpeed());
+        assertEquals(10, weapon.getAttackSpeed(), 0.01f);
     }
 
     @Test

@@ -590,4 +590,46 @@ public class BaseTest {
         assertEquals("Bases should have same collision box dimensions", 
                     playerBox.width, enemyBox.width, 0.01f);
     }
+
+    @Test
+    public void testSetCollisionBox(){
+        Rectangle tmp = new Rectangle();
+        playerBase.setCollisionBox(tmp);   
+        assertEquals("Should be same", tmp, playerBase.getCollisionBox());
+    }
+
+    @Test
+    public void testSetUnitPerLane(){
+        List<List<Unit>> tmp = new ArrayList<>();
+        playerBase.setUnitsPerLane(tmp);
+        assertEquals("Units per Lane should be set", tmp, playerBase.getUnitsPerLane());
+    }
+
+    @Test
+    public void testSetHero(){
+        playerBase.setHero(mockHero);
+        assertEquals("Hero per Lane should be set", mockHero, playerBase.getHero());
+    }
+
+    @Test
+    public void testBuyUnits(){
+        when(mockHero.getGold()).thenReturn(1000);
+        Unit result = playerBase.buyUnit(Base.Type.MELEE, 0, mockHero);
+        assertNotNull("Should not be null", result);
+        result = playerBase.buyUnit(Base.Type.SNIPER, 0, mockHero);
+        assertNotNull("Should not be null", result);
+        result = playerBase.buyUnit(Base.Type.TANK, 0, mockHero);
+        assertNotNull("Should not be null", result);
+    }
+
+    @Test
+    public void testBuyUnitsNotEnoughGold(){
+        when(mockHero.getGold()).thenReturn(0);
+        Unit result = playerBase.buyUnit(Base.Type.MELEE, 0, mockHero);
+        assertNull("Should be null", result);
+        result = playerBase.buyUnit(Base.Type.SNIPER, 0, mockHero);
+        assertNull("Should be null", result);
+        result = playerBase.buyUnit(Base.Type.TANK, 0, mockHero);
+        assertNull("Should be null", result);
+    }
 }

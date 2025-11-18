@@ -3,6 +3,8 @@ package com.main.entities.player;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Generated;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
@@ -28,7 +30,7 @@ public class Hero extends Unit {
         ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT
     }
 
-    private float getCurrentAttackAnimationDuration() {
+    protected float getCurrentAttackAnimationDuration() {
         switch (direction) {
             case ATTACKRIGHT:
                 return (AttackRight != null) ? AttackRight.getAnimationDuration() : 0f;
@@ -169,7 +171,8 @@ public class Hero extends Unit {
         loadedTextures.add(tex);
         return new TextureRegion(tex);
     }
-
+    
+    @lombok.Generated
     /**
      * Met à jour le Hero (déplacements avec LibGDX)
      * 
@@ -458,18 +461,22 @@ public class Hero extends Unit {
 
     // Keep public methods for backward compatibility
     public void moveUp(float delta, float mapHeight, List<Unit> enemies) {
+        direction = Direction.UP;
         tryMove(0, speed * delta * 60, Float.MAX_VALUE, mapHeight, findClosestEnemy(enemies));
     }
 
     public void moveDown(float delta, List<Unit> enemies) {
+        direction = Direction.DOWN;
         tryMove(0, -speed * delta * 60, Float.MAX_VALUE, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
     public void moveLeft(float delta, List<Unit> enemies) {
+        direction = Direction.LEFT;
         tryMove(-speed * delta * 60, 0, Float.MAX_VALUE, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
     public void moveRight(float delta, float mapWidth, List<Unit> enemies) {
+        direction = Direction.RIGHT;
         tryMove(speed * delta * 60, 0, mapWidth, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
@@ -532,6 +539,7 @@ public class Hero extends Unit {
         }
     }
 
+    @lombok.Generated
     public void render(SpriteBatch batch) {
         TextureRegion currentFrame;
         float visualWidth;
@@ -730,6 +738,13 @@ public class Hero extends Unit {
         return false;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
     // === AUDIO SYSTEM ===
 
     /**

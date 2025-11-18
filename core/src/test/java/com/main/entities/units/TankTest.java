@@ -43,6 +43,9 @@ public class TankTest {
     
     @Mock
     private Graphics mockGraphics;
+
+    @Mock
+    private Base mockBase;
     
     @Mock
     private Unit mockEnemy;
@@ -581,5 +584,11 @@ public class TankTest {
         // Vérifie que render est appelé avec 5 paramètres (incluant width et height)
         verify(mockBatch, atLeastOnce()).draw(any(TextureRegion.class), anyFloat(), anyFloat(), 
             anyFloat(), anyFloat());
+    }
+
+    @Test
+    public void testGetAttackAnimationDuration(){
+        tank.attackAnimation = null;
+        assertEquals("Attack anim null", 0.5f, tank.getAttackAnimationDuration(), 0.01f);
     }
 }

@@ -29,6 +29,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
+import com.main.map.Base;
 
 public class SniperTest {
 
@@ -37,6 +38,9 @@ public class SniperTest {
     
     @Mock
     private SpriteBatch mockBatch;
+
+    @Mock
+    private Base mockBase;
     
     @Mock
     private GL20 mockGL;
@@ -71,7 +75,7 @@ public class SniperTest {
         when(mockGraphics.getWidth()).thenReturn(800);
         when(mockGraphics.getHeight()).thenReturn(600);
         
-        sniper = new Sniper(100, 200);
+        sniper = new Sniper(100, 200, mockBase);
         enemies = new ArrayList<>();
         
         when(mockEnemy.getPosX()).thenReturn(500.0f);
@@ -100,8 +104,8 @@ public class SniperTest {
 
     @Test
     public void testConstructorWithDifferentPositions() {
-        Sniper sniper1 = new Sniper(0, 0);
-        Sniper sniper2 = new Sniper(500, 300);
+        Sniper sniper1 = new Sniper(0, 0, mockBase);
+        Sniper sniper2 = new Sniper(500, 300, mockBase);
         
         assertEquals("First sniper X should be 0", 0.0f, sniper1.getPosX(), 0.01f);
         assertEquals("Second sniper X should be 500", 500.0f, sniper2.getPosX(), 0.01f);

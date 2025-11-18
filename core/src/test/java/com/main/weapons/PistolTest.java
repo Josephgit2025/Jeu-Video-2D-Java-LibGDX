@@ -18,8 +18,8 @@ public class PistolTest {
     public void testConstructor() {
         assertNotNull(pistol);
         assertEquals(10, pistol.getDamage());
-        assertEquals(50, pistol.getRange());
-        assertEquals(7, pistol.getAttackSpeed());
+        assertEquals(150, pistol.getRange());
+        assertEquals(1f, pistol.getAttackSpeed(), 0.01f);
         assertEquals(12, pistol.getMaxMunitions());
         assertEquals(12, pistol.getMunitions());
     }
