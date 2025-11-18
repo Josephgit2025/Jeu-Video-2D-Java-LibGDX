@@ -11,6 +11,10 @@ import com.main.entities.player.Hero;
 import com.main.map.Base;
 
 public abstract class Unit {
+    // Stats de base pour l'équilibrage global
+    public static final int HP_BASE = 200;
+    public static final float DAMAGE_BASE = 30f;
+    public static final float ATTACK_SPEED_BASE = 1.5f;
 
     // Unit states for animation control
     public enum UnitState {
@@ -23,7 +27,7 @@ public abstract class Unit {
     protected float posY;
     protected Sprite sprite;
     protected int health;
-    protected int attackDamage;
+    protected float attackDamage;
     protected float attackSpeed; // Time in seconds between attacks
     protected float speed;
     public Unit target;
@@ -114,7 +118,7 @@ public abstract class Unit {
     }
 
     public int getAttackDamage() {
-        return attackDamage;
+        return (int)attackDamage;
     }
 
     public float getAttackSpeed() {
@@ -320,7 +324,7 @@ public abstract class Unit {
             if (distance <= this.range) {
                 System.out.println(this.getClass().getSimpleName() + " attacks " + target.getClass().getSimpleName() +
                         " (HP: " + target.getHealth() + " -> " + (target.getHealth() - attackDamage) + ")");
-                target.takeDamage(attackDamage);
+                target.takeDamage((int)attackDamage);
                 attackCooldown = attackSpeed;
                 currentState = UnitState.ATTACKING;
                 attackAnimationTimer = getAttackAnimationDuration();
@@ -350,7 +354,7 @@ public abstract class Unit {
     // Méthode pour attaquer la base
     public void attackBase(Base enemyBase) {
         if (enemyBase != null && attackCooldown <= 0) {
-            enemyBase.takeDamage(this.attackDamage);
+            enemyBase.takeDamage((int)this.attackDamage);
             attackCooldown = attackSpeed;
             // Use subclass-specific attack animation duration when available
             attackAnimationTimer = getAttackAnimationDuration();

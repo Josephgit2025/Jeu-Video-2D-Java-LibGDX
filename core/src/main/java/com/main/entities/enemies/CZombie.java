@@ -1,5 +1,5 @@
 package com.main.entities.enemies;
-
+import com.main.entities.Unit;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -10,10 +10,10 @@ public class CZombie extends Zombie {
 
     public CZombie(int posX, int posY, Base allyBase) {
         super("zombie/crawl/Walk1.png", posX, posY, allyBase);
-        this.health = 300;
-        this.speed = 40;
-        this.attackDamage = 15;
-        this.attackSpeed = 1.2f; // 1.2 seconds between attacks (slower zombie)
+        this.health = (int)(0.7f * Unit.HP_BASE);
+        this.speed = 60;
+        this.attackDamage = 1.3f * Unit.DAMAGE_BASE;
+        this.attackSpeed = 0.5f * Unit.ATTACK_SPEED_BASE;
         this.range = 50;
 
         // Load walk animation
