@@ -24,16 +24,13 @@ public class UnitShopButton {
     private Rectangle bounds;
     private Base.Type unitType;
     private Integer spawnIndex; // Nullable pour les boutons de type d'unité
-    private Color color;
-    private Color borderColor;
+
     private ButtonType buttonType;
     private boolean selected;
     private String label;
     private BitmapFont font;
     protected List<Texture> loadedTextures = new ArrayList<>();
     protected TextureRegion idleFrame;
-    private static final float START_X = 540f; // À droite (800 - 3*60 - 2*10 - 20)
-    private static final float UNIT_BUTTONS_Y = 520f; // En haut
 
     // Constructeur pour bouton de type d'unité
     public UnitShopButton(float x, float y, float width, float height, Base.Type unitType) {
@@ -42,7 +39,6 @@ public class UnitShopButton {
         this.spawnIndex = null;
         this.buttonType = ButtonType.UNIT_TYPE;
         this.selected = false;
-        this.borderColor = Color.CLEAR;
         this.font = new BitmapFont();
         this.font.getData().setScale(1.2f);
 
@@ -61,7 +57,7 @@ public class UnitShopButton {
                 break;
         }
 
-        Texture idleTex = new Texture(Gdx.files.internal("Frames/"+ this.label + ".png"));
+        Texture idleTex = new Texture(Gdx.files.internal("Frames/" + this.label + ".png"));
         this.idleFrame = new TextureRegion(idleTex);
     }
 
@@ -72,13 +68,11 @@ public class UnitShopButton {
         this.spawnIndex = spawnIndex;
         this.buttonType = ButtonType.SPAWN_POINT;
         this.selected = false;
-        this.color = Color.CLEAR;
-        this.borderColor = Color.CLEAR;
-        this.label = "S" + (spawnIndex + 1);
+        this.label = "" + (spawnIndex + 1);
         this.font = new BitmapFont();
         this.font.getData().setScale(1.2f);
 
-        Texture idleTex = new Texture(Gdx.files.internal("Frames/Melee.png"));
+        Texture idleTex = new Texture(Gdx.files.internal("Frames/" + this.label + ".png"));
         this.idleFrame = new TextureRegion(idleTex);
     }
 
@@ -106,25 +100,23 @@ public class UnitShopButton {
         // Bordure (plus épaisse si sélectionné)
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         if (selected) {
-            shapeRenderer.setColor(Color.WHITE);
-            // Dessiner une bordure plus épaisse
-            for (int i = 0; i < 3; i++) {
-                shapeRenderer.rect(bounds.x - i, bounds.y - i, bounds.width + i * 2, bounds.height + i * 2);
-            }
-        } else {
-            shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
-        }
+            shapeRenderer.setColor(Color.PURPLE);
+                shapeRenderer.rect(drawX + 16, drawY, drawW - 37, drawH + 1);
+        } 
+        
+        // else {
+        //     shapeRenderer.rect(bounds.x, bounds.y, bounds.width, bounds.height);
+        // }
         shapeRenderer.end();
 
         // Dessiner le label
         batch.begin();
-        font.setColor(Color.WHITE);
 
         if (buttonType == ButtonType.UNIT_TYPE && currentFrame != null) {
             batch.draw(currentFrame, drawX, drawY, drawW, drawH);
         } else {
             // Pour les spawn buttons → afficher du texte
-            font.draw(batch, label, bounds.x + 10, bounds.y + 25);
+            batch.draw(currentFrame, drawX, drawY, drawW, drawH);
         }
         batch.end();
     }

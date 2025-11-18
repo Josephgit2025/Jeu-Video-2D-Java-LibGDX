@@ -38,7 +38,7 @@ public class UnitShop {
     private static final float BUTTON_SPACING = 10f;
     private static final float START_X = 540f; // À droite (800 - 3*60 - 2*10 - 20)
     private static final float UNIT_BUTTONS_Y = 520f; // En haut
-    private static final float SPAWN_BUTTONS_Y = 470f; // Juste en dessous
+    private static final float SPAWN_BUTTONS_Y = 460f; // Juste en dessous
     protected List<Texture> loadedTextures = new ArrayList<>();
     // protected TextureRegion idleFrame;
 
@@ -72,7 +72,6 @@ public class UnitShop {
 
         Base.Type[] types = { Base.Type.MELEE, Base.Type.SNIPER, Base.Type.TANK };
 
-        // Créer les 3 boutons de type d'unité (en haut)
         for (int i = 0; i < types.length; i++) {
             float buttonX = START_X + i * (BUTTON_WIDTH + BUTTON_SPACING);
             unitTypeButtons.add(new UnitShopButton(
