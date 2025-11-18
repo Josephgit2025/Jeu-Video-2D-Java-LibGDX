@@ -145,13 +145,13 @@ public class Hero extends Unit {
         AttackDown.setPlayMode(Animation.PlayMode.NORMAL);
 
         this.health = 500;
-        this.weapon = new Pistol();
+        this.weapon = new Shotgun();
         this.speed = 8;
         this.attackSpeed = 1;
         this.map = map;
 
         // initialiser gold
-        this.gold = 50; // Start with 50 gold
+        this.gold = 100; // Start with 100 gold
     }
 
     private TextureRegion[] loadFrames(String pattern, int count) {

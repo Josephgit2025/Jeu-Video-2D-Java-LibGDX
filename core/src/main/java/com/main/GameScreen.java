@@ -103,6 +103,7 @@ public class GameScreen implements Screen {
         this.pauseFont.setColor(Color.WHITE);
         this.pauseFont.getData().setScale(4f);
         // Initialize Unit Shop
+        this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         this.unitShop = new UnitShop(playerBase, hero);
         
         // Load audio
@@ -149,9 +150,9 @@ public class GameScreen implements Screen {
         this.map = new WarMap();
         this.enemyBase = new Base(1350, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(-22, 300, true, this.mapHeight); // true = spawn soldiers
-        this.unitShop = new UnitShop(playerBase, hero);
         this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
         this.playerBase.setHero(hero);
+        this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         
         // ✅ IMPORTANT: Réassigner le son au nouveau héros
         System.out.println("🔄 RESET: Réassignation du son au nouveau héros...");
