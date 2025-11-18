@@ -8,10 +8,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.map.Base;
 
 public class Melee extends Soldier {
-        protected int cost;
 
 
-    public static final int COST = 1;
+    public static final int COST = 20;
 
     public Melee(float posX, float posY, Base allyBase) {
         super("Melee/Walk1.png", posX, posY, allyBase);
@@ -19,7 +18,6 @@ public class Melee extends Soldier {
         this.health = (int)(0.7f * Unit.HP_BASE);
         this.attackDamage = 0.5f * Unit.DAMAGE_BASE;
         this.attackSpeed = 0.8f * Unit.ATTACK_SPEED_BASE;
-        this.cost = 30;
         this.speed = 60;
         this.range = 50;
 
