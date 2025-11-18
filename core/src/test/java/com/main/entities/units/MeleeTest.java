@@ -75,7 +75,7 @@ public class MeleeTest {
         when(mockGraphics.getWidth()).thenReturn(800);
         when(mockGraphics.getHeight()).thenReturn(600);
         
-        melee = new Melee(100, 200);
+        melee = new Melee(100, 200, mockBase);
         enemies = new ArrayList<>();
         
         when(mockEnemy.getPosX()).thenReturn(500.0f);
@@ -104,8 +104,8 @@ public class MeleeTest {
 
     @Test
     public void testConstructorWithDifferentPositions() {
-        Melee melee1 = new Melee(0, 0);
-        Melee melee2 = new Melee(500, 300);
+        Melee melee1 = new Melee(0, 0, mockBase);
+        Melee melee2 = new Melee(500, 300, mockBase);
         
         assertEquals("First melee X should be 0", 0.0f, melee1.getPosX(), 0.01f);
         assertEquals("Second melee X should be 500", 500.0f, melee2.getPosX(), 0.01f);
@@ -556,5 +556,11 @@ public class MeleeTest {
         assertNotNull("Walk animation should be loaded", melee.walkAnimation);
         assertNotNull("Attack animation should be loaded", melee.attackAnimation);
         assertNotNull("Idle frame should be loaded", melee.idleFrame);
+    }
+
+    @Test
+    public void testGetAttackAnimationDuration(){
+        melee.attackAnimation = null;
+        assertEquals("Attack anim null", 0.5f, melee.getAttackAnimationDuration(), 0.01f);
     }
 }

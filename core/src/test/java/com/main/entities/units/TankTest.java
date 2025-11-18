@@ -28,6 +28,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
+import com.main.map.Base;
 
 public class TankTest {
 
@@ -42,6 +43,9 @@ public class TankTest {
     
     @Mock
     private Graphics mockGraphics;
+
+    @Mock
+    private Base mockBase;
     
     @Mock
     private Unit mockEnemy;
@@ -70,7 +74,7 @@ public class TankTest {
         when(mockGraphics.getWidth()).thenReturn(800);
         when(mockGraphics.getHeight()).thenReturn(600);
         
-        tank = new Tank(100, 200);
+        tank = new Tank(100, 200, mockBase);
         enemies = new ArrayList<>();
         
         when(mockEnemy.getPosX()).thenReturn(500.0f);
@@ -99,8 +103,8 @@ public class TankTest {
 
     @Test
     public void testConstructorWithDifferentPositions() {
-        Tank tank1 = new Tank(0, 0);
-        Tank tank2 = new Tank(500, 300);
+        Tank tank1 = new Tank(0, 0, mockBase);
+        Tank tank2 = new Tank(500, 300, mockBase);
         
         assertEquals("First tank X should be 0", 0.0f, tank1.getPosX(), 0.01f);
         assertEquals("Second tank X should be 500", 500.0f, tank2.getPosX(), 0.01f);
@@ -577,5 +581,11 @@ public class TankTest {
         // Vérifie que render est appelé avec 5 paramètres (incluant width et height)
         verify(mockBatch, atLeastOnce()).draw(any(TextureRegion.class), anyFloat(), anyFloat(), 
             anyFloat(), anyFloat());
+    }
+
+    @Test
+    public void testGetAttackAnimationDuration(){
+        tank.attackAnimation = null;
+        assertEquals("Attack anim null", 0.5f, tank.getAttackAnimationDuration(), 0.01f);
     }
 }

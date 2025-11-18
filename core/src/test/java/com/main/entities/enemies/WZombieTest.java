@@ -23,6 +23,7 @@ import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.main.map.Base;
 
 public class WZombieTest {
 
@@ -32,6 +33,9 @@ public class WZombieTest {
     @Mock
     private SpriteBatch mockBatch;
     
+    @Mock
+    private Base mockBase;
+
     @Mock
     private GL20 mockGL;
     
@@ -60,7 +64,7 @@ public class WZombieTest {
         when(mockGraphics.getWidth()).thenReturn(800);
         when(mockGraphics.getHeight()).thenReturn(600);
         
-        wZombie = new WZombie(100, 200);
+        wZombie = new WZombie(100, 200, mockBase);
     }
 
     // ===== Constructor Tests =====
@@ -83,8 +87,8 @@ public class WZombieTest {
 
     @Test
     public void testConstructorWithDifferentPositions() {
-        WZombie z1 = new WZombie(0, 0);
-        WZombie z2 = new WZombie(500, 300);
+        WZombie z1 = new WZombie(0, 0, mockBase);
+        WZombie z2 = new WZombie(500, 300, mockBase);
         
         assertEquals("First zombie X should be 0", 0.0f, z1.getPosX(), 0.01f);
         assertEquals("Second zombie X should be 500", 500.0f, z2.getPosX(), 0.01f);

@@ -32,7 +32,6 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
     private boolean moving;
-    private Direction direction;
     private Base enemyBase;
     private Base playerBase;
     private int mapWidth;
@@ -60,10 +59,6 @@ public class GameScreen implements Screen {
 
     private GameState gameState = GameState.PLAYING;
     private boolean pauseKeyPressed = false;
-
-    private enum Direction {
-        UP, DOWN, LEFT, RIGHT
-    }
 
     public GameScreen(Main game) {
         this.game = game;

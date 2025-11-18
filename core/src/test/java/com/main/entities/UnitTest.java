@@ -27,6 +27,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.main.entities.player.Hero;
 import com.main.map.Base;
 
 public class UnitTest {
@@ -39,7 +40,13 @@ public class UnitTest {
     
     @Mock
     private SpriteBatch mockBatch;
+
+    @Mock
+    private Hero mockHero;
     
+    @Mock
+    private List<List<Unit>> mockunitPerLane;
+
     @Mock
     private GL20 mockGL;
     
@@ -48,6 +55,9 @@ public class UnitTest {
     
     @Mock
     private Base mockBase;
+
+    @Mock
+    private Unit mockUnit;
 
     // Classe concrète pour tester la classe abstraite Unit
     private class TestUnit extends Unit {
@@ -62,6 +72,8 @@ public class UnitTest {
             this.attackSpeed = 2.0f;
             this.speed = 50.0f;
             this.range = 100;
+            this.allyBase = mockBase;
+            this.setIndex(0);
         }
     }
 
@@ -178,6 +190,11 @@ public class UnitTest {
         unit.takeDamage(150);
         assertEquals("Health should be 0 with overkill", 0, unit.getHealth());
         assertTrue("Unit should be dead", unit.isDead());
+    }
+
+    @Test
+    public void testGetIndex(){
+        assertEquals("Index should be 0", 0, unit.getIndex());
     }
 
     @Test
@@ -715,5 +732,148 @@ public class UnitTest {
         unit.setSpritePosX(100);
         float newXLeft = unit.calculateNewPositionX(1.0f, -1);
         assertEquals("Should move left", 50.0f, newXLeft, 0.1f);
+    }
+
+    @Test
+    public void testWouldCollideWithBase(){
+        unit.setTargetBase(mockBase);
+        unit.posX = 100;
+        unit.posY = 200;
+        Rectangle tmp = new Rectangle(120, 200, 800, 600);
+        when(mockBase.getCollisionBox()).thenReturn(tmp);
+        assertTrue(unit.wouldCollideWithBase(120));
+    }
+
+    @Test
+    public void testWouldCollideWithBaseCollisionBoxNull(){
+        unit.setTargetBase(mockBase);
+        when(mockBase.getCollisionBox()).thenReturn(null);
+        assertFalse(unit.wouldCollideWithBase(120));
+    }
+
+    @Test
+    public void testIsNearEnemyBaseBaseBoxNull(){
+        when(mockBase.getCollisionBox()).thenReturn(null);
+        assertFalse(unit.isNearEnemyBase(mockBase));
+    }
+
+    @Test
+    public void testShouldStopMovingAnimTimer(){
+        unit.setTarget(enemy1);
+        unit.attack();
+        assertTrue(unit.shouldStopMoving());
+    }
+
+    @Test
+    public void testShouldStopMovingIndexZero(){
+        unit.setTarget(enemy1);
+        unit.setIndex(0);
+        assertTrue(unit.shouldStopMoving());
+    }
+
+    @Test
+    public void testCheckUnitCollision(){
+        assertFalse(unit.checkUnitCollisions(unit.getPosX(), unit.getPosY()));
+    }
+
+    @Test
+    public void testCheckUnitCollisionTargetBaseHero(){
+        when(mockBase.getHero()).thenReturn(mockHero);
+        when(mockHero.getPosX()).thenReturn(100f);
+        when(mockHero.getPosY()).thenReturn(200f);
+        when(mockHero.getWidth()).thenReturn(35f);
+        unit.setAllyBase(mockBase);
+        assertTrue(unit.checkUnitCollisions(120f, 200f));
+    }
+
+    @Test
+    public void testCheckUnitCollisionTargetBaseHeroFar(){
+        when(mockBase.getHero()).thenReturn(mockHero);
+        when(mockHero.getPosX()).thenReturn(0f);
+        when(mockHero.getPosY()).thenReturn(0f);
+        when(mockHero.getWidth()).thenReturn(35f);
+        unit.setAllyBase(mockBase);
+        assertFalse(unit.checkUnitCollisions(120f, 200f));
+    }
+
+    @Test
+    public void testCheckUnitCollisionIndexNotZero(){
+        List<Unit> lane1Units = new ArrayList<>();
+        TestUnit testunit = new TestUnit(100, 200);
+        lane1Units.add(unit);        // Index 0
+        lane1Units.add(testunit);    // Index 1
+        
+        testunit.setAllyBase(mockBase);
+        testunit.setIndex(1);
+        testunit.setLane(1);
+        
+        unit.setIndex(0);
+        unit.setLane(1);
+        unit.setAllyBase(mockBase);
+        
+        List<List<Unit>> allLanes = new ArrayList<>();
+        allLanes.add(new ArrayList<>()); // Lane 0 (vide)
+        allLanes.add(lane1Units);        // Lane 1 (avec nos units)
+        
+        when(mockBase.getUnitsPerLane()).thenReturn(allLanes); // ✅ Retourner la vraie structure
+        
+        // Test: l'unité à l'index 1 vérifie la collision avec l'unité à l'index 0
+        assertTrue("Should collide", testunit.checkUnitCollisions(120f, 200f));
+    }
+
+    @Test
+    public void testCheckUnitCollisionIndexNotZeroHeroNotNull(){
+        List<Unit> lane1Units = new ArrayList<>();
+        TestUnit testunit = new TestUnit(100, 200);
+        lane1Units.add(unit);        // Index 0
+        lane1Units.add(testunit);    // Index 1
+        
+        testunit.setAllyBase(mockBase);
+        testunit.setIndex(1);
+        testunit.setLane(1);
+        
+        unit.setIndex(0);
+        unit.setLane(1);
+        unit.setAllyBase(mockBase);
+        
+        List<List<Unit>> allLanes = new ArrayList<>();
+        allLanes.add(new ArrayList<>()); // Lane 0 (vide)
+        allLanes.add(lane1Units);        // Lane 1 (avec nos units)
+        
+        when(mockBase.getUnitsPerLane()).thenReturn(allLanes); // ✅ Retourner la vraie structure
+        when(mockBase.getHero()).thenReturn(mockHero);
+        when(mockHero.getPosX()).thenReturn(110f);
+        when(mockHero.getPosY()).thenReturn(200f);
+        
+        // Test: l'unité à l'index 1 vérifie la collision avec l'unité à l'index 0
+        assertTrue("Should collide", testunit.checkUnitCollisions(120f, 200f));
+    }
+
+    @Test
+    public void testCheckUnitCollisionIndexNotZeroHeroNotNullNoCollision(){
+        List<Unit> lane1Units = new ArrayList<>();
+        TestUnit testunit = new TestUnit(0, 200);
+        lane1Units.add(unit);        // Index 0
+        lane1Units.add(testunit);    // Index 1
+        
+        testunit.setAllyBase(mockBase);
+        testunit.setIndex(1);
+        testunit.setLane(1);
+        
+        unit.setIndex(0);
+        unit.setLane(1);
+        unit.setAllyBase(mockBase);
+        
+        List<List<Unit>> allLanes = new ArrayList<>();
+        allLanes.add(new ArrayList<>()); // Lane 0 (vide)
+        allLanes.add(lane1Units);        // Lane 1 (avec nos units)
+        
+        when(mockBase.getUnitsPerLane()).thenReturn(allLanes); // ✅ Retourner la vraie structure
+        when(mockBase.getHero()).thenReturn(mockHero);
+        when(mockHero.getPosX()).thenReturn(800f);
+        when(mockHero.getPosY()).thenReturn(200f);
+        
+        // Test: l'unité à l'index 1 vérifie la collision avec l'unité à l'index 0
+        assertFalse("Should not collide", testunit.checkUnitCollisions(10f, 200f));
     }
 }

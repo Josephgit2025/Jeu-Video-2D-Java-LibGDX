@@ -26,6 +26,7 @@ import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.main.entities.Unit;
+import com.main.map.Base;
 import com.main.map.WarMap;
 import com.main.weapons.Pistol;
 import com.main.weapons.SniperRifle;
@@ -39,6 +40,9 @@ public class HeroTest {
     @Mock
     private WarMap mockMap;
     
+    @Mock
+    private Base mockBase;
+
     @Mock
     private Unit mockTarget;
     
@@ -68,7 +72,7 @@ public class HeroTest {
         
         when(mockMap.isCollisionRect(anyFloat(), anyFloat(), anyFloat(), anyFloat())).thenReturn(false);
         
-        hero = new Hero(100, 200, mockMap);
+        hero = new Hero(100, 200, mockMap, mockBase);
         hero.setWeapon(new Pistol());
         
         enemies = new ArrayList<>();
@@ -92,9 +96,9 @@ public class HeroTest {
 
     @Test
     public void testConstructorInitializesDefaultWeapon() {
-        Hero newHero = new Hero(0, 0, mockMap);
-        assertNotNull("Default weapon should be Machette", newHero.weapon);
-        assertTrue("Default weapon should be Machette", newHero.weapon instanceof SniperRifle);
+        Hero newHero = new Hero(0, 0, mockMap, mockBase);
+        assertNotNull("Default weapon should be Pistol", newHero.weapon);
+        assertTrue("Default weapon should be Pistol", newHero.weapon instanceof Pistol);
     }
 
     @Test
@@ -632,6 +636,97 @@ public class HeroTest {
         
         hero.heal(200);
         assertEquals("Health capped at max", 500, hero.getCurrentHealth());
+    }
+
+    @Test
+    public void testGetCurrentAttackAnimationDurationRight(){
+        when(mockTarget.getPosX()).thenReturn(150.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        hero.moveRight(0.016f, 1000, enemies);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        hero.attack();
+        assertEquals("No clue what's expected",hero.AttackRight.getAnimationDuration(), hero.getCurrentAttackAnimationDuration(),  0.01f);
+    }
+
+    @Test
+    public void testGetCurrentAttackAnimationDurationLeft(){
+        when(mockTarget.getPosX()).thenReturn(80.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        hero.moveLeft(0.016f, enemies);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        hero.attack();
+        assertEquals("No clue what's expected", hero.AttackLeft.getAnimationDuration(), hero.getCurrentAttackAnimationDuration(),  0.01f);
+    }
+
+    @Test
+    public void testGetCurrentAttackAnimationDurationDown(){
+        when(mockTarget.getPosX()).thenReturn(100.0f);
+        when(mockTarget.getPosY()).thenReturn(180.0f);
+        hero.moveDown(0.016f, enemies);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        hero.attack();
+        assertEquals("No clue what's expected", hero.AttackDown.getAnimationDuration(), hero.getCurrentAttackAnimationDuration(),  0.01f);
+    }
+    @Test
+    public void testGetCurrentAttackAnimationDurationUp(){
+        when(mockTarget.getPosX()).thenReturn(100.0f);
+        when(mockTarget.getPosY()).thenReturn(220.0f);
+        hero.moveUp(0.016f, 1000, enemies);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        hero.attack();
+        assertEquals("No clue what's expected", hero.AttackUp.getAnimationDuration(), hero.getCurrentAttackAnimationDuration(),  0.01f);
+    }
+
+    @Test
+    public void testGetCurrentAttackAnimationDurationNullDown(){
+        when(mockTarget.getPosX()).thenReturn(100.0f);
+        when(mockTarget.getPosY()).thenReturn(220.0f);
+        hero.AttackDown = null;
+        hero.moveDown(0.016f, enemies);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        hero.attack();
+        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(), 0.01f);
+    }
+
+    @Test
+    public void testGetCurrentAttackAnimationDurationNullLeft(){
+        when(mockTarget.getPosX()).thenReturn(80.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        hero.AttackLeft = null;
+        hero.moveLeft(0.016f, enemies);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        hero.attack();
+        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(), 0.01f);
+    }
+
+    @Test
+    public void testGetCurrentAttackAnimationDurationNullUp(){
+        when(mockTarget.getPosX()).thenReturn(100.0f);
+        when(mockTarget.getPosY()).thenReturn(220.0f);
+        hero.AttackUp = null;
+        hero.moveUp(0.016f, 1000, enemies);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        hero.attack();
+        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(),  0.01f);
+    }
+
+    @Test
+    public void testGetCurrentAttackAnimationDurationNullRight(){
+        when(mockTarget.getPosX()).thenReturn(150.0f);
+        when(mockTarget.getPosY()).thenReturn(200.0f);
+        hero.AttackRight = null;
+        hero.moveRight(0.016f, 1000, enemies);
+        hero.setTarget(mockTarget);
+        hero.setCooldown(0);
+        hero.attack();
+        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(),  0.01f);
     }
 
     // Classe helper pour tester les collisions

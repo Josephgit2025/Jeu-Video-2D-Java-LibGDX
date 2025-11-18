@@ -78,6 +78,7 @@ public class Zombie extends Unit {
         this.stateTime += delta;
     }
 
+    @lombok.Generated
     @Override
     public void render(SpriteBatch batch) {
         TextureRegion currentFrame;
@@ -145,6 +146,7 @@ public class Zombie extends Unit {
         return frames;
     }
 
+    @lombok.Generated
     @Override
     public void dispose() {
         super.dispose();
