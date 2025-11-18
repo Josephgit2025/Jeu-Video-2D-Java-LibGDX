@@ -23,6 +23,7 @@ public class UnitShop {
     private List<UnitShopButton> spawnPointButtons;
     private Base playerBase;
     private Hero hero;
+    private gold goldDisplay;
 
     // UI Camera and Viewport (same as HUD)
     private Viewport viewport;
@@ -45,11 +46,12 @@ public class UnitShop {
     private static final float UI_WIDTH = 800f;
     private static final float UI_HEIGHT = 600f;
 
-    public UnitShop(Base playerBase, Hero hero) {
+    public UnitShop(Base playerBase, Hero hero, gold goldDisplay) {
         this.playerBase = playerBase;
         this.hero = hero;
         this.unitTypeButtons = new ArrayList<>();
         this.spawnPointButtons = new ArrayList<>();
+        this.goldDisplay = goldDisplay;
 
         // Initialize UI camera and viewport
         camera = new OrthographicCamera();
@@ -59,6 +61,11 @@ public class UnitShop {
         touchPos = new Vector3();
 
         createButtons();
+    }
+
+    // Ajout d'un constructeur rétrocompatible pour ne pas casser l'ancien code
+    public UnitShop(Base playerBase, Hero hero) {
+        this(playerBase, hero, null);
     }
 
     private void createButtons() {
@@ -141,6 +148,9 @@ public class UnitShop {
                 Unit newUnit = playerBase.buyUnit(button.getUnitType(), selectedSpawnPoint, hero);
                 if (newUnit != null) {
                     playerBase.addUnit(newUnit);
+                    if (goldDisplay != null) {
+                        goldDisplay.update(hero.getGold());
+                    }
                 }
                 return true;
             }

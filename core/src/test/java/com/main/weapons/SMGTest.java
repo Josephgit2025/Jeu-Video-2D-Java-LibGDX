@@ -18,8 +18,8 @@ public class SMGTest {
     public void testConstructor() {
         assertNotNull(smg);
         assertEquals(20, smg.getDamage());
-        assertEquals(100, smg.getRange());
-        assertEquals(25, smg.getAttackSpeed());
+        assertEquals(200, smg.getRange());
+        assertEquals(0.5f, smg.getAttackSpeed(), 0.01f);
         assertEquals(35, smg.getMaxMunitions());
         assertEquals(35, smg.getMunitions());
     }

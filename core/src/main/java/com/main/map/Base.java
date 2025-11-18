@@ -81,6 +81,14 @@ public class Base {
         return position;
     }
 
+    public void setCollisionBox(Rectangle collisionBox){
+        this.collisionBox = collisionBox;
+    }
+
+    public void setUnitsPerLane(List<List<Unit>> unitsPerLane) {
+        this.unitsPerLane = unitsPerLane;
+    }
+
     public float getPosX() {
         return position.getPosX();
     }

@@ -53,7 +53,7 @@ public class SoldierTest {
     // Classe concrète pour tester la classe abstraite Soldier
     private class TestSoldier extends Soldier {
         public TestSoldier(float posX, float posY) {
-            super(null, posX, posY);
+            super(null, posX, posY, mockBase);
             this.texture = mock(Texture.class);
             this.sprite = mock(Sprite.class);
             when(this.sprite.getX()).thenReturn(posX);

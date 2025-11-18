@@ -18,8 +18,8 @@ public class ShotgunTest {
     public void testConstructor() {
         assertNotNull(shotgun);
         assertEquals(70, shotgun.getDamage());
-        assertEquals(35, shotgun.getRange());
-        assertEquals(4, shotgun.getAttackSpeed());
+        assertEquals(100, shotgun.getRange());
+        assertEquals(1.5f, shotgun.getAttackSpeed(), 0.01f);
         assertEquals(6, shotgun.getMaxMunitions());
         assertEquals(6, shotgun.getMunitions());
     }

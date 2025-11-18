@@ -69,6 +69,7 @@ public class Soldier extends Unit {
         this.stateTime += delta;
     }
 
+    @lombok.Generated
     @Override
     public void render(SpriteBatch batch) {
         TextureRegion currentFrame;
@@ -122,6 +123,7 @@ public class Soldier extends Unit {
         return frames;
     }
 
+    @lombok.Generated
     @Override
     public void dispose() {
         super.dispose();

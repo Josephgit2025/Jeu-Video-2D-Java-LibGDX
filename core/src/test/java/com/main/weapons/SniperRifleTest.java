@@ -18,8 +18,8 @@ public class SniperRifleTest {
     public void testConstructor() {
         assertNotNull(sniper);
         assertEquals(150, sniper.getDamage());
-        assertEquals(300, sniper.getRange());
-        assertEquals(3, sniper.getAttackSpeed());
+        assertEquals(450, sniper.getRange());
+        assertEquals(3f, sniper.getAttackSpeed(), 0.01f);
         assertEquals(5, sniper.getMaxMunitions());
         assertEquals(5, sniper.getMunitions());
     }

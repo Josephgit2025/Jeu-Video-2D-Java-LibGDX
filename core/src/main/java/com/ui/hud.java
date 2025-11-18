@@ -229,6 +229,14 @@ public class hud implements Disposable {
         goldDisplay.setGold(gold);
     }
     
+    /**
+     * Getter for goldDisplay
+     * @return Current gold display object
+     */
+    public gold getGoldDisplay() {
+        return goldDisplay;
+    }
+    
     @Override
     public void dispose() {
         batch.dispose();
