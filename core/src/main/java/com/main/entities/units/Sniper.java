@@ -6,10 +6,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.map.Base;
 
 public class Sniper extends Soldier {
-        protected int cost;
 
 
-    public static final int COST = 1;
+    public static final int COST = 30;
 
     public Sniper(int posX, int posY, Base allyBase) {
         super("Sniper/Walk1.png", posX, posY, allyBase);
@@ -17,7 +16,6 @@ public class Sniper extends Soldier {
         this.health = (int)(0.5f * Unit.HP_BASE);
         this.attackDamage = 1.5f * Unit.DAMAGE_BASE;
         this.attackSpeed = 2f * Unit.ATTACK_SPEED_BASE;
-        this.cost = 40;
         this.speed = 30;
         this.range = 150;
 

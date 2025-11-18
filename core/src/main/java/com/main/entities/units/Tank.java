@@ -7,10 +7,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.map.Base;
 
 public class Tank extends Soldier {
-        protected int cost;
 
 
-    public static final int COST = 1;
+    public static final int COST = 40;
 
     public Tank(float posX, float posY, Base allyBase) {
         super("Tank/Ride1.png", posX, posY, allyBase);
@@ -18,7 +17,6 @@ public class Tank extends Soldier {
         this.health = (int)(2.0f * Unit.HP_BASE);
         this.attackDamage = 0.3f * Unit.DAMAGE_BASE;
         this.attackSpeed = 0.6f * Unit.ATTACK_SPEED_BASE;
-        this.cost = 60;
         this.speed = 40;
         this.range = 100;
 

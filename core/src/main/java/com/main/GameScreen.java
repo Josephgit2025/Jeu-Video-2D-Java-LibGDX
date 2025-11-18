@@ -97,7 +97,7 @@ public class GameScreen implements Screen {
         this.pauseFont.setColor(Color.WHITE);
         this.pauseFont.getData().setScale(4f);
         // Initialize Unit Shop
-        this.unitShop = new UnitShop(playerBase, hero);
+        this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
     }
 
     // Recommencer le jeu après avoir perdu
@@ -105,9 +105,9 @@ public class GameScreen implements Screen {
         this.map = new WarMap();
         this.enemyBase = new Base(1350, 300, false, this.mapHeight); // false = spawn zombies
         this.playerBase = new Base(-22, 300, true, this.mapHeight); // true = spawn soldiers
-        this.unitShop = new UnitShop(playerBase, hero);
         this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
         this.playerBase.setHero(hero);
+        this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         // Resize the new unitShop to match current window size
         this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
