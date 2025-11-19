@@ -529,9 +529,9 @@ public class Hero extends Unit {
     }
 
     /**
-     * Find the closest enemy within attack range
-     * 
-     * @param units List of all enemy units
+     * Finds the closest enemy within attack range.
+     *
+     * @param enemies List of all enemy units
      * @return Closest enemy in range, or null if none found
      */
     protected Unit findClosestEnemyInRange(List<Unit> enemies) {
@@ -552,22 +552,48 @@ public class Hero extends Unit {
     }
 
     // Keep public methods for backward compatibility
+    /**
+     * Moves the hero up on the map.
+     * @param delta Time since last frame
+     * @param mapHeight Height of the map
+     * @param enemies List of enemy units
+     */
     public void moveUp(float delta, float mapHeight, List<Unit> enemies) {
         tryMove(0, speed * delta * 60, Float.MAX_VALUE, mapHeight, findClosestEnemy(enemies));
     }
 
+    /**
+     * Moves the hero down on the map.
+     * @param delta Time since last frame
+     * @param enemies List of enemy units
+     */
     public void moveDown(float delta, List<Unit> enemies) {
         tryMove(0, -speed * delta * 60, Float.MAX_VALUE, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
+    /**
+     * Moves the hero left on the map.
+     * @param delta Time since last frame
+     * @param enemies List of enemy units
+     */
     public void moveLeft(float delta, List<Unit> enemies) {
         tryMove(-speed * delta * 60, 0, Float.MAX_VALUE, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
+    /**
+     * Moves the hero right on the map.
+     * @param delta Time since last frame
+     * @param mapWidth Width of the map
+     * @param enemies List of enemy units
+     */
     public void moveRight(float delta, float mapWidth, List<Unit> enemies) {
         tryMove(speed * delta * 60, 0, mapWidth, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
+    /**
+     * Sets the hero's weapon.
+     * @param weapon Weapon to set
+     */
     public void setWeapon(Weapon weapon) {
         if (weapon != null) {
             this.weapon = weapon;

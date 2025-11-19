@@ -29,12 +29,21 @@ public class Base {
      * Enum representing the types of units that can be spawned by a base.
      * Used to determine spawning logic and unit costs.
      */
+    /**
+     * Types of units that can be spawned by a base.
+     */
     public enum Type {
+        /** Melee unit. */
         MELEE,
+        /** Tank unit. */
         TANK,
+        /** Sniper unit. */
         SNIPER,
+        /** Woman unit. */
         WOMAN,
+        /** Crawl unit. */
         CRAWL,
+        /** Fast unit. */
         FAST
     }
     
