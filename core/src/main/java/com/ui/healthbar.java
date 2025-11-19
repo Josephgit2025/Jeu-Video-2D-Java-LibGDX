@@ -30,6 +30,14 @@ public class healthbar implements Disposable {
     private static final float ICON_SIZE = 26f;
     private static final float ICON_OFFSET = 32f;
     
+    // New healthbar texture (image complète)
+    private Texture healthbarTexture;
+    private boolean useCustomTexture = false;
+    
+    // Dimensions de l'image healthbar_modif.png (à ajuster selon votre image)
+    private static final int HEART_WIDTH_IN_IMAGE = 80;  // Largeur du cœur dans l'image
+    private static final int BAR_START_X = 80;           // Début de la barre après le cœur
+    
     // Colors (style jeu 2D)
     private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1f);      // Fond gris foncé (style 2D)
     private static final Color BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f, 1f);          // Gris foncé
@@ -72,12 +80,25 @@ public class healthbar implements Disposable {
      */
     public healthbar(float x, float y, float width, float height, String heartIconPath) {
         this(x, y, width, height);
+        
+        // Charger l'icône de cœur d'abord
         try {
             this.heartIcon = new Texture(heartIconPath);
             this.hasIcon = true;
+            System.out.println("✅ Icône de cœur chargée: " + heartIconPath);
         } catch (Exception e) {
             System.err.println("Could not load heart icon: " + heartIconPath);
             this.hasIcon = false;
+        }
+        
+        // Essayer de charger la texture de barre personnalisée
+        try {
+            this.healthbarTexture = new Texture(Gdx.files.internal("ui/healthbar.png"));
+            this.useCustomTexture = true;
+            System.out.println("✅ Texture de barre personnalisée chargée: healthbar.png");
+        } catch (Exception e) {
+            System.out.println("⚠️ Texture personnalisée non trouvée, utilisation du style par défaut");
+            this.useCustomTexture = false;
         }
     }
     
@@ -127,15 +148,63 @@ public class healthbar implements Disposable {
      * @param batch SpriteBatch for drawing icon
      */
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-        // Draw heart icon if available (aligned vertically with the bar)
-        if (hasIcon && heartIcon != null) {
+        // Si on utilise la texture personnalisée
+        if (useCustomTexture && healthbarTexture != null) {
             batch.begin();
-            batch.draw(heartIcon, x - ICON_OFFSET, y + (height - ICON_SIZE) / 2, ICON_SIZE, ICON_SIZE);
+            renderCustomTexture(batch);
             batch.end();
+        } else {
+            // Fallback: ancien style avec ShapeRenderer
+            if (hasIcon && heartIcon != null) {
+                batch.begin();
+                batch.draw(heartIcon, x - ICON_OFFSET, y + (height - ICON_SIZE) / 2, ICON_SIZE, ICON_SIZE);
+                batch.end();
+            }
+            render(shapeRenderer);
+        }
+    }
+    
+    /**
+     * Render avec la texture personnalisée (healthbar.png)
+     */
+    private void renderCustomTexture(SpriteBatch batch) {
+        float healthPercentage = (float) currentHealth / maxHealth;
+        
+        // Taille réduite mais bien visible
+        float scale = 0.10f;
+        float totalWidth = healthbarTexture.getWidth() * scale;
+        float totalHeight = healthbarTexture.getHeight() * scale;
+        
+        // j'ai dessiner l'icône heart.png juste à côté de la barre
+        if (hasIcon && heartIcon != null) {
+            float heartSize = totalHeight * 1.2f;
+            float heartOffset = 5f;
+            batch.setColor(1f, 1f, 1f, 1f);
+            batch.draw(heartIcon, x - heartSize - heartOffset, y, heartSize, heartSize);
         }
         
-        // Render the bar only (no text)
-        render(shapeRenderer);
+        // j'ai dessiner la barre complète
+        batch.setColor(0.5f, 0.5f, 0.5f, 1f);
+        batch.draw(healthbarTexture,
+            x, y,
+            totalWidth, totalHeight,
+            0, 0,
+            healthbarTexture.getWidth(), healthbarTexture.getHeight(),
+            false, false);
+        
+        // j'ai dessiner le remplissage vert par-dessus
+        if (healthPercentage > 0) {
+            batch.setColor(1f, 1f, 1f, 1f);
+            float fillWidth = totalWidth * healthPercentage;
+            int sourceFillWidth = (int)(healthbarTexture.getWidth() * healthPercentage);
+            
+            batch.draw(healthbarTexture,
+                x, y,
+                fillWidth, totalHeight,
+                0, 0,
+                sourceFillWidth, healthbarTexture.getHeight(),
+                false, false);
+        }
     }
     
     /**
@@ -193,6 +262,9 @@ public class healthbar implements Disposable {
         font.dispose();
         if (heartIcon != null) {
             heartIcon.dispose();
+        }
+        if (healthbarTexture != null) {
+            healthbarTexture.dispose();
         }
     }
 }
