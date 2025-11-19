@@ -7,14 +7,15 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.map.Base;
 
+/**
+ * Represents a crawling zombie enemy unit.
+ */
 public class CZombie extends Zombie {
 
     /**
-     * Constructs a new CZombie instance with specific stats and animations for the
-     * "crawl" zombie type.
-     *
-     * @param posX     Initial X position
-     * @param posY     Initial Y position
+     * Constructs a new CZombie instance with specific stats and animations for the "crawl" zombie type.
+     * @param posX Initial X position
+     * @param posY Initial Y position
      * @param allyBase Reference to the allied base
      */
     public CZombie(int posX, int posY, Base allyBase) {

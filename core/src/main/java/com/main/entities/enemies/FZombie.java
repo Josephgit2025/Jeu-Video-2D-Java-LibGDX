@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.map.Base;
 
+/**
+ * Represents a normal zombie enemy unit.
+ */
 public class FZombie extends Zombie {
 
     /**

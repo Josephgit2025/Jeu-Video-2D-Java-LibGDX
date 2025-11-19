@@ -10,6 +10,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.main.entities.player.Hero;
 import com.main.map.Base;
 
+/**
+ * Abstract base class for all units in the game (player, enemy, etc).
+ * Handles position, health, attack, movement, and rendering logic.
+ */
 public abstract class Unit {
         /**
          * Lane index for lane-based movement and targeting.
@@ -46,16 +50,23 @@ public abstract class Unit {
         ATTACKING
     }
 
+    /** X position of the unit. */
     protected float posX;
+    /** Y position of the unit. */
     protected float posY;
+    /** Sprite used for rendering the unit. */
     protected Sprite sprite;
+    /** Current health of the unit. */
     protected int health;
+    /** Attack damage value. */
     protected float attackDamage;
     /**
      * Time in seconds between attacks (attack speed).
      */
     protected float attackSpeed;
+    /** Movement speed of the unit. */
     protected float speed;
+    /** Current target of the unit. */
     public Unit target;
     /**
      * Reference to the enemy base for attack logic.
@@ -98,6 +109,8 @@ public abstract class Unit {
     /**
      * Hook for subclasses to override the duration of their attack animation.
      * Default implementation returns the global ATTACK_ANIMATION_DURATION.
+     *
+     * @return Duration of the attack animation in seconds
      */
     protected float getAttackAnimationDuration() {
         return ATTACK_ANIMATION_DURATION;
