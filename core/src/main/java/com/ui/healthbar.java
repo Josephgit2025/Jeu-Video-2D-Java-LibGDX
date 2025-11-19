@@ -9,47 +9,120 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
- * HealthBar component for displaying hero's health
+ * Represents a health bar UI component for displaying the hero's health in the game.
+ * Supports both default and custom textured rendering, with optional heart icon.
+ * Handles health value updates, rendering, and resource management.
  */
 public class healthbar implements Disposable {
-    
-    // Position and dimensions
+
+    /**
+     * X position of the health bar (top-left corner).
+     */
     private float x;
+
+    /**
+     * Y position of the health bar (top-left corner).
+     */
     private float y;
+
+    /**
+     * Width of the health bar.
+     */
     private float width;
+
+    /**
+     * Height of the health bar.
+     */
     private float height;
-    
-    // Health values
+
+    /**
+     * Current health value displayed by the bar.
+     */
     private int currentHealth;
+
+    /**
+     * Maximum health value for the bar.
+     */
     private int maxHealth;
-    
-    // Visual components
+
+    /**
+     * Font used for health text display.
+     */
     private BitmapFont font;
+
+    /**
+     * Texture for the heart icon (optional).
+     */
     private Texture heartIcon;
+
+    /**
+     * Indicates if the heart icon is enabled and loaded.
+     */
     private boolean hasIcon;
+
+    /**
+     * Size of the heart icon in pixels.
+     */
     private static final float ICON_SIZE = 26f;
+
+    /**
+     * Offset for positioning the heart icon relative to the bar.
+     */
     private static final float ICON_OFFSET = 32f;
-    
-    // New healthbar texture (image complète)
+
+    /**
+     * Texture for the custom health bar (optional).
+     */
     private Texture healthbarTexture;
+
+    /**
+     * Indicates if the custom health bar texture is used.
+     */
     private boolean useCustomTexture = false;
-    
-    // Dimensions de l'image healthbar_modif.png (à ajuster selon votre image)
-    private static final int HEART_WIDTH_IN_IMAGE = 80;  // Largeur du cœur dans l'image
-    private static final int BAR_START_X = 80;           // Début de la barre après le cœur
-    
-    // Colors (style jeu 2D)
-    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1f);      // Fond gris foncé (style 2D)
-    private static final Color BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f, 1f);          // Gris foncé
-    private static final Color HEALTH_COLOR = new Color(0.1f, 0.9f, 0.1f, 1f);          // Vert vif
-    private static final Color LOW_HEALTH_COLOR = new Color(0.9f, 0.1f, 0.1f, 1f);      // Rouge vif
-    private static final Color MEDIUM_HEALTH_COLOR = new Color(1f, 0.6f, 0f, 1f);       // Orange vif
-    
-    // Border thickness (plus épais pour style isométrique)
+
+    /**
+     * Width of the heart in the custom health bar image (pixels).
+     */
+    private static final int HEART_WIDTH_IN_IMAGE = 80;
+
+    /**
+     * X coordinate where the health bar starts after the heart in the custom image (pixels).
+     */
+    private static final int BAR_START_X = 80;
+
+    /**
+     * Background color for the health bar (dark gray, 2D style).
+     */
+    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 1f);
+
+    /**
+     * Border color for the health bar (dark gray).
+     */
+    private static final Color BORDER_COLOR = new Color(0.4f, 0.4f, 0.4f, 1f);
+
+    /**
+     * Color for high health (bright green).
+     */
+    private static final Color HEALTH_COLOR = new Color(0.1f, 0.9f, 0.1f, 1f);
+
+    /**
+     * Color for low health (bright red).
+     */
+    private static final Color LOW_HEALTH_COLOR = new Color(0.9f, 0.1f, 0.1f, 1f);
+
+    /**
+     * Color for medium health (bright orange).
+     */
+    private static final Color MEDIUM_HEALTH_COLOR = new Color(1f, 0.6f, 0f, 1f);
+
+    /**
+     * Thickness of the health bar border (pixels).
+     */
     private static final float BORDER_THICKNESS = 4f;
     
     /**
-     * Constructor for HealthBar without icon
+     * Constructs a HealthBar without a heart icon.
+     *
      * @param x X position (top-left corner)
      * @param y Y position (top-left corner)
      * @param width Width of the health bar
@@ -71,41 +144,43 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Constructor for HealthBar with heart icon
+     * Constructs a HealthBar with a heart icon and attempts to load a custom health bar texture.
+     *
      * @param x X position (top-left corner)
      * @param y Y position (top-left corner)
      * @param width Width of the health bar
      * @param height Height of the health bar
-     * @param heartIconPath Path to heart icon texture
+     * @param heartIconPath Path to the heart icon texture
      */
     public healthbar(float x, float y, float width, float height, String heartIconPath) {
         this(x, y, width, height);
         
-        // Charger l'icône de cœur d'abord
+        // Attempt to load the heart icon texture
         try {
             this.heartIcon = new Texture(heartIconPath);
             this.hasIcon = true;
-            System.out.println("✅ Icône de cœur chargée: " + heartIconPath);
+            System.out.println("Heart icon loaded: " + heartIconPath);
         } catch (Exception e) {
             System.err.println("Could not load heart icon: " + heartIconPath);
             this.hasIcon = false;
         }
-        
-        // Essayer de charger la texture de barre personnalisée
+
+        // Attempt to load the custom health bar texture
         try {
             this.healthbarTexture = new Texture(Gdx.files.internal("ui/healthbar.png"));
             this.useCustomTexture = true;
-            System.out.println("✅ Texture de barre personnalisée chargée: healthbar.png");
+            System.out.println("Custom health bar texture loaded: healthbar.png");
         } catch (Exception e) {
-            System.out.println("⚠️ Texture personnalisée non trouvée, utilisation du style par défaut");
+            System.out.println("Custom texture not found, using default style.");
             this.useCustomTexture = false;
         }
     }
     
     /**
-     * Met à jour les valeurs de santé
-     * @param currentHealth Vie actuelle
-     * @param maxHealth Vie maximale
+     * Updates the health values displayed by the health bar.
+     *
+     * @param currentHealth Current health value
+     * @param maxHealth Maximum health value
      */
     public void update(int currentHealth, int maxHealth) {
         this.currentHealth = Math.max(0, currentHealth);
@@ -113,7 +188,10 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * @param shapeRenderer ShapeRenderer pour dessiner les formes
+     * Renders the health bar using the default style (ShapeRenderer).
+     * Draws the border, background, and health fill based on current health.
+     *
+     * @param shapeRenderer ShapeRenderer used for drawing shapes
      */
     public void render(ShapeRenderer shapeRenderer) {
         // Calculer le pourcentage de santé
@@ -143,9 +221,11 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Render the health bar with optional heart icon (without text)
+     * Renders the health bar with optional heart icon and custom texture if available.
+     * If the custom texture is loaded, uses it for rendering; otherwise falls back to default style.
+     *
      * @param shapeRenderer ShapeRenderer for drawing shapes
-     * @param batch SpriteBatch for drawing icon
+     * @param batch SpriteBatch for drawing icons and textures
      */
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
         // Si on utilise la texture personnalisée
@@ -165,7 +245,10 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Render avec la texture personnalisée (healthbar.png)
+     * Renders the health bar using the custom texture (healthbar.png).
+     * Draws the heart icon and overlays the health fill based on current health percentage.
+     *
+     * @param batch SpriteBatch used for drawing textures
      */
     private void renderCustomTexture(SpriteBatch batch) {
         float healthPercentage = (float) currentHealth / maxHealth;
@@ -208,8 +291,10 @@ public class healthbar implements Disposable {
     }
     
     /**
-     @param percentage 
-     @return 
+     * Determines the color of the health fill based on the current health percentage.
+     *
+     * @param percentage Health percentage (0.0 to 1.0)
+     * @return Color representing the health state (green, orange, or red)
      */
     private Color getHealthColor(float percentage) {
         if (percentage > 0.5f) {
@@ -222,9 +307,10 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Set position of the health bar
-     * @param x X position
-     * @param y Y position
+     * Sets the position of the health bar.
+     *
+     * @param x X position (top-left corner)
+     * @param y Y position (top-left corner)
      */
     public void setPosition(float x, float y) {
         this.x = x;
@@ -232,9 +318,10 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Set dimensions of the health bar
-     * @param width Width
-     * @param height Height
+     * Sets the dimensions of the health bar.
+     *
+     * @param width Width of the health bar
+     * @param height Height of the health bar
      */
     public void setSize(float width, float height) {
         this.width = width;
@@ -242,7 +329,8 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Get current health
+     * Returns the current health value displayed by the bar.
+     *
      * @return Current health value
      */
     public int getCurrentHealth() {
@@ -250,13 +338,18 @@ public class healthbar implements Disposable {
     }
     
     /**
-     * Get maximum health
+     * Returns the maximum health value for the bar.
+     *
      * @return Maximum health value
      */
     public int getMaxHealth() {
         return maxHealth;
     }
     
+    /**
+     * Releases all resources used by the health bar, including font, heart icon, and custom texture.
+     * Should be called when the health bar is no longer needed to prevent memory leaks.
+     */
     @Override
     public void dispose() {
         font.dispose();

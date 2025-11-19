@@ -7,39 +7,79 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Disposable;
 
+
 /**
- * GoldDisplay component for displaying player's gold/currency
+ * The {@code gold} class is a UI component for displaying the player's gold or currency.
+ * It renders the gold value, optionally with a coin icon, and provides methods to update, add, remove, and set gold.
+ * Implements {@link Disposable} for proper resource management.
  */
 public class gold implements Disposable {
     
-    // Position
+    /**
+     * X position of the gold display.
+     */
     private float x;
+
+    /**
+     * Y position of the gold display.
+     */
     private float y;
-    
-    // Gold value
+
+    /**
+     * Current gold value displayed.
+     */
     private int gold;
-    
-    // Visual components
+
+    /**
+     * Font for rendering the gold value.
+     */
     private BitmapFont font;
-    private Texture coinIcon; // Optional: icon for gold
+
+    /**
+     * Optional coin icon texture for gold display.
+     */
+    private Texture coinIcon;
+
+    /**
+     * Indicates if the gold display has a coin icon.
+     */
     private boolean hasIcon;
-    
-    // Display settings
+
+    /**
+     * Size of the coin icon in pixels.
+     */
     private static final float ICON_SIZE = 45f;
-    private static final float TEXT_OFFSET_X = 49f; // Écritures rapprochées de l'icône gold
-    
-    // Colors
-    private static final Color GOLD_COLOR = new Color(1f, 0.84f, 0f, 1f); // Gold color
-    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 0.7f); // Semi-transparent background
-    
-    // Background padding
+
+    /**
+     * Horizontal offset for text when icon is present.
+     */
+    private static final float TEXT_OFFSET_X = 49f;
+
+    /**
+     * Color for gold text (bright gold).
+     */
+    private static final Color GOLD_COLOR = new Color(1f, 0.84f, 0f, 1f);
+
+    /**
+     * Background color for the gold display (semi-transparent dark gray).
+     */
+    private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 0.7f);
+
+    /**
+     * Horizontal padding for background.
+     */
     private static final float PADDING_X = 10f;
+
+    /**
+     * Vertical padding for background.
+     */
     private static final float PADDING_Y = 8f;
     
     /**
-     * Constructor for GoldDisplay without icon
-     * @param x X position
-     * @param y Y position
+     * Constructs a gold display UI component without an icon.
+     *
+     * @param x X position of the display
+     * @param y Y position of the display
      */
     public gold(float x, float y) {
         this.x = x;
@@ -54,9 +94,10 @@ public class gold implements Disposable {
     }
     
     /**
-     * Constructor for GoldDisplay with icon
-     * @param x X position
-     * @param y Y position
+     * Constructs a gold display UI component with a coin icon.
+     *
+     * @param x X position of the display
+     * @param y Y position of the display
      * @param coinIconPath Path to the coin icon texture
      */
     public gold(float x, float y, String coinIconPath) {
@@ -71,7 +112,8 @@ public class gold implements Disposable {
     }
     
     /**
-     * Update gold value
+     * Updates the gold value displayed.
+     *
      * @param gold Current gold amount
      */
     public void update(int gold) {
@@ -79,7 +121,8 @@ public class gold implements Disposable {
     }
     
     /**
-     * Render the gold display
+     * Renders the gold display (icon and value) using the provided {@link SpriteBatch}.
+     *
      * @param batch SpriteBatch for rendering
      */
     public void render(SpriteBatch batch) {
@@ -103,7 +146,8 @@ public class gold implements Disposable {
     }
     
     /**
-     * Render the gold display with background
+     * Renders the gold display with a background using the provided {@link ShapeRenderer} and {@link SpriteBatch}.
+     *
      * @param shapeRenderer ShapeRenderer for background
      * @param batch SpriteBatch for text and icon
      */
@@ -130,9 +174,10 @@ public class gold implements Disposable {
     }
     
     /**
-     * Set position of the gold display
-     * @param x X position
-     * @param y Y position
+     * Sets the position of the gold display.
+     *
+     * @param x New X position
+     * @param y New Y position
      */
     public void setPosition(float x, float y) {
         this.x = x;
@@ -140,8 +185,9 @@ public class gold implements Disposable {
     }
     
     /**
-     * Add gold to current amount
-     * @param amount Amount to add
+     * Adds gold to the current amount displayed.
+     *
+     * @param amount Amount of gold to add
      */
     public void addGold(int amount) {
         // this.gold += amount;
@@ -151,9 +197,10 @@ public class gold implements Disposable {
     }
     
     /**
-     * Remove gold from current amount
-     * @param amount Amount to remove
-     * @return true if successful, false if not enough gold
+     * Removes gold from the current amount displayed.
+     *
+     * @param amount Amount of gold to remove
+     * @return {@code true} if gold was successfully removed, {@code false} if not enough gold
      */
     public boolean removeGold(int amount) {
         if (this.gold >= amount) {
@@ -164,23 +211,26 @@ public class gold implements Disposable {
     }
     
     /**
-     * Set gold amount directly
-     * @param gold Gold amount
+     * Sets the gold amount directly in the display.
+     *
+     * @param gold Gold amount to set
      */
     public void setGold(int gold) {
         this.gold = Math.max(0, gold);
     }
     
     /**
-     * Get current gold amount
-     * @return Current gold
+     * Gets the current gold amount displayed.
+     *
+     * @return Current gold value
      */
     public int getGold() {
         return gold;
     }
     
     /**
-     * Set font color
+     * Sets the color of the font used for the gold display.
+     *
      * @param color New color for the font
      */
     public void setColor(Color color) {
@@ -188,14 +238,19 @@ public class gold implements Disposable {
     }
     
     /**
-     * Set font scale
-     * @param scale Font scale
+     * Sets the scale of the font used for the gold display.
+     *
+     * @param scale Font scale (must be positive)
      */
     public void setFontScale(float scale) {
         if (scale > 0f)
             font.getData().setScale(scale);
     }
     
+    /**
+     * Disposes all resources used by the gold display, including font and icon.
+     * Should be called when the display is no longer needed to free memory.
+     */
     @Override
     public void dispose() {
         font.dispose();

@@ -13,39 +13,83 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+
 /**
- * Overlay affiché quand la base du joueur est détruite
+ * The {@code BaseDestroyedOverlay} class displays an overlay when the player's base is destroyed.
+ * It renders a semi-transparent background, a "GAME OVER" title, and interactive buttons (REPLAY, QUIT).
+ * Handles input, hover effects, and resource management for the overlay.
+ * Implements {@link Disposable} for proper cleanup.
  */
 public class BaseDestroyedOverlay implements Disposable {
     
+    /**
+     * Viewport for scaling and positioning overlay elements.
+     */
     private Viewport viewport;
+
+    /**
+     * SpriteBatch for drawing textures and fonts.
+     */
     private SpriteBatch batch;
+
+    /**
+     * ShapeRenderer for drawing shapes (background, overlays).
+     */
     private ShapeRenderer shapeRenderer;
-    
-    // Dimensions de l'overlay
+
+    /**
+     * Logical width of the overlay.
+     */
     private static final float OVERLAY_WIDTH = 800f;
+
+    /**
+     * Logical height of the overlay.
+     */
     private static final float OVERLAY_HEIGHT = 600f;
-    
-    // Fonts
+
+    /**
+     * Font for rendering the title text.
+     */
     private BitmapFont titleFont;
+
+    /**
+     * Font for rendering button text.
+     */
     private BitmapFont buttonFont;
-    
-    // Layout pour le texte
+
+    /**
+     * Layout for measuring and positioning the title text.
+     */
     private GlyphLayout titleLayout;
-    
-    // Button rectangles for click detection
+
+    /**
+     * Rectangle representing the REPLAY button for click detection.
+     */
     private Rectangle replayButton;
+
+    /**
+     * Rectangle representing the QUIT button for click detection.
+     */
     private Rectangle quitButton;
-    
-    // Hover effect
-    private int selectedIndex = -1; // -1 = rien, 0 = REPLAY, 1 = QUIT
-    
-    // Button dimensions
+
+    /**
+     * Index of the currently hovered button (-1 = none, 0 = REPLAY, 1 = QUIT).
+     */
+    private int selectedIndex = -1;
+
+    /**
+     * Width of the buttons.
+     */
     private static final float BUTTON_WIDTH = 200f;
+
+    /**
+     * Height of the buttons.
+     */
     private static final float BUTTON_HEIGHT = 60f;
     
     /**
-     * Constructeur
+     * Constructs the overlay and initializes all resources, fonts, and button positions.
+     * Sets up viewport, rendering tools, and interactive elements.
      */
     public BaseDestroyedOverlay() {
         viewport = new FitViewport(OVERLAY_WIDTH, OVERLAY_HEIGHT);
@@ -109,7 +153,8 @@ public class BaseDestroyedOverlay implements Disposable {
     }
     
     /**
-     * Render l'overlay de base détruite
+     * Renders the destroyed base overlay, including background, title, and buttons.
+     * Handles hover effects and button highlighting.
      */
     public void render() {
         // Update hover effect
@@ -181,7 +226,11 @@ public class BaseDestroyedOverlay implements Disposable {
     }
     
     /**
-     * Draw text with inverted effect (yellow background, black text)
+     * Draws button text with inverted effect (yellow background, black text) for hover state.
+     *
+     * @param text The text to render
+     * @param x X position
+     * @param y Y position
      */
     private void drawTextInverted(String text, float x, float y) {
         GlyphLayout layout = new GlyphLayout(buttonFont, text);
@@ -200,7 +249,8 @@ public class BaseDestroyedOverlay implements Disposable {
     }
     
     /**
-     * Update hover effect for buttons
+     * Updates the hover effect for buttons based on mouse position.
+     * Sets {@code selectedIndex} to the hovered button index.
      */
     private void updateHover() {
         Vector2 mouse = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
@@ -241,10 +291,11 @@ public class BaseDestroyedOverlay implements Disposable {
     }
     
     /**
-     * Handle click on overlay
-     * @param screenX Screen X coordinate
-     * @param screenY Screen Y coordinate
-     * @return "replay" if replay button clicked, "quit" if quit button clicked, null otherwise
+     * Handles mouse click events on the overlay and determines which button was clicked.
+     *
+     * @param screenX Screen X coordinate of the click
+     * @param screenY Screen Y coordinate of the click
+     * @return "replay" if REPLAY button was clicked, "quit" if QUIT button was clicked, {@code null} otherwise
      */
     public String handleClick(int screenX, int screenY) {
         Vector2 mouse = viewport.unproject(new Vector2(screenX, screenY));
@@ -285,12 +336,19 @@ public class BaseDestroyedOverlay implements Disposable {
     }
     
     /**
-     * Resize le viewport
+     * Resizes the overlay viewport when the window size changes.
+     *
+     * @param width New width of the window
+     * @param height New height of the window
      */
     public void resize(int width, int height) {
         viewport.update(width, height, true);
     }
     
+    /**
+     * Disposes all resources used by the overlay, including rendering components and fonts.
+     * Should be called when the overlay is no longer needed to free memory.
+     */
     @Override
     public void dispose() {
         batch.dispose();
