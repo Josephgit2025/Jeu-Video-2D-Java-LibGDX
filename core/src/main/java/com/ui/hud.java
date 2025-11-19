@@ -13,6 +13,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * HUD (Heads-Up Display) class for displaying game UI elements
  * such as health bar and gold counter.
  */
+/**
+ * La classe hud gère l'affichage des éléments de l'interface utilisateur (HUD).
+ * Elle affiche les informations essentielles comme la vie, l'or et les notifications.
+ */
 public class hud implements Disposable {
     
     // Viewport and camera for UI rendering
@@ -40,7 +44,7 @@ public class hud implements Disposable {
     private static final float GOLD_X = 40f;
     private static final float GOLD_Y = 535f;
     
-    // Base health bar positions and dimensions (barres verticales pour les bases)
+    // Base health bar positions and dimensions (barres verticales)
     private static final float BASE_HEALTH_BAR_WIDTH = 8f;   // Largeur fine pour barre verticale
     private static final float BASE_HEALTH_BAR_HEIGHT = 150f; // Hauteur pour barre verticale
     
