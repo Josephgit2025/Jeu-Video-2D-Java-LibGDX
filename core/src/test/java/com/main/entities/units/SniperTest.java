@@ -95,11 +95,11 @@ public class SniperTest {
 
     @Test
     public void testConstructorInitializesStats() {
-        assertEquals("Sniper health should be 150", 150, sniper.getHealth());
-        assertEquals("Sniper attack damage should be 40", 40, sniper.getAttackDamage());
+        assertEquals("Sniper health should be 100", 100, sniper.getHealth());
+        assertEquals("Sniper attack damage should be 45", 45, sniper.getAttackDamage());
         assertEquals("Sniper speed should be 30", 30.0f, sniper.getSpeed(), 0.01f);
-        assertEquals("Sniper attack speed should be 2.5", 2.5f, sniper.getAttackSpeed(), 0.01f);
-        assertEquals("Sniper range should be 250", 250, sniper.getRange());
+        assertEquals("Sniper attack speed should be 3", 3f, sniper.getAttackSpeed(), 0.01f);
+        assertEquals("Sniper range should be 150", 150, sniper.getRange());
     }
 
     @Test
@@ -117,12 +117,12 @@ public class SniperTest {
 
     @Test
     public void testGetHealth() {
-        assertEquals("Health should be 150", 150, sniper.getHealth());
+        assertEquals("Health should be 100", 100, sniper.getHealth());
     }
 
     @Test
     public void testGetAttackDamage() {
-        assertEquals("Attack damage should be 40", 40, sniper.getAttackDamage());
+        assertEquals("Attack damage should be 45", 45, sniper.getAttackDamage());
     }
 
     @Test
@@ -132,12 +132,12 @@ public class SniperTest {
 
     @Test
     public void testGetAttackSpeed() {
-        assertEquals("Attack speed should be 2.5", 2.5f, sniper.getAttackSpeed(), 0.01f);
+        assertEquals("Attack speed should be 3", 3f, sniper.getAttackSpeed(), 0.01f);
     }
 
     @Test
     public void testGetRange() {
-        assertEquals("Range should be 250 (long range)", 250, sniper.getRange());
+        assertEquals("Range should be 150 (long range)", 150, sniper.getRange());
     }
 
     // ===== Movement Tests =====
@@ -218,19 +218,19 @@ public class SniperTest {
     @Test
     public void testTakeDamage() {
         sniper.takeDamage(50);
-        assertEquals("Health should decrease by 50", 100, sniper.getHealth());
+        assertEquals("Health should decrease by 50", 50, sniper.getHealth());
     }
 
     @Test
     public void testTakeDamageMultipleTimes() {
         sniper.takeDamage(30);
         sniper.takeDamage(40);
-        assertEquals("Health should decrease by 70 total", 80, sniper.getHealth());
+        assertEquals("Health should decrease by 70 total", 30, sniper.getHealth());
     }
 
     @Test
     public void testTakeDamageExact() {
-        sniper.takeDamage(150);
+        sniper.takeDamage(100);
         assertEquals("Health should be 0", 0, sniper.getHealth());
         assertTrue("Sniper should be dead", sniper.isDead());
     }
@@ -255,16 +255,16 @@ public class SniperTest {
 
     @Test
     public void testIsNotDeadAfterPartialDamage() {
-        sniper.takeDamage(100);
-        assertFalse("Sniper should not be dead after taking 100 damage", sniper.isDead());
+        sniper.takeDamage(90);
+        assertFalse("Sniper should not be dead after taking 90 damage", sniper.isDead());
     }
 
     @Test
     public void testTakeDamageTwice() {
-        sniper.takeDamage(75);
+        sniper.takeDamage(50);
         assertFalse("Should survive first attack", sniper.isDead());
         
-        sniper.takeDamage(75);
+        sniper.takeDamage(50);
         assertTrue("Should die after second attack", sniper.isDead());
     }
 
@@ -274,7 +274,7 @@ public class SniperTest {
     public void testAttackWithLongRangeTarget() {
         // Sniper a une portée de 250, donc peut attaquer à distance
         Unit distantEnemy = mock(Unit.class);
-        when(distantEnemy.getPosX()).thenReturn(300.0f); // 200 pixels de distance
+        when(distantEnemy.getPosX()).thenReturn(250.0f); // 200 pixels de distance
         when(distantEnemy.getPosY()).thenReturn(200.0f);
         when(distantEnemy.isDead()).thenReturn(false);
         when(distantEnemy.getHealth()).thenReturn(100);
@@ -284,7 +284,7 @@ public class SniperTest {
         
         sniper.attack();
         
-        verify(distantEnemy, atLeastOnce()).takeDamage(40);
+        verify(distantEnemy, atLeastOnce()).takeDamage(45);
         assertEquals("Should be in ATTACKING state", Unit.UnitState.ATTACKING, sniper.getCurrentState());
     }
 
@@ -316,8 +316,8 @@ public class SniperTest {
     @Test
     public void testSlowerAttackSpeed() {
         // Vérifie que le sniper a un cooldown plus long (2.5s vs 1.0s du melee)
-        assertEquals("Sniper should have slower attack speed", 2.5f, sniper.getAttackSpeed(), 0.01f);
-        assertTrue("Sniper attack speed should be slower than melee", sniper.getAttackSpeed() > 1.0f);
+        assertEquals("Sniper should have slower attack speed", 3f, sniper.getAttackSpeed(), 0.01f);
+        assertTrue("Sniper attack speed should be slower than melee", sniper.getAttackSpeed() > 1.2f);
     }
 
     // ===== Target Selection Tests =====
@@ -473,7 +473,7 @@ public class SniperTest {
     @Test
     public void testStateAfterAttack() {
         Unit distantEnemy = mock(Unit.class);
-        when(distantEnemy.getPosX()).thenReturn(300.0f);
+        when(distantEnemy.getPosX()).thenReturn(120.0f);
         when(distantEnemy.getPosY()).thenReturn(200.0f);
         when(distantEnemy.isDead()).thenReturn(false);
         
@@ -490,7 +490,7 @@ public class SniperTest {
     public void testLongRangeAttack() {
         // Vérifie que le sniper peut attaquer à 250 de distance
         Unit veryDistantEnemy = mock(Unit.class);
-        when(veryDistantEnemy.getPosX()).thenReturn(340.0f); // 240 pixels de distance
+        when(veryDistantEnemy.getPosX()).thenReturn(250.0f); // 240 pixels de distance
         when(veryDistantEnemy.getPosY()).thenReturn(200.0f);
         when(veryDistantEnemy.isDead()).thenReturn(false);
         
@@ -498,7 +498,7 @@ public class SniperTest {
         sniper.setCooldown(0);
         sniper.attack();
         
-        verify(veryDistantEnemy, atLeastOnce()).takeDamage(40);
+        verify(veryDistantEnemy, atLeastOnce()).takeDamage(45);
     }
 
     @Test
@@ -536,13 +536,13 @@ public class SniperTest {
 
     @Test
     public void testCombatSequence() {
-        sniper.takeDamage(50);
+        sniper.takeDamage(20);
         assertFalse("Should survive first attack", sniper.isDead());
         
-        sniper.takeDamage(50);
+        sniper.takeDamage(20);
         assertFalse("Should survive second attack", sniper.isDead());
         
-        sniper.takeDamage(50);
+        sniper.takeDamage(60);
         assertTrue("Should die after third attack", sniper.isDead());
     }
 
@@ -566,11 +566,11 @@ public class SniperTest {
     @Test
     public void testSniperStatsAreDifferent() {
         // Vérifier que Sniper a des stats spécifiques
-        assertEquals("Sniper specific health", 150, sniper.getHealth());
-        assertEquals("Sniper specific damage", 40, sniper.getAttackDamage());
+        assertEquals("Sniper specific health", 100, sniper.getHealth());
+        assertEquals("Sniper specific damage", 45, sniper.getAttackDamage());
         assertEquals("Sniper specific speed", 30.0f, sniper.getSpeed(), 0.01f);
-        assertEquals("Sniper specific range", 250, sniper.getRange()); // Longue portée
-        assertEquals("Sniper slower attack", 2.5f, sniper.getAttackSpeed(), 0.01f);
+        assertEquals("Sniper specific range", 150, sniper.getRange()); // Longue portée
+        assertEquals("Sniper slower attack", 3f, sniper.getAttackSpeed(), 0.01f);
     }
 
     @Test

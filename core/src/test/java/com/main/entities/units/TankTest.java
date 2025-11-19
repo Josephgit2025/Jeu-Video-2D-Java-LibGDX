@@ -94,10 +94,10 @@ public class TankTest {
 
     @Test
     public void testConstructorInitializesStats() {
-        assertEquals("Tank health should be 500", 500, tank.getHealth());
-        assertEquals("Tank attack damage should be 30", 30, tank.getAttackDamage());
-        assertEquals("Tank speed should be 15", 15.0f, tank.getSpeed(), 0.01f);
-        assertEquals("Tank attack speed should be 3.0", 3.0f, tank.getAttackSpeed(), 0.01f);
+        assertEquals("Tank health should be 400", 400, tank.getHealth());
+        assertEquals("Tank attack damage should be 9", 9, tank.getAttackDamage());
+        assertEquals("Tank speed should be 40", 40.0f, tank.getSpeed(), 0.01f);
+        assertEquals("Tank attack speed should be 0.9", 0.9f, tank.getAttackSpeed(), 0.01f);
         assertEquals("Tank range should be 100", 100, tank.getRange());
     }
 
@@ -116,22 +116,22 @@ public class TankTest {
 
     @Test
     public void testGetHealth() {
-        assertEquals("Health should be 500", 500, tank.getHealth());
+        assertEquals("Health should be 400", 400, tank.getHealth());
     }
 
     @Test
     public void testGetAttackDamage() {
-        assertEquals("Attack damage should be 30", 30, tank.getAttackDamage());
+        assertEquals("Attack damage should be 9", 9, tank.getAttackDamage());
     }
 
     @Test
     public void testGetSpeed() {
-        assertEquals("Speed should be 15", 15.0f, tank.getSpeed(), 0.01f);
+        assertEquals("Speed should be 40", 40.0f, tank.getSpeed(), 0.01f);
     }
 
     @Test
     public void testGetAttackSpeed() {
-        assertEquals("Attack speed should be 3.0", 3.0f, tank.getAttackSpeed(), 0.01f);
+        assertEquals("Attack speed should be 0.9", 0.9f, tank.getAttackSpeed(), 0.01f);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class TankTest {
         float initialX = tank.getPosX();
         tank.move(1.0f);
         // Movement = speed * delta = 15 * 1.0 = 15
-        float expectedX = initialX + 15;
+        float expectedX = initialX + 40;
         assertEquals("Position should increase by speed * delta", expectedX, tank.getPosX(), 0.1f);
     }
 
@@ -163,7 +163,7 @@ public class TankTest {
         tank.move(1.0f);
         tank.move(1.0f);
         tank.move(1.0f);
-        float expectedX = initialX + (15 * 3);
+        float expectedX = initialX + (40 * 3);
         assertEquals("Position after 3 moves", expectedX, tank.getPosX(), 0.1f);
     }
 
@@ -171,7 +171,7 @@ public class TankTest {
     public void testMoveWithRealisticDelta() {
         float initialX = tank.getPosX();
         tank.move(0.016f); // 60 FPS
-        float expectedX = initialX + (15 * 0.016f);
+        float expectedX = initialX + (40 * 0.016f);
         assertEquals("Position with realistic delta", expectedX, tank.getPosX(), 0.01f);
     }
 
@@ -186,7 +186,7 @@ public class TankTest {
     public void testMoveWithSmallDelta() {
         float initialX = tank.getPosX();
         tank.move(0.001f);
-        float expectedX = initialX + (15 * 0.001f);
+        float expectedX = initialX + (40 * 0.001f);
         assertEquals("Position with small delta", expectedX, tank.getPosX(), 0.01f);
     }
 
@@ -194,7 +194,7 @@ public class TankTest {
     public void testMoveWithLargeDelta() {
         float initialX = tank.getPosX();
         tank.move(5.0f);
-        float expectedX = initialX + (15 * 5.0f);
+        float expectedX = initialX + (40 * 5.0f);
         assertEquals("Position with large delta", expectedX, tank.getPosX(), 0.1f);
     }
 
@@ -208,15 +208,15 @@ public class TankTest {
             totalDelta += 0.016f;
         }
         
-        float expectedX = initialX + (15 * totalDelta);
+        float expectedX = initialX + (40 * totalDelta);
         assertEquals("Position after continuous movement", expectedX, tank.getPosX(), 1.0f);
     }
 
     @Test
     public void testSlowMovement() {
         // Vérifie que le tank est lent comparé aux autres unités
-        assertTrue("Tank should be slower than Melee", tank.getSpeed() < 100);
-        assertTrue("Tank should be slower than Sniper", tank.getSpeed() < 30);
+        assertTrue("Tank should be slower than Melee", tank.getSpeed() < 60);
+        assertTrue("Tank should be higher than Sniper", tank.getSpeed() > 30);
     }
 
     // ===== Combat Tests =====
@@ -224,19 +224,19 @@ public class TankTest {
     @Test
     public void testTakeDamage() {
         tank.takeDamage(100);
-        assertEquals("Health should decrease by 100", 400, tank.getHealth());
+        assertEquals("Health should decrease by 100", 300, tank.getHealth());
     }
 
     @Test
     public void testTakeDamageMultipleTimes() {
         tank.takeDamage(150);
         tank.takeDamage(150);
-        assertEquals("Health should decrease by 300 total", 200, tank.getHealth());
+        assertEquals("Health should decrease by 300 total", 100, tank.getHealth());
     }
 
     @Test
     public void testTakeDamageExact() {
-        tank.takeDamage(500);
+        tank.takeDamage(400);
         assertEquals("Health should be 0", 0, tank.getHealth());
         assertTrue("Tank should be dead", tank.isDead());
     }
@@ -289,22 +289,22 @@ public class TankTest {
         
         tank.attack();
         
-        verify(closeEnemy, atLeastOnce()).takeDamage(30);
+        verify(closeEnemy, atLeastOnce()).takeDamage(9);
         assertEquals("Should be in ATTACKING state", Unit.UnitState.ATTACKING, tank.getCurrentState());
     }
 
     @Test
     public void testSlowAttackSpeed() {
-        assertEquals("Tank should have slow attack speed (3.0s)", 3.0f, tank.getAttackSpeed(), 0.01f);
-        assertTrue("Tank attack speed should be slower than melee", tank.getAttackSpeed() > 1.0f);
-        assertTrue("Tank attack speed should be slower than sniper", tank.getAttackSpeed() > 2.5f);
+        assertEquals("Tank should have slow attack speed (0.9s)", 0.9f, tank.getAttackSpeed(), 0.01f);
+        assertTrue("Tank attack speed should be higher than melee", tank.getAttackSpeed() < 1.2f);
+        assertTrue("Tank attack speed should be higher than sniper", tank.getAttackSpeed() < 3f);
     }
 
     @Test
     public void testHighDamage() {
-        assertEquals("Tank should have high damage (30)", 30, tank.getAttackDamage());
-        assertTrue("Tank damage should be higher than melee", tank.getAttackDamage() > 20);
-        assertTrue("Tank damage should be lower than sniper", tank.getAttackDamage() < 40);
+        assertEquals("Tank should have high damage (30)", 9, tank.getAttackDamage());
+        assertTrue("Tank damage should be lower than melee", tank.getAttackDamage() < 15);
+        assertTrue("Tank damage should be lower than sniper", tank.getAttackDamage() < 45);
     }
 
     // ===== Target Selection Tests =====
@@ -494,16 +494,16 @@ public class TankTest {
 
     @Test
     public void testCombatSequence() {
-        tank.takeDamage(150);
+        tank.takeDamage(100);
         assertFalse("Should survive first attack", tank.isDead());
         
-        tank.takeDamage(150);
+        tank.takeDamage(100);
         assertFalse("Should survive second attack", tank.isDead());
         
-        tank.takeDamage(150);
+        tank.takeDamage(100);
         assertFalse("Should survive third attack", tank.isDead());
         
-        tank.takeDamage(50);
+        tank.takeDamage(100);
         assertTrue("Should die after fourth attack", tank.isDead());
     }
 
@@ -538,7 +538,7 @@ public class TankTest {
         }
         
         // Au moins une attaque devrait avoir été effectuée
-        verify(closeEnemy, atLeastOnce()).takeDamage(30);
+        verify(closeEnemy, atLeastOnce()).takeDamage(9);
     }
 
     @Test
@@ -550,11 +550,11 @@ public class TankTest {
     @Test
     public void testTankStatsAreDifferent() {
         // Vérifier que Tank a des stats spécifiques
-        assertEquals("Tank specific health", 500, tank.getHealth());
-        assertEquals("Tank specific damage", 30, tank.getAttackDamage());
-        assertEquals("Tank specific speed", 15.0f, tank.getSpeed(), 0.01f);
+        assertEquals("Tank specific health", 400, tank.getHealth());
+        assertEquals("Tank specific damage", 9, tank.getAttackDamage());
+        assertEquals("Tank specific speed", 40.0f, tank.getSpeed(), 0.01f);
         assertEquals("Tank specific range", 100, tank.getRange());
-        assertEquals("Tank specific attack speed", 3.0f, tank.getAttackSpeed(), 0.01f);
+        assertEquals("Tank specific attack speed", 0.9f, tank.getAttackSpeed(), 0.01f);
     }
 
     @Test
@@ -567,10 +567,10 @@ public class TankTest {
     @Test
     public void testTankCharacteristics() {
         // Tank : haute vie, dégâts moyens, très lent, attaque lente
-        assertTrue("Tank health should be highest", tank.getHealth() >= 500);
-        assertTrue("Tank should be very slow", tank.getSpeed() <= 15);
-        assertTrue("Tank should have slowest attack rate", tank.getAttackSpeed() >= 3.0f);
-        assertTrue("Tank damage should be decent", tank.getAttackDamage() >= 30);
+        assertTrue("Tank health should be highest", tank.getHealth() >= 400);
+        assertTrue("Tank should be very slow", tank.getSpeed() <= 40);
+        assertTrue("Tank should have slowest attack rate", tank.getAttackSpeed() >= 0.9f);
+        assertTrue("Tank damage should be decent", tank.getAttackDamage() >= 9);
         assertTrue("Tank range should be medium", tank.getRange() == 100);
     }
 

@@ -95,10 +95,10 @@ public class MeleeTest {
 
     @Test
     public void testConstructorInitializesStats() {
-        assertEquals("Melee health should be 200", 200, melee.getHealth());
-        assertEquals("Melee attack damage should be 20", 20, melee.getAttackDamage());
-        assertEquals("Melee speed should be 100", 100.0f, melee.getSpeed(), 0.01f);
-        assertEquals("Melee attack speed should be 1.0", 1.0f, melee.getAttackSpeed(), 0.01f);
+        assertEquals("Melee health should be 140", 140, melee.getHealth());
+        assertEquals("Melee attack damage should be 15", 15, melee.getAttackDamage());
+        assertEquals("Melee speed should be 60", 60.0f, melee.getSpeed(), 0.01f);
+        assertEquals("Melee attack speed should be 1.2", 1.2f, melee.getAttackSpeed(), 0.01f);
         assertEquals("Melee range should be 50", 50, melee.getRange());
     }
 
@@ -117,22 +117,22 @@ public class MeleeTest {
 
     @Test
     public void testGetHealth() {
-        assertEquals("Health should be 200", 200, melee.getHealth());
+        assertEquals("Health should be 140", 140, melee.getHealth());
     }
 
     @Test
     public void testGetAttackDamage() {
-        assertEquals("Attack damage should be 20", 20, melee.getAttackDamage());
+        assertEquals("Attack damage should be 15", 15, melee.getAttackDamage());
     }
 
     @Test
     public void testGetSpeed() {
-        assertEquals("Speed should be 100", 100.0f, melee.getSpeed(), 0.01f);
+        assertEquals("Speed should be 60", 60.0f, melee.getSpeed(), 0.01f);
     }
 
     @Test
     public void testGetAttackSpeed() {
-        assertEquals("Attack speed should be 1.0", 1.0f, melee.getAttackSpeed(), 0.01f);
+        assertEquals("Attack speed should be 1.2", 1.2f, melee.getAttackSpeed(), 0.01f);
     }
 
     @Test
@@ -154,7 +154,7 @@ public class MeleeTest {
         float initialX = melee.getPosX();
         melee.move(1.0f);
         // Movement = speed * delta = 100 * 1.0 = 100
-        float expectedX = initialX + 100;
+        float expectedX = initialX + 60;
         assertEquals("Position should increase by speed * delta", expectedX, melee.getPosX(), 0.1f);
     }
 
@@ -164,7 +164,7 @@ public class MeleeTest {
         melee.move(1.0f);
         melee.move(1.0f);
         melee.move(1.0f);
-        float expectedX = initialX + (100 * 3);
+        float expectedX = initialX + (60 * 3);
         assertEquals("Position after 3 moves", expectedX, melee.getPosX(), 0.1f);
     }
 
@@ -172,7 +172,7 @@ public class MeleeTest {
     public void testMoveWithRealisticDelta() {
         float initialX = melee.getPosX();
         melee.move(0.016f); // 60 FPS
-        float expectedX = initialX + (100 * 0.016f);
+        float expectedX = initialX + (60 * 0.016f);
         assertEquals("Position with realistic delta", expectedX, melee.getPosX(), 0.01f);
     }
 
@@ -187,7 +187,7 @@ public class MeleeTest {
     public void testMoveWithSmallDelta() {
         float initialX = melee.getPosX();
         melee.move(0.001f);
-        float expectedX = initialX + (100 * 0.001f);
+        float expectedX = initialX + (60 * 0.001f);
         assertEquals("Position with small delta", expectedX, melee.getPosX(), 0.01f);
     }
 
@@ -195,7 +195,7 @@ public class MeleeTest {
     public void testMoveWithLargeDelta() {
         float initialX = melee.getPosX();
         melee.move(5.0f);
-        float expectedX = initialX + (100 * 5.0f);
+        float expectedX = initialX + (60 * 5.0f);
         assertEquals("Position with large delta", expectedX, melee.getPosX(), 0.1f);
     }
 
@@ -209,7 +209,7 @@ public class MeleeTest {
             totalDelta += 0.016f;
         }
         
-        float expectedX = initialX + (100 * totalDelta);
+        float expectedX = initialX + (60 * totalDelta);
         assertEquals("Position after continuous movement", expectedX, melee.getPosX(), 1.0f);
     }
 
@@ -218,19 +218,19 @@ public class MeleeTest {
     @Test
     public void testTakeDamage() {
         melee.takeDamage(50);
-        assertEquals("Health should decrease by 50", 150, melee.getHealth());
+        assertEquals("Health should decrease by 50", 90, melee.getHealth());
     }
 
     @Test
     public void testTakeDamageMultipleTimes() {
         melee.takeDamage(30);
         melee.takeDamage(40);
-        assertEquals("Health should decrease by 70 total", 130, melee.getHealth());
+        assertEquals("Health should decrease by 70 total", 70, melee.getHealth());
     }
 
     @Test
     public void testTakeDamageExact() {
-        melee.takeDamage(200);
+        melee.takeDamage(140);
         assertEquals("Health should be 0", 0, melee.getHealth());
         assertTrue("Melee should be dead", melee.isDead());
     }
@@ -274,7 +274,7 @@ public class MeleeTest {
         
         melee.attack();
         
-        verify(closeEnemy, atLeastOnce()).takeDamage(20);
+        verify(closeEnemy, atLeastOnce()).takeDamage(15);
         assertEquals("Should be in ATTACKING state", Unit.UnitState.ATTACKING, melee.getCurrentState());
     }
 
@@ -496,7 +496,7 @@ public class MeleeTest {
         melee.takeDamage(50);
         assertFalse("Should survive first attack", melee.isDead());
         
-        melee.takeDamage(100);
+        melee.takeDamage(50);
         assertFalse("Should survive second attack", melee.isDead());
         
         melee.takeDamage(50);
@@ -533,7 +533,7 @@ public class MeleeTest {
         }
         
         // Au moins une attaque devrait avoir été effectuée
-        verify(closeEnemy, atLeastOnce()).takeDamage(20);
+        verify(closeEnemy, atLeastOnce()).takeDamage(15);
     }
 
     @Test
@@ -545,9 +545,9 @@ public class MeleeTest {
     @Test
     public void testMeleeStatsAreDifferent() {
         // Vérifier que Melee a des stats spécifiques
-        assertEquals("Melee specific health", 200, melee.getHealth());
-        assertEquals("Melee specific damage", 20, melee.getAttackDamage());
-        assertEquals("Melee specific speed", 100.0f, melee.getSpeed(), 0.01f);
+        assertEquals("Melee specific health", 140, melee.getHealth());
+        assertEquals("Melee specific damage", 15, melee.getAttackDamage());
+        assertEquals("Melee specific speed", 60.0f, melee.getSpeed(), 0.01f);
         assertEquals("Melee specific range", 50, melee.getRange()); // Courte portée
     }
 
