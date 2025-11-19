@@ -1,3 +1,10 @@
+
+/**
+ * The TitleScreen class represents the main menu screen of the game.
+ * It displays the background, logo, and menu buttons (PLAY, QUIT),
+ * handles user input for menu navigation, and manages rendering and resource disposal.
+ * This screen is the entry point for the player before starting gameplay.
+ */
 package com.main.screens;
 
 import com.badlogic.gdx.Application;
@@ -17,22 +24,75 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.main.Main;
 
+
+/**
+ * Main menu screen for the game, showing background, logo, and menu buttons.
+ * Handles input and rendering for the title/menu interface.
+ */
 public class TitleScreen implements Screen {
 
-    protected Main game;
-    protected SpriteBatch batch;
-    protected OrthographicCamera camera;
-    protected Viewport viewport;
-    protected BitmapFont font;
-    protected Texture background;
-    protected Texture titleLogo;      // logo ajouté
 
+    /**
+     * Reference to the main game instance for screen transitions.
+     */
+    protected Main game;
+
+    /**
+     * SpriteBatch used for rendering all visual elements.
+     */
+    protected SpriteBatch batch;
+
+    /**
+     * Orthographic camera for 2D rendering.
+     */
+    protected OrthographicCamera camera;
+
+    /**
+     * Viewport for scaling and resizing the screen.
+     */
+    protected Viewport viewport;
+
+    /**
+     * BitmapFont for rendering menu text.
+     */
+    protected BitmapFont font;
+
+    /**
+     * Background texture for the title screen.
+     */
+    protected Texture background;
+
+    /**
+     * Main logo texture displayed at the top of the screen.
+     */
+    protected Texture titleLogo;
+
+    /**
+     * Logical width of the game world for layout.
+     */
     private static final float WORLD_WIDTH = 800f;
+
+    /**
+     * Logical height of the game world for layout.
+     */
     private static final float WORLD_HEIGHT = 480f;
 
+    /**
+     * Array of menu item labels (PLAY, QUIT).
+     */
     private String[] menuItems = {"PLAY", "QUIT"};
+
+    /**
+     * Index of the currently selected menu item (-1 if none).
+     */
     protected int selectedIndex = -1;
 
+    /**
+     * Constructs the TitleScreen and initializes all resources (background, logo, font, camera, viewport).
+     * Handles resource loading and fallback for headless mode.
+     *
+     * @param game Reference to the main game instance for screen transitions
+     */
     public TitleScreen(Main game) {
         this.game = game;
         
@@ -83,6 +143,12 @@ public class TitleScreen implements Screen {
         }
     }
 
+    /**
+     * Renders the title screen, including background, logo, and menu buttons.
+     * Handles menu hover and input logic each frame.
+     *
+     * @param delta Time elapsed since last frame (in seconds)
+     */
     @Override
     public void render(float delta) {
         if (batch == null) return; // Skip rendering in headless mode
@@ -152,7 +218,14 @@ public class TitleScreen implements Screen {
         batch.end();
     }
 
-    // Texte avec ombre douce (position manuelle)
+    /**
+     * Draws menu text with a soft shadow for visual clarity.
+     *
+     * @param text The text to render
+     * @param x X position
+     * @param y Y position
+     * @param color Main color of the text
+     */
     private void drawTextWithShadow(String text, float x, float y, Color color) {
         if (font == null) return;
         
@@ -167,7 +240,13 @@ public class TitleScreen implements Screen {
         font.draw(batch, layout, x, y);
     }
 
-    // Texte avec effet d'inversion (hover) - fond jaune et texte noir
+    /**
+     * Draws menu text with inverted colors and a thick yellow shadow for hover effect.
+     *
+     * @param text The text to render
+     * @param x X position
+     * @param y Y position
+     */
     private void drawTextWithShadowInverted(String text, float x, float y) {
         if (font == null) return;
         
@@ -186,6 +265,10 @@ public class TitleScreen implements Screen {
         font.draw(batch, layout, x, y);
     }
 
+    /**
+     * Updates the selectedIndex based on mouse hover over menu buttons.
+     * Calculates button rectangles and checks mouse position for hover detection.
+     */
     private void updateHover() {
         if (font == null) return;
         
@@ -234,6 +317,10 @@ public class TitleScreen implements Screen {
         }
     }
 
+    /**
+     * Handles user input for menu selection (mouse click).
+     * Triggers screen transitions or application exit based on selected menu item.
+     */
     protected void handleInput() {
         if (Gdx.input.justTouched() && selectedIndex != -1) {
             switch (menuItems[selectedIndex]) {
@@ -251,7 +338,12 @@ public class TitleScreen implements Screen {
         }
     }
     
-    // Helper method for testing handleInput with specific selectedIndex
+    /**
+     * Helper method for testing handleInput with a specific menu selection.
+     * Temporarily sets selectedIndex, processes input, then restores previous selection.
+     *
+     * @param selection Index of the menu item to simulate selection
+     */
     protected void handleInputWithSelection(int selection) {
         int oldSelection = selectedIndex;
         selectedIndex = selection;
@@ -259,12 +351,38 @@ public class TitleScreen implements Screen {
         selectedIndex = oldSelection;
     }
 
+    /**
+     * Handles screen resizing and updates the viewport.
+     *
+     * @param width New width of the screen
+     * @param height New height of the screen
+     */
     @Override public void resize(int width, int height) { viewport.update(width, height, true); }
+
+    /**
+     * Called when the screen is shown. No additional logic required.
+     */
     @Override public void show() {}
+
+    /**
+     * Called when the game is paused. No additional logic required.
+     */
     @Override public void pause() {}
+
+    /**
+     * Called when the game is resumed. No additional logic required.
+     */
     @Override public void resume() {}
+
+    /**
+     * Called when the screen is hidden. No additional logic required.
+     */
     @Override public void hide() {}
 
+    /**
+     * Disposes all resources used by the title screen (batch, font, textures).
+     * Should be called when the screen is no longer needed to free memory.
+     */
     @Override
     public void dispose() {
         if (batch != null) batch.dispose();

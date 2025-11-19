@@ -15,7 +15,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
- * Overlay affiché quand le jeu est en pause
+ * Represents the pause overlay UI displayed when the game is paused.
+ * Manages rendering, button interactions, hover effects, and confirmation dialogs for quitting to the menu.
+ * Handles resource management and viewport resizing for consistent UI behavior.
  */
 public class PauseOverlay implements Disposable {
     
@@ -23,43 +25,80 @@ public class PauseOverlay implements Disposable {
     private SpriteBatch batch;
     private ShapeRenderer shapeRenderer;
     
-    // Dimensions de l'overlay
+    /**
+     * Logical width of the overlay in world units.
+     */
     private static final float OVERLAY_WIDTH = 800f;
+    /**
+     * Logical height of the overlay in world units.
+     */
     private static final float OVERLAY_HEIGHT = 600f;
-    
-    // Fonts
+
+    /**
+     * Font for the overlay title.
+     */
     private BitmapFont titleFont;
+    /**
+     * Font for button labels.
+     */
     private BitmapFont buttonFont;
+    /**
+     * Font for confirmation dialog text.
+     */
     private BitmapFont confirmFont;
-    
-    // Layout pour le texte
+
+    /**
+     * Layout for measuring and positioning the title text.
+     */
     private GlyphLayout titleLayout;
-    
-    // Button rectangles for click detection
+
+    /**
+     * Rectangle for RESUME button hitbox.
+     */
     private Rectangle resumeButton;
+    /**
+     * Rectangle for QUIT button hitbox.
+     */
     private Rectangle quitButton;
+    /**
+     * Rectangle for YES button hitbox in confirmation dialog.
+     */
     private Rectangle yesButton;
+    /**
+     * Rectangle for NO button hitbox in confirmation dialog.
+     */
     private Rectangle noButton;
-    
-    // Hover effect
-    private int selectedIndex = -1; // -1 = rien, 0 = RESUME, 1 = QUIT (ou YES/NO en mode confirmation)
-    
-    // Button dimensions
+
+    /**
+     * Index of the currently hovered button (-1 = none, 0 = RESUME/YES, 1 = QUIT/NO).
+     */
+    private int selectedIndex = -1;
+
+    /**
+     * Button width in world units.
+     */
     private static final float BUTTON_WIDTH = 200f;
+    /**
+     * Button height in world units.
+     */
     private static final float BUTTON_HEIGHT = 60f;
-    
-    // Confirmation state
+
+    /**
+     * True if confirmation dialog is shown.
+     */
     private boolean showConfirmation = false;
     
     /**
-     * Constructeur
+     * Constructs the PauseOverlay and initializes all UI components, fonts, and button hitboxes.
+     * Loads custom fonts and sets up rectangles for button click detection and hover effects.
+     * Ensures the overlay is ready for rendering and interaction.
      */
     public PauseOverlay() {
         viewport = new FitViewport(OVERLAY_WIDTH, OVERLAY_HEIGHT);
         batch = new SpriteBatch();
         shapeRenderer = new ShapeRenderer();
         
-        // Initialiser le font pour le titre
+        // Initialize title font
         try {
             FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PressStart2P.ttf"));
             FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -145,31 +184,32 @@ public class PauseOverlay implements Disposable {
     }
     
     /**
-     * Render l'overlay de pause
+     * Renders the pause overlay UI, including background, title, buttons, and confirmation dialog.
+     * Handles hover effects and button highlighting based on mouse position.
+     * Should be called every frame while the game is paused.
      */
     public void render() {
         // Update hover effect
         updateHover();
-        
+
         viewport.apply();
         batch.setProjectionMatrix(viewport.getCamera().combined);
         shapeRenderer.setProjectionMatrix(viewport.getCamera().combined);
-        
-        // Utiliser les dimensions réelles du viewport
+
         float screenWidth = viewport.getWorldWidth();
         float screenHeight = viewport.getWorldHeight();
-        
-        // Fond semi-transparent noir
+
+        // Draw semi-transparent black background
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        
+
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(0, 0, 0, 0.7f);
         shapeRenderer.rect(0, 0, screenWidth, screenHeight);
         shapeRenderer.end();
-        
+
         Gdx.gl.glDisable(GL20.GL_BLEND);
-        
+
         batch.begin();
         
         if (!showConfirmation) {
@@ -234,12 +274,17 @@ public class PauseOverlay implements Disposable {
     }
     
     /**
-     * Draw text with inverted effect (yellow background, black text)
+     * Draws button text with an inverted effect (yellow background, black text) for hover highlighting.
+     * Used to visually indicate the currently hovered or selected button.
+     *
+     * @param text The button label to draw.
+     * @param x The X position for the text.
+     * @param y The Y position for the text.
      */
     private void drawTextInverted(String text, float x, float y) {
         GlyphLayout layout = new GlyphLayout(buttonFont, text);
 
-        // Ombre jaune/dorée (plus épaisse pour effet de fond)
+        // Draw thick yellow shadow for highlight effect
         buttonFont.setColor(Color.YELLOW);
         for (int offsetX = -2; offsetX <= 2; offsetX++) {
             for (int offsetY = -2; offsetY <= 2; offsetY++) {
@@ -247,13 +292,15 @@ public class PauseOverlay implements Disposable {
             }
         }
 
-        // Texte noir par-dessus
+        // Draw black text on top
         buttonFont.setColor(Color.BLACK);
         buttonFont.draw(batch, layout, x, y);
     }
     
     /**
-     * Update hover effect for buttons
+     * Updates the hover effect for buttons based on the current mouse position.
+     * Determines which button is currently hovered and updates selectedIndex accordingly.
+     * Supports both main menu and confirmation dialog states.
      */
     private void updateHover() {
         Vector2 mouse = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
@@ -266,14 +313,14 @@ public class PauseOverlay implements Disposable {
             // RESUME button
             GlyphLayout resumeLayout = new GlyphLayout(buttonFont, "RESUME");
             float resumeX = (OVERLAY_WIDTH - resumeLayout.width) / 2f;
-            
+
             Rectangle resumeHitbox = new Rectangle(
-                resumeX - 10, 
+                resumeX - 10,
                 resumeButton.y + 40 - resumeLayout.height - 5,
                 resumeLayout.width + 20,
                 resumeLayout.height + 10
             );
-            
+
             if (resumeHitbox.contains(mx, my)) {
                 selectedIndex = 0;
             }
@@ -281,14 +328,14 @@ public class PauseOverlay implements Disposable {
             // QUIT button
             GlyphLayout quitLayout = new GlyphLayout(buttonFont, "QUIT");
             float quitX = (OVERLAY_WIDTH - quitLayout.width) / 2f;
-            
+
             Rectangle quitHitbox = new Rectangle(
                 quitX - 10,
                 quitButton.y + 40 - quitLayout.height - 5,
                 quitLayout.width + 20,
                 quitLayout.height + 10
             );
-            
+
             if (quitHitbox.contains(mx, my)) {
                 selectedIndex = 1;
             }
@@ -296,14 +343,14 @@ public class PauseOverlay implements Disposable {
             // YES button
             GlyphLayout yesLayout = new GlyphLayout(buttonFont, "YES");
             float yesX = yesButton.x + (BUTTON_WIDTH - yesLayout.width) / 2f;
-            
+
             Rectangle yesHitbox = new Rectangle(
-                yesX - 10, 
+                yesX - 10,
                 yesButton.y + 40 - yesLayout.height - 5,
                 yesLayout.width + 20,
                 yesLayout.height + 10
             );
-            
+
             if (yesHitbox.contains(mx, my)) {
                 selectedIndex = 0;
             }
@@ -311,14 +358,14 @@ public class PauseOverlay implements Disposable {
             // NO button
             GlyphLayout noLayout = new GlyphLayout(buttonFont, "NO");
             float noX = noButton.x + (BUTTON_WIDTH - noLayout.width) / 2f;
-            
+
             Rectangle noHitbox = new Rectangle(
                 noX - 10,
                 noButton.y + 40 - noLayout.height - 5,
                 noLayout.width + 20,
                 noLayout.height + 10
             );
-            
+
             if (noHitbox.contains(mx, my)) {
                 selectedIndex = 1;
             }
@@ -326,43 +373,45 @@ public class PauseOverlay implements Disposable {
     }
     
     /**
-     * Handle click on overlay
-     * @param screenX Screen X coordinate
-     * @param screenY Screen Y coordinate
-     * @return "resume" if resume clicked, "quit" if quit confirmed, "cancel" if cancelled, "confirm" if asking for confirmation, null otherwise
+     * Handles mouse click events on the overlay and determines which button was clicked.
+     * Manages state transitions for confirmation dialogs and returns the corresponding action string.
+     *
+     * @param screenX The screen X coordinate of the click event.
+     * @param screenY The screen Y coordinate of the click event.
+     * @return "resume" if RESUME is clicked, "confirm" if QUIT is clicked (shows confirmation), "quit" if YES is confirmed, "cancel" if NO is selected, null otherwise.
      */
     public String handleClick(int screenX, int screenY) {
         Vector2 mouse = viewport.unproject(new Vector2(screenX, screenY));
         float worldX = mouse.x;
         float worldY = mouse.y;
-        
+
         if (!showConfirmation) {
             // Check RESUME button
             GlyphLayout resumeLayout = new GlyphLayout(buttonFont, "RESUME");
             float resumeX = (OVERLAY_WIDTH - resumeLayout.width) / 2f;
-            
+
             Rectangle resumeHitbox = new Rectangle(
-                resumeX - 10, 
+                resumeX - 10,
                 resumeButton.y + 40 - resumeLayout.height - 5,
                 resumeLayout.width + 20,
                 resumeLayout.height + 10
             );
-            
+
             if (resumeHitbox.contains(worldX, worldY)) {
                 return "resume";
             }
-            
+
             // Check QUIT button
             GlyphLayout quitLayout = new GlyphLayout(buttonFont, "QUIT");
             float quitX = (OVERLAY_WIDTH - quitLayout.width) / 2f;
-            
+
             Rectangle quitHitbox = new Rectangle(
                 quitX - 10,
                 quitButton.y + 40 - quitLayout.height - 5,
                 quitLayout.width + 20,
                 quitLayout.height + 10
             );
-            
+
             if (quitHitbox.contains(worldX, worldY)) {
                 showConfirmation = true;
                 return "confirm";
@@ -371,59 +420,69 @@ public class PauseOverlay implements Disposable {
             // Check YES button
             GlyphLayout yesLayout = new GlyphLayout(buttonFont, "YES");
             float yesX = yesButton.x + (BUTTON_WIDTH - yesLayout.width) / 2f;
-            
+
             Rectangle yesHitbox = new Rectangle(
-                yesX - 10, 
+                yesX - 10,
                 yesButton.y + 40 - yesLayout.height - 5,
                 yesLayout.width + 20,
                 yesLayout.height + 10
             );
-            
+
             if (yesHitbox.contains(worldX, worldY)) {
                 showConfirmation = false; // Reset for next time
                 return "quit";
             }
-            
+
             // Check NO button
             GlyphLayout noLayout = new GlyphLayout(buttonFont, "NO");
             float noX = noButton.x + (BUTTON_WIDTH - noLayout.width) / 2f;
-            
+
             Rectangle noHitbox = new Rectangle(
                 noX - 10,
                 noButton.y + 40 - noLayout.height - 5,
                 noLayout.width + 20,
                 noLayout.height + 10
             );
-            
+
             if (noHitbox.contains(worldX, worldY)) {
                 showConfirmation = false; // Back to pause menu
                 return "cancel";
             }
         }
-        
+
         return null;
     }
     
     /**
-     * Reset confirmation state
+     * Resets the confirmation dialog state, returning to the main pause menu.
+     * Used to exit the confirmation prompt and restore the main overlay.
      */
     public void resetConfirmation() {
         showConfirmation = false;
     }
     
     /**
-     * Resize le viewport
+     * Resizes the overlay viewport to match the new screen dimensions.
+     * Ensures UI elements remain properly scaled and positioned.
+     *
+     * @param width The new screen width in pixels.
+     * @param height The new screen height in pixels.
      */
     public void resize(int width, int height) {
         viewport.update(width, height, true);
     }
     
+    /**
+     * Releases all resources used by the overlay, including fonts, batch, and shape renderer.
+     * Should be called when the overlay is no longer needed to prevent memory leaks.
+     * Implements Disposable for proper resource management.
+     */
     @Override
     public void dispose() {
-        batch.dispose();
-        shapeRenderer.dispose();
-        titleFont.dispose();
-        buttonFont.dispose();
-        confirmFont.dispose();
+        if (batch != null) batch.dispose();
+        if (shapeRenderer != null) shapeRenderer.dispose();
+        if (titleFont != null) titleFont.dispose();
+        if (buttonFont != null) buttonFont.dispose();
+        if (confirmFont != null) confirmFont.dispose();
     }
 }
