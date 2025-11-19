@@ -124,6 +124,11 @@ public class Hero extends Unit {
     private Animation<TextureRegion> walkDown;
 
     /**
+     * Idle textures for each direction (cardinal and diagonal).
+     */
+    private TextureRegion idle, idleR, idleL, idleU, idleD, idleUR, idleUL, idleDR, idleDL;
+
+    /**
      * Animation for attacking right.
      */
     private Animation<TextureRegion> AttackRight;
@@ -193,7 +198,7 @@ public class Hero extends Unit {
      * @param map      Reference to the game map
      * @param allyBase Reference to the allied base
      */
-    public Hero(float posX, float posY, WarMap map, Base allyBase) {
+        public Hero(float posX, float posY, WarMap map, Base allyBase) {
         super("sold/Idle.png", posX, posY);
         this.allyBase = allyBase;
 
@@ -201,37 +206,52 @@ public class Hero extends Unit {
         walkRight = new Animation<>(FRAME_DURATION, rightFrames);
         walkRight.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] leftFrames = loadFrames("sold/Left%d.png",
-                8);
+        TextureRegion[] leftFrames = loadFrames("sold/Left%d.png", 8);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] upFrames = loadFrames("sold/Up%d.png",
-                8);
+        TextureRegion[] upFrames = loadFrames("sold/Up%d.png", 8);
         walkUp = new Animation<>(FRAME_DURATIONW, upFrames);
         walkUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] downFrames = loadFrames("sold/Down%d.png",
-                8);
+        TextureRegion[] downFrames = loadFrames("sold/Down%d.png", 8);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
+
+        // Load single-frame idle textures (cardinal + diagonal)
+        idle = loadSingle("sold/Idle.png");
+        idleR = loadSingle("sold/IdleR.png");
+        idleL = loadSingle("sold/IdleL.png");
+        idleU = loadSingle("sold/IdleU.png");
+        idleD = loadSingle("sold/IdleD.png");
+        idleUR = loadSingle("sold/IdleUR.png");
+        idleUL = loadSingle("sold/IdleUL.png");
+        idleDR = loadSingle("sold/IdleDR.png");
+        idleDL = loadSingle("sold/IdleDL.png");
+
+        // Fallback: if any idle direction is missing, use main idle
+        if (idleR == null) idleR = idle;
+        if (idleL == null) idleL = idle;
+        if (idleU == null) idleU = idle;
+        if (idleD == null) idleD = idle;
+        if (idleUR == null) idleUR = idle;
+        if (idleUL == null) idleUL = idle;
+        if (idleDR == null) idleDR = idle;
+        if (idleDL == null) idleDL = idle;
 
         TextureRegion[] rightAttack = loadFrames("sold/AttackR%d.png", 4);
         AttackRight = new Animation<>(FRAME_DURATION, rightAttack);
         AttackRight.setPlayMode(Animation.PlayMode.NORMAL);
 
-        TextureRegion[] leftAttack = loadFrames("sold/AttackL%d.png",
-                4);
+        TextureRegion[] leftAttack = loadFrames("sold/AttackL%d.png", 4);
         AttackLeft = new Animation<>(FRAME_DURATION, leftAttack);
         AttackLeft.setPlayMode(Animation.PlayMode.NORMAL);
 
-        TextureRegion[] upAttack = loadFrames("sold/AttackU%d.png",
-                4);
+        TextureRegion[] upAttack = loadFrames("sold/AttackU%d.png", 4);
         AttackUp = new Animation<>(FRAME_DURATIONW, upAttack);
         AttackUp.setPlayMode(Animation.PlayMode.NORMAL);
 
-        TextureRegion[] downAttack = loadFrames("sold/AttackD%d.png",
-                4);
+        TextureRegion[] downAttack = loadFrames("sold/AttackD%d.png", 4);
         AttackDown = new Animation<>(FRAME_DURATIONW, downAttack);
         AttackDown.setPlayMode(Animation.PlayMode.NORMAL);
 
@@ -243,7 +263,7 @@ public class Hero extends Unit {
 
         // initialiser gold
         this.gold = 100; // Start with 100 gold
-    }
+        }
 
     /**
      * Loads an array of frames for an animation from file names matching a pattern.
@@ -260,6 +280,21 @@ public class Hero extends Unit {
             frames[i] = new TextureRegion(tex);
         }
         return frames;
+    }
+
+    /**
+     * Loads a single texture region from a file path.
+     * @param path Path to the texture file
+     * @return Loaded TextureRegion, or null if not found
+     */
+    private TextureRegion loadSingle(String path) {
+        try {
+            Texture tex = new Texture(Gdx.files.internal(path));
+            loadedTextures.add(tex);
+            return new TextureRegion(tex);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -670,17 +705,33 @@ public class Hero extends Unit {
 
         switch (direction) {
             case RIGHT:
-                currentFrame = walkRight.getKeyFrame(stateTime, true);
-                visualWidth = 50;
-                visualHeight = 50;
+                if (moving) {
+                    currentFrame = walkRight.getKeyFrame(stateTime, true);
+                    visualWidth = 50;
+                    visualHeight = 50;
+                } else {
+                    currentFrame = (idleR != null) ? idleR : idle;
+                    visualWidth = 30;
+                    visualHeight = 50;
+                }
                 break;
             case LEFT:
-                currentFrame = walkLeft.getKeyFrame(stateTime, true);
-                visualWidth = 50;
-                visualHeight = 50;
+                if (moving) {
+                    currentFrame = walkLeft.getKeyFrame(stateTime, true);
+                    visualWidth = 50;
+                    visualHeight = 50;
+                } else {
+                    currentFrame = (idleL != null) ? idleL : idle;
+                    visualWidth = 30;
+                    visualHeight = 50;
+                }
                 break;
             case UP:
-                currentFrame = walkUp.getKeyFrame(stateTime, true);
+                if (moving) {
+                    currentFrame = walkUp.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = (idleU != null) ? idleU : idle;
+                }
                 visualWidth = 30;
                 visualHeight = 50;
                 break;
@@ -705,7 +756,11 @@ public class Hero extends Unit {
                 visualHeight = 50;
                 break;
             default:
-                currentFrame = walkDown.getKeyFrame(stateTime, true);
+                if (moving) {
+                    currentFrame = walkDown.getKeyFrame(stateTime, true);
+                } else {
+                    currentFrame = (idleD != null) ? idleD : idle;
+                }
                 visualWidth = 30;
                 visualHeight = 50;
                 break;
