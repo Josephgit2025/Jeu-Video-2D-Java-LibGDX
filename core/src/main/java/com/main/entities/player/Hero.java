@@ -21,6 +21,7 @@ import com.main.weapons.Pistol;
 import com.main.weapons.SMG;
 import com.main.weapons.Shotgun;
 import com.main.weapons.Weapon;
+import com.ui.Inventory;
 
 public class Hero extends Unit {
 
@@ -75,6 +76,7 @@ public class Hero extends Unit {
 
     // Audio
     private Sound shootSound;
+    private Inventory inventory;
 
     public Hero(float posX, float posY, WarMap map, Base allyBase) {
         super("sold/Idle.png", posX, posY);
@@ -486,6 +488,10 @@ public class Hero extends Unit {
         }
     }
 
+    public Weapon getWeapon(){
+        return this.weapon;
+    }
+
     @Override
     public void attack() {
         if (target == null || target.isDead()) {
@@ -755,4 +761,5 @@ public class Hero extends Unit {
     public void setShootSound(Sound shootSound) {
         this.shootSound = shootSound;
     }
+
 }

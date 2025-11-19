@@ -19,6 +19,7 @@ import com.main.map.WarMap;
 import com.ui.BaseDestroyedOverlay;
 import com.ui.BaseZombieDestroyedOverlay;
 import com.ui.GameOverOverlay;
+import com.ui.Inventory;
 import com.ui.PauseOverlay;
 import com.ui.UnitShop;
 import com.ui.hud;
@@ -46,6 +47,7 @@ public class GameScreen implements Screen {
     private PauseOverlay pauseOverlay;
     private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
     private UnitShop unitShop;
+    private Inventory inventory;
 
     // Audio
     private Music backgroundMusic;
@@ -100,37 +102,40 @@ public class GameScreen implements Screen {
         // Initialize Unit Shop
         this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         this.unitShop = new UnitShop(playerBase, hero);
-        
+        this.inventory = new Inventory(hero);
+
         // Load audio
         loadSounds();
     }
-    
+
     /**
      * Charge les sons et la musique du jeu
      */
     private void loadSounds() {
         try {
             System.out.println("🎵 CHARGEMENT DES SONS...");
-            
+
             // Musique de fond
-            backgroundMusic = com.badlogic.gdx.Gdx.audio.newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
+            backgroundMusic = com.badlogic.gdx.Gdx.audio
+                    .newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
             backgroundMusic.setLooping(true);
             backgroundMusic.setVolume(0.4f);
             backgroundMusic.play();
             System.out.println("✅ Musique de fond chargée et démarrée");
-            
+
             // Son de tir
-            shootSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/coup de feu heros.mp3"));
+            shootSound = com.badlogic.gdx.Gdx.audio
+                    .newSound(com.badlogic.gdx.Gdx.files.internal("sounds/coup de feu heros.mp3"));
             System.out.println("✅ Son de tir chargé: " + (shootSound != null ? "OK" : "NULL"));
-            
+
             // Passer le son au héros
             hero.setShootSound(shootSound);
             System.out.println("✅ Son assigné au héros");
-            
+
             // TEST: Jouer le son une fois au démarrage pour vérifier
             System.out.println("🔊 TEST: Lecture du son de tir au démarrage...");
             shootSound.play(1.0f);
-            
+
         } catch (Exception e) {
             System.out.println("Erreur lors du chargement des sons : " + e.getMessage());
             System.out.println("Assurez-vous d'avoir les fichiers :");
@@ -148,7 +153,8 @@ public class GameScreen implements Screen {
         this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
         this.playerBase.setHero(hero);
         this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
-        
+        this.inventory = new Inventory(hero);
+
         // ✅ IMPORTANT: Réassigner le son au nouveau héros
         System.out.println("🔄 RESET: Réassignation du son au nouveau héros...");
         if (shootSound != null) {
@@ -157,9 +163,10 @@ public class GameScreen implements Screen {
         } else {
             System.out.println("❌ ERREUR: shootSound est NULL dans reset()!");
         }
-        
+
         // Resize the new unitShop to match current window size
         this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
+        this.inventory.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
     }
 
@@ -215,6 +222,7 @@ public class GameScreen implements Screen {
 
         // Render Unit Shop buttons
         unitShop.render(shapeRenderer, batch);
+        inventory.render(shapeRenderer, batch);
 
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
@@ -433,10 +441,10 @@ public class GameScreen implements Screen {
 
         // Spawn des ennemis
         enemyBase.spawnUnit(this, delta);
-        
+
         // Spawn des alliés
         playerBase.spawnUnit(this, delta);
-        
+
         // Update : les ennemis attaquent les alliés (et leur base) et vice-versa
         enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase, this.hero);
         playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase, null);
@@ -488,6 +496,9 @@ public class GameScreen implements Screen {
             if (unitShop != null) {
                 unitShop.resize(width, height);
             }
+            if (inventory != null) {
+                inventory.resize(width, height);
+            }
         }
     }
 
@@ -531,9 +542,11 @@ public class GameScreen implements Screen {
             baseZombieDestroyedOverlay.dispose();
         if (pauseOverlay != null)
             pauseOverlay.dispose();
+        if (inventory != null)
+            inventory.dispose();
         if (pauseFont != null)
             pauseFont.dispose();
-        
+
         // Dispose audio resources
         if (backgroundMusic != null)
             backgroundMusic.dispose();
