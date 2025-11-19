@@ -175,7 +175,7 @@ public class healthbar implements Disposable {
         float totalWidth = healthbarTexture.getWidth() * scale;
         float totalHeight = healthbarTexture.getHeight() * scale;
         
-        // 1. Dessiner l'icône heart.png juste à côté de la barre
+        // j'ai dessiner l'icône heart.png juste à côté de la barre
         if (hasIcon && heartIcon != null) {
             float heartSize = totalHeight * 1.2f;
             float heartOffset = 5f;
@@ -183,7 +183,7 @@ public class healthbar implements Disposable {
             batch.draw(heartIcon, x - heartSize - heartOffset, y, heartSize, heartSize);
         }
         
-        // 2. Dessiner la barre complète (fond sombre pour voir la partie vide)
+        // j'ai dessiner la barre complète
         batch.setColor(0.5f, 0.5f, 0.5f, 1f);
         batch.draw(healthbarTexture,
             x, y,
@@ -192,7 +192,7 @@ public class healthbar implements Disposable {
             healthbarTexture.getWidth(), healthbarTexture.getHeight(),
             false, false);
         
-        // 3. Dessiner le remplissage vert par-dessus (selon la vie)
+        // j'ai dessiner le remplissage vert par-dessus
         if (healthPercentage > 0) {
             batch.setColor(1f, 1f, 1f, 1f);
             float fillWidth = totalWidth * healthPercentage;
