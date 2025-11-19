@@ -24,7 +24,7 @@ import com.main.weapons.Weapon;
 
 public class Hero extends Unit {
 
-    private enum Direction {
+    protected enum Direction {
         UP, DOWN, LEFT, RIGHT,
         UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT,
         ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT
@@ -60,11 +60,11 @@ public class Hero extends Unit {
     private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
     private Animation<TextureRegion> walkUR, walkUL, walkDR, walkDL;
     private TextureRegion idle, idleR, idleL, idleU, idleD, idleUR, idleUL, idleDR, idleDL;
-    private Animation<TextureRegion> AttackRight, AttackLeft, AttackUp, AttackDown;
+    protected Animation<TextureRegion> AttackRight, AttackLeft, AttackUp, AttackDown;
 
     // uses inherited stateTime from Unit
     private boolean moving = false;
-    private Direction direction = Direction.DOWN;
+    protected Direction direction = Direction.DOWN;
     // previous facing (non-attack) to revert to after attack animation finishes
     private Direction prevDirection = Direction.DOWN;
     private List<Texture> loadedTextures = new ArrayList<>();

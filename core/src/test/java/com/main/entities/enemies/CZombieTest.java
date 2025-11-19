@@ -78,10 +78,10 @@ public class CZombieTest {
 
     @Test
     public void testCZombieStats() {
-        assertEquals("CZombie health should be 300", 300, cZombie.getHealth());
-        assertEquals("CZombie speed should be 40", 40.0f, cZombie.getSpeed(), 0.01f);
-        assertEquals("CZombie attack damage should be 15", 15, cZombie.getAttackDamage());
-        assertEquals("CZombie attack speed should be 1.2", 1.2f, cZombie.getAttackSpeed(), 0.01f);
+        assertEquals("CZombie health should be 140", 140, cZombie.getHealth());
+        assertEquals("CZombie speed should be 60", 60.0f, cZombie.getSpeed(), 0.01f);
+        assertEquals("CZombie attack damage should be 39", 39, cZombie.getAttackDamage());
+        assertEquals("CZombie attack speed should be 0.75", 0.75f, cZombie.getAttackSpeed(), 0.01f);
         assertEquals("CZombie range should be 50", 50, cZombie.getRange());
     }
 
@@ -187,9 +187,9 @@ public class CZombieTest {
 
     @Test
     public void testCZombieStatsAreDifferent() {
-        assertEquals("CZombie specific health", 300, cZombie.getHealth());
-        assertEquals("CZombie specific damage", 15, cZombie.getAttackDamage());
-        assertEquals("CZombie specific speed", 40.0f, cZombie.getSpeed(), 0.01f);
-        assertEquals("CZombie slower attack", 1.2f, cZombie.getAttackSpeed(), 0.01f);
+        assertEquals("CZombie specific health", 140, cZombie.getHealth());
+        assertEquals("CZombie specific damage", 39, cZombie.getAttackDamage());
+        assertEquals("CZombie specific speed", 60.0f, cZombie.getSpeed(), 0.01f);
+        assertEquals("CZombie slower attack", 0.75f, cZombie.getAttackSpeed(), 0.01f);
     }
 }
