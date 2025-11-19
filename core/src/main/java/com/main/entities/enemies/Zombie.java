@@ -11,25 +11,88 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
 import com.main.map.Base;
 
+/**
+ * Represents a basic zombie enemy unit in the game.
+ * <p>
+ * Inherits from {@link Unit} and provides zombie-specific behaviors such as
+ * movement, attack logic, and animation handling.
+ * Zombies interact with the player and allied base, using a state machine for
+ * movement and combat.
+ */
 public class Zombie extends Unit {
-        // Valeurs de base pour l’équilibrage
-        public static final int HP_BASE = 200;
-        public static final float DAMAGE_BASE = 30f;
-        public static final float ATTACK_SPEED_BASE = 1.5f;
-    // Animation fields - shared by all zombie types
+    /**
+     * Base health value for balancing zombie difficulty.
+     */
+    public static final int HP_BASE = 200;
+
+    /**
+     * Base damage value for zombie attacks.
+     */
+    public static final float DAMAGE_BASE = 30f;
+
+    /**
+     * Base attack speed (seconds per attack) for zombies.
+     */
+    public static final float ATTACK_SPEED_BASE = 1.5f;
+
+    /**
+     * Animation for walking left. Shared by all zombie types.
+     */
     protected Animation<TextureRegion> walkLeft;
+
+    /**
+     * Animation for attacking. Shared by all zombie types.
+     */
     protected Animation<TextureRegion> attackAnimation;
+
+    /**
+     * Static frame used for attack pose.
+     */
     protected TextureRegion attackFrame;
+
+    /**
+     * Static frame used for idle pose.
+     */
     protected TextureRegion idleFrame;
+
+    /**
+     * Indicates if the zombie is currently moving.
+     */
     protected boolean moving = false;
+
+    /**
+     * List of loaded textures for animation management and resource cleanup.
+     */
     protected List<Texture> loadedTextures = new ArrayList<>();
+
+    /**
+     * Duration of each animation frame in seconds.
+     */
     protected final float FRAME_DURATION = 0.2f;
 
+    /**
+     * Constructs a new Zombie unit with the specified sprite, position, and allied
+     * base.
+     *
+     * @param filePath Path to the sprite file for this zombie
+     * @param posX     Initial X position
+     * @param posY     Initial Y position
+     * @param allyBase Reference to the allied base associated with this unit
+     */
     public Zombie(String filePath, float posX, float posY, Base allyBase) {
         super(filePath, posX, posY);
         this.allyBase = allyBase;
     }
 
+    /**
+     * Updates the zombie's movement and attack logic for the current frame.
+     * <p>
+     * Handles state transitions, attack cooldowns, animation timing, and collision
+     * checks.
+     * If a target is in range, initiates an attack and updates animation state.
+     *
+     * @param delta Time elapsed since the last frame (in seconds)
+     */
     @Override
     public void move(float delta) {
         this.moving = false; // Reset moving state
@@ -55,7 +118,8 @@ public class Zombie extends Unit {
                 // Use the shared attack logic so damage, cooldown and attack animation timer
                 // are applied
                 attack();
-                // stateTime reset is handled by Unit.attack(); ensure we advance during this frame
+                // stateTime reset is handled by Unit.attack(); ensure we advance during this
+                // frame
                 this.stateTime += delta;
                 return;
             }
@@ -82,55 +146,34 @@ public class Zombie extends Unit {
         this.stateTime += delta;
     }
 
-    @lombok.Generated
+    /**
+     * Renders the zombie on the screen using the current animation frame and state.
+     * <p>
+     * Selects the appropriate animation or static frame based on the zombie's state
+     * (attacking, idle, walking).
+     *
+     * @param batch SpriteBatch used for drawing the zombie
+     */
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame;
-        
-
-        // Choose animation based on current state
-        switch (getCurrentState()) {
-            case ATTACKING:
-                if (attackAnimation != null) {
-                    currentFrame = attackAnimation.getKeyFrame(stateTime, false);
-                } else if (attackFrame != null) {
-                    currentFrame = attackFrame;
-                } else if (idleFrame != null) {
-                    currentFrame = idleFrame;
-                } else {
-                    currentFrame = walkLeft != null ? walkLeft.getKeyFrame(stateTime, true) : null;
-                }
-                break;
-            case IDLE:
-                if (idleFrame != null) {
-                    currentFrame = idleFrame;
-                } else if (idleFrame == null && walkLeft != null) {
-                    currentFrame = walkLeft.getKeyFrame(stateTime, true);
-                } else {
-                    currentFrame = null;
-                }
-                break;
-            case WALKING:
-            default:
-                if (walkLeft != null) {
-                    currentFrame = walkLeft.getKeyFrame(stateTime, true);
-                } else {
-                    currentFrame = idleFrame;
-                }
-                break;
+        TextureRegion currentFrame = idleFrame;
+        if (currentState == UnitState.WALKING && walkLeft != null) {
+            currentFrame = walkLeft.getKeyFrame(stateTime, true);
+        } else if (currentState == UnitState.ATTACKING && attackAnimation != null) {
+            currentFrame = attackAnimation.getKeyFrame(stateTime, false);
         }
-
-        // draw the selected frame if any
-        if (currentFrame != null) {
-            batch.draw(currentFrame, this.posX, this.posY);
-        }
+        batch.draw(currentFrame, posX, posY);
     }
 
     /**
-     * Get the current frame based on state - can be overridden by subclasses
-     * for specific animation behavior
+     * Returns the duration of the attack animation for this zombie.
+     * <p>
+     * Can be overridden by subclasses for custom animation timing.
+     *
+     * @return Duration of the attack animation in seconds
      */
-    protected float getAttackAnimationDuration() {
+    @Override
+    public float getAttackAnimationDuration() {
         if (attackAnimation != null) {
             return attackAnimation.getAnimationDuration();
         }
@@ -138,7 +181,13 @@ public class Zombie extends Unit {
     }
 
     /**
-     * Utility method to load animation frames from a pattern
+     * Loads an array of animation frames from file names matching a pattern.
+     * <p>
+     * Used for initializing walking and attack animations.
+     *
+     * @param pattern Filename pattern with a %d placeholder for frame number
+     * @param count   Number of frames to load
+     * @return Array of loaded TextureRegion frames
      */
     protected TextureRegion[] loadFrames(String pattern, int count) {
         TextureRegion[] frames = new TextureRegion[count];
@@ -150,7 +199,12 @@ public class Zombie extends Unit {
         return frames;
     }
 
-    @lombok.Generated
+    /**
+     * Disposes of all loaded textures and resources used by this zombie.
+     * <p>
+     * Ensures proper cleanup to prevent memory leaks. Calls super.dispose() for
+     * base cleanup.
+     */
     @Override
     public void dispose() {
         super.dispose();

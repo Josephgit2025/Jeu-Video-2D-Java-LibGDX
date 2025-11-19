@@ -16,8 +16,19 @@ import com.main.entities.units.Sniper;
 import com.main.entities.units.Tank;
 import com.main.utils.Position;
 
+/**
+ * Represents a base in the game, either player or enemy.
+ * <p>
+ * Manages unit spawning, health, position, attack power, collision box, and lane organization.
+ * Handles logic for buying units, spawning units, updating unit states, and interactions with the map and other entities.
+ * Player bases spawn soldiers, enemy bases spawn zombies. Each base tracks units per lane and manages their updates and interactions.
+ */
 public class Base {
     
+    /**
+     * Enum representing the types of units that can be spawned by a base.
+     * Used to determine spawning logic and unit costs.
+     */
     public enum Type {
         MELEE,
         TANK,
@@ -27,21 +38,73 @@ public class Base {
         FAST
     }
     
+    /**
+     * Current health of the base. When it reaches zero, the base is destroyed.
+     */
     private int health = 1000;
+    /**
+     * Position of the base on the map (X, Y coordinates).
+     */
     private Position position;
+    /**
+     * Attack power of the base, used for damage calculations.
+     */
     private int attackPower = 50;
+    /**
+     * Timer tracking the time since the last unit spawn.
+     */
     private float lastSpawn;
-    private List<Unit> units; // Unités de cette base
+    /**
+     * List of all units currently managed by this base.
+     */
+    private List<Unit> units;
+    /**
+     * List of units organized per lane (3 lanes per base).
+     */
     private List<List<Unit>> unitsPerLane;
+    /**
+     * Random number generator for spawning logic.
+     */
     private Random random;
-    private boolean isPlayerBase; // true = spawn soldiers, false = spawn zombies
-    private String name; // Name for debugging
-    private Rectangle collisionBox; // Hitbox de la base (3 tuiles de large x hauteur de la map)
-    private static final int TILE_SIZE = 16; // Taille d'une tuile dans Tiled
-    private static final float SCALE = 2.0f; // Scale de la map
+    /**
+     * Flag indicating if this base is the player base (true) or enemy base (false).
+     * Player bases spawn soldiers, enemy bases spawn zombies.
+     */
+    private boolean isPlayerBase;
+    /**
+     * Name of the base, used for debugging and logging.
+     */
+    private String name;
+    /**
+     * Collision box (hitbox) of the base, spanning 3 tiles wide and the full map height.
+     */
+    private Rectangle collisionBox;
+    /**
+     * Size of a tile in the map (pixels).
+     */
+    private static final int TILE_SIZE = 16;
+    /**
+     * Scale factor for the map, used to calculate positions and sizes.
+     */
+    private static final float SCALE = 2.0f;
+    /**
+     * Array of Y coordinates for unit spawn points (top, middle, bottom lanes).
+     */
     private int[] spawnPointsY;
+    /**
+     * Reference to the hero associated with this base (player base only).
+     */
     private Hero player = null;
 
+    /**
+     * Constructs a new Base instance with specified position, type, and map height.
+     * Initializes lanes, spawn points, collision box, and other attributes.
+     *
+     * @param posX        X position of the base on the map
+     * @param posY        Y position of the base on the map
+     * @param isPlayerBase True if this is the player base, false for enemy base
+     * @param mapHeight   Height of the map (used for hitbox and spawn calculations)
+     */
     public Base(int posX, int posY, boolean isPlayerBase, int mapHeight) {
         this.position = new Position(posX, posY);
         lastSpawn = 0.0f;
@@ -73,38 +136,84 @@ public class Base {
         //         name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
     }
 
+    /**
+     * Returns the current health of the base.
+     *
+     * @return Current health value
+     */
     public int getHealth() {
         return health;
     }
 
+    /**
+     * Returns the position of the base on the map.
+     *
+     * @return Position object containing X and Y coordinates
+     */
     public Position getPosition() {
         return position;
     }
 
+    /**
+     * Sets the collision box (hitbox) for the base.
+     *
+     * @param collisionBox Rectangle representing the new hitbox
+     */
     public void setCollisionBox(Rectangle collisionBox){
         this.collisionBox = collisionBox;
     }
 
+    /**
+     * Sets the list of units per lane for this base.
+     *
+     * @param unitsPerLane List of lists of units, one per lane
+     */
     public void setUnitsPerLane(List<List<Unit>> unitsPerLane) {
         this.unitsPerLane = unitsPerLane;
     }
 
+    /**
+     * Returns the X position of the base on the map.
+     *
+     * @return X coordinate
+     */
     public float getPosX() {
         return position.getPosX();
     }
 
+    /**
+     * Returns the attack power of the base.
+     *
+     * @return Attack power value
+     */
     public int getAttackPower() {
         return attackPower;
     }
 
+    /**
+     * Sets the hero associated with this base (player base only).
+     *
+     * @param player Hero instance to associate
+     */
     public void setHero(Hero player){
         this.player = player;
     }
 
+    /**
+     * Returns the hero associated with this base (player base only).
+     *
+     * @return Hero instance or null if not set
+     */
     public Hero getHero(){
         return player;
     }
 
+    /**
+     * Reduces the base's health by the specified damage amount.
+     * Ensures health does not drop below zero. Logs the damage event.
+     *
+     * @param damage Amount of damage to apply
+     */
     public void takeDamage(int damage) {
         int oldHealth = this.health;
         this.health -= damage;
@@ -115,37 +224,72 @@ public class Base {
                 ">>> " + name + " takes " + damage + " damage! (HP: " + oldHealth + " -> " + this.health + ")");
     }
 
+    /**
+     * Returns the list of units organized per lane.
+     *
+     * @return List of lists of units per lane
+     */
     public List<List<Unit>> getUnitsPerLane() {
         return unitsPerLane;
     }
 
+    /**
+     * Checks if the base is destroyed (health is zero or less).
+     *
+     * @return True if destroyed, false otherwise
+     */
     public boolean isDestroyed() {
         return this.health <= 0;
     }
 
+    /**
+     * Returns the name of the base (for debugging/logging).
+     *
+     * @return Name string
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the collision box (hitbox) of the base.
+     *
+     * @return Rectangle representing the hitbox
+     */
     public Rectangle getCollisionBox() {
         return collisionBox;
     }
 
+    /**
+     * Adds a unit to the base's unit list if not null.
+     *
+     * @param unit Unit to add
+     */
     public void addUnit(Unit unit) {
         if (unit != null) {
             this.units.add(unit);
         }
     }
 
+    /**
+     * Returns the list of all units managed by this base.
+     *
+     * @return List of units
+     */
     public List<Unit> getUnits() {
         return this.units;
     }
 
+    /**
+     * Buys and spawns a unit of the specified type for the player base, if the hero has enough gold.
+     * Deducts gold, creates the unit, and adds it to the appropriate lane.
+     *
+     * @param unitType   Type of unit to buy (MELEE, TANK, SNIPER)
+     * @param spawnIndex Index of the lane to spawn the unit (0: bottom, 1: middle, 2: top)
+     * @param hero       Hero instance for gold deduction and ownership
+     * @return The created Unit if successful, null otherwise
+     */
     public Unit buyUnit(Type unitType, int spawnIndex, Hero hero) {
-        // spawnIndex = 0, 1 ou 2 (pour les 3 points Y)
-        // Vérifie le coût selon le type
-        // Vérifie si hero a assez d'or
-        // Retire l'or et crée l'unité
         int spawnY = spawnPointsY[spawnIndex];
         switch (unitType) {
             case MELEE:
@@ -198,6 +342,14 @@ public class Base {
         return null;
     }
 
+    /**
+     * Spawns a new unit for the base if the spawn timer has elapsed.
+     * Player bases spawn soldiers, enemy bases spawn zombies. Units are added to the correct lane and tracked.
+     *
+     * @param screen GameScreen instance for map width and context
+     * @param delta  Time elapsed since last update (seconds)
+     * @return The spawned Unit if successful, null otherwise
+     */
     public Unit spawnUnit(GameScreen screen, float delta) {
         if (lastSpawn >= 5.0f) {
             lastSpawn = 0.0f;
@@ -276,6 +428,10 @@ public class Base {
         return null;
     }
 
+    /**
+     * Updates the index of each unit in every lane to maintain correct ordering.
+     * Used after adding or removing units from lanes.
+     */
     private void updateIndexes(){
         for (List<Unit> list : unitsPerLane){
             int newIndex = 0;
@@ -286,25 +442,28 @@ public class Base {
     }
 
     /**
-     * Met à jour toutes les unités de cette base
-     * 
-     * @param delta     Le temps écoulé
-     * @param enemies   La liste des ennemis à attaquer
-     * @param enemyBase La base ennemie à attaquer si pas d'ennemis
+     * Updates all units managed by this base.
+     * Removes dead units, updates indexes, sets targets, updates cooldowns, and handles movement and attack logic.
+     * Units attack enemy base if no target is available and they are near the base.
+     *
+     * @param delta     Time elapsed since last update (seconds)
+     * @param enemies   List of enemy units to attack
+     * @param enemyBase Enemy base to attack if no enemies are present
+     * @param hero      Hero instance to include as a target (if present)
      */
     public void updateUnits(float delta, List<Unit> enemies, Base enemyBase, Hero hero) {
-        // Supprime les unités mortes
+        // Remove dead units
         units.removeIf(Unit::isDead);
         for (List<Unit> list : unitsPerLane)
             list.removeIf(Unit::isDead);
         updateIndexes();
 
-        // Met à jour chaque unité
+        // Update each unit
         for (Unit unit : units) {
             // Set enemy base as target
             unit.setTargetBase(enemyBase);
             
-            // Filtre uniquement les ennemis vivants
+            // Filter only live enemies
             List<Unit> liveEnemies = new ArrayList<>();
             if (enemies != null) {
                 for (Unit enemy : enemies){
@@ -316,17 +475,16 @@ public class Base {
             if (hero != null)
                 liveEnemies.add(hero);
 
-            // Determine target and update cooldown BEFORE moving so move(delta) sees the
-            // correct state
+            // Determine target and update cooldown BEFORE moving so move(delta) sees the correct state
             unit.selectTarget(liveEnemies);
             unit.updateCooldown(delta);
 
-            // À la fin de la boucle, après la gestion des attaques entre unités
+            // If no target and near enemy base, attack the base
             if (unit.target == null && unit.isNearEnemyBase(enemyBase)) {
                 unit.attackBase(enemyBase);
             }
 
-            // Move will handle attack triggering and animation timing internally
+            // Move handles attack triggering and animation timing internally
             unit.move(delta);
         }
     }

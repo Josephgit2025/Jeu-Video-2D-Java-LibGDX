@@ -1,7 +1,17 @@
 package com.main.weapons;
 
-public class SMG extends Weapon{
-    public SMG(){
+/**
+ * Represents a submachine gun (SMG) weapon in the game.
+ * <p>
+ * Provides low damage, medium range, very fast attack speed, and high ammunition capacity. Used by units for close-quarters combat.
+ */
+public class SMG extends Weapon {
+
+    /**
+     * Constructs an SMG with predefined stats (damage, range, attack speed, ammunition).
+     * Calls the superclass constructor with SMG parameters.
+     */
+    public SMG() {
         super(20, 200, 0.5f, 35);
     }
 }
