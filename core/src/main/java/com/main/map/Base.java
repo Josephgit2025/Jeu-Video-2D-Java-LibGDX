@@ -135,9 +135,8 @@ public class Base {
         float boxWidth = 3 * TILE_SIZE * SCALE; // 3 tuiles * 16px * 2 = 96px
         float boxHeight = mapHeight; // Toute la hauteur de la map
 
-        // Position : pour la base joueur (gauche), pour la base ennemie (droite - 3
-        // tuiles)
-        float boxX = isPlayerBase ? posX : (posX - boxWidth);
+        // Position : pour la base joueur (gauche), pour la base ennemie (droite - largeur hitbox)
+        float boxX = isPlayerBase ? posX : (posX - boxWidth + 65); // Décalage léger à droite pour la base zombie
         float boxY = 0; // Du bas de la map
 
         this.collisionBox = new Rectangle(boxX, boxY, boxWidth, boxHeight);
