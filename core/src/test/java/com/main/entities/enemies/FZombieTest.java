@@ -78,10 +78,10 @@ public class FZombieTest {
 
     @Test
     public void testFZombieStats() {
-        assertEquals("FZombie health should be 450", 450, fZombie.getHealth());
-        assertEquals("FZombie speed should be 80", 80.0f, fZombie.getSpeed(), 0.01f);
-        assertEquals("FZombie attack damage should be 25", 25, fZombie.getAttackDamage());
-        assertEquals("FZombie attack speed should be 0.8", 0.8f, fZombie.getAttackSpeed(), 0.01f);
+        assertEquals("FZombie health should be 400", 400, fZombie.getHealth());
+        assertEquals("FZombie speed should be 30", 30.0f, fZombie.getSpeed(), 0.01f);
+        assertEquals("FZombie attack damage should be 18", 18, fZombie.getAttackDamage());
+        assertEquals("FZombie attack speed should be 1.2", 1.2f, fZombie.getAttackSpeed(), 0.01f);
         assertEquals("FZombie range should be 50", 50, fZombie.getRange());
     }
 
@@ -109,7 +109,7 @@ public class FZombieTest {
     public void testMoveCalculation() {
         float initialX = fZombie.getPosX();
         fZombie.move(1.0f);
-        float expectedX = initialX - 80;
+        float expectedX = initialX - 30;
         assertEquals("Position after move", expectedX, fZombie.getPosX(), 0.1f);
     }
 
@@ -117,7 +117,7 @@ public class FZombieTest {
     public void testMoveWithRealisticDelta() {
         float initialX = fZombie.getPosX();
         fZombie.move(0.016f);
-        float expectedX = initialX - (80 * 0.016f);
+        float expectedX = initialX - (30 * 0.016f);
         assertEquals("Position with realistic delta", expectedX, fZombie.getPosX(), 0.01f);
     }
 
@@ -127,7 +127,7 @@ public class FZombieTest {
         fZombie.move(0.1f);
         fZombie.move(0.1f);
         fZombie.move(0.1f);
-        float expectedX = initialX - (80 * 0.3f);
+        float expectedX = initialX - (30 * 0.3f);
         assertEquals("Position after multiple moves", expectedX, fZombie.getPosX(), 0.1f);
     }
 
@@ -136,15 +136,16 @@ public class FZombieTest {
     @Test
     public void testTakeDamage() {
         fZombie.takeDamage(100);
-        assertEquals("Health should decrease by 100", 350, fZombie.getHealth());
+        assertEquals("Health should decrease by 100", 300, fZombie.getHealth());
         assertFalse("FZombie should not be dead", fZombie.isDead());
     }
 
     @Test
     public void testTakeDamageMultipleTimes() {
-        fZombie.takeDamage(150);
-        fZombie.takeDamage(150);
-        fZombie.takeDamage(150);
+        fZombie.takeDamage(100);
+        fZombie.takeDamage(100);
+        fZombie.takeDamage(100);
+        fZombie.takeDamage(100);
         assertEquals("Health should be 0", 0, fZombie.getHealth());
         assertTrue("FZombie should be dead", fZombie.isDead());
     }
@@ -189,8 +190,8 @@ public class FZombieTest {
 
     @Test
     public void testFZombieStatsAreDifferent() {
-        assertEquals("FZombie specific health", 450, fZombie.getHealth());
-        assertEquals("FZombie specific damage", 25, fZombie.getAttackDamage());
-        assertEquals("FZombie specific speed", 80.0f, fZombie.getSpeed(), 0.01f);
+        assertEquals("FZombie specific health", 400, fZombie.getHealth());
+        assertEquals("FZombie specific damage", 18, fZombie.getAttackDamage());
+        assertEquals("FZombie specific speed", 30.0f, fZombie.getSpeed(), 0.01f);
     }
 }

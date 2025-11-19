@@ -147,7 +147,7 @@ public class Hero extends Unit {
         AttackDown.setPlayMode(Animation.PlayMode.NORMAL);
 
         this.health = 500;
-        this.weapon = new Shotgun();
+        this.weapon = new Pistol();
         this.speed = 8;
         this.attackSpeed = 1;
         this.map = map;

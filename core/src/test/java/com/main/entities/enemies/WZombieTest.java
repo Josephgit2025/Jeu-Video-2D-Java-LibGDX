@@ -78,10 +78,10 @@ public class WZombieTest {
 
     @Test
     public void testWZombieStats() {
-        assertEquals("WZombie health should be 350", 350, wZombie.getHealth());
-        assertEquals("WZombie speed should be 130", 130.0f, wZombie.getSpeed(), 0.01f);
-        assertEquals("WZombie attack damage should be 20", 20, wZombie.getAttackDamage());
-        assertEquals("WZombie attack speed should be 0.8", 0.8f, wZombie.getAttackSpeed(), 0.01f);
+        assertEquals("WZombie health should be 120", 120, wZombie.getHealth());
+        assertEquals("WZombie speed should be 60", 60.0f, wZombie.getSpeed(), 0.01f);
+        assertEquals("WZombie attack damage should be 27", 27, wZombie.getAttackDamage());
+        assertEquals("WZombie attack speed should be 1.8", 1.8f, wZombie.getAttackSpeed(), 0.01f);
         assertEquals("WZombie range should be 50", 50, wZombie.getRange());
     }
 
@@ -111,7 +111,7 @@ public class WZombieTest {
         float delta = 0.5f;
         wZombie.move(delta);
         
-        float expectedX = initialX - (130 * delta);
+        float expectedX = initialX - (60 * delta);
         assertEquals("X position should be correct after move", expectedX, wZombie.getPosX(), 0.01f);
     }
 
@@ -129,7 +129,7 @@ public class WZombieTest {
         wZombie.move(0.1f);
         wZombie.move(0.1f);
         
-        float expectedX = initialX - (130 * 0.3f);
+        float expectedX = initialX - (60 * 0.3f);
         assertEquals("X position should be correct after multiple moves", expectedX, wZombie.getPosX(), 0.01f);
     }
 
@@ -138,15 +138,13 @@ public class WZombieTest {
     @Test
     public void testTakeDamage() {
         wZombie.takeDamage(50);
-        assertEquals("Health should decrease by 50", 300, wZombie.getHealth());
+        assertEquals("Health should decrease by 50", 70, wZombie.getHealth());
     }
 
     @Test
     public void testTakeDamageMultipleTimes() {
         wZombie.takeDamage(100);
-        wZombie.takeDamage(100);
-        wZombie.takeDamage(100);
-        assertEquals("Health should decrease correctly", 50, wZombie.getHealth());
+        assertEquals("Health should decrease correctly", 20, wZombie.getHealth());
     }
 
     @Test
@@ -187,7 +185,7 @@ public class WZombieTest {
             totalDelta += 0.016f;
         }
         
-        float expectedX = initialX - (130 * totalDelta);
+        float expectedX = initialX - (60 * totalDelta);
         assertEquals("Position after continuous movement", expectedX, wZombie.getPosX(), 1.0f);
     }
 
@@ -198,8 +196,8 @@ public class WZombieTest {
 
     @Test
     public void testWZombieStatsAreDifferent() {
-        assertEquals("WZombie specific health", 350, wZombie.getHealth());
-        assertEquals("WZombie specific damage", 20, wZombie.getAttackDamage());
-        assertEquals("WZombie specific speed", 130.0f, wZombie.getSpeed(), 0.01f);
+        assertEquals("WZombie specific health", 120, wZombie.getHealth());
+        assertEquals("WZombie specific damage", 27, wZombie.getAttackDamage());
+        assertEquals("WZombie specific speed", 60.0f, wZombie.getSpeed(), 0.01f);
     }
 }

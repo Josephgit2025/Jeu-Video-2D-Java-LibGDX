@@ -109,7 +109,7 @@ public class CZombieTest {
     public void testMoveCalculation() {
         float initialX = cZombie.getPosX();
         cZombie.move(1.0f);
-        float expectedX = initialX - 40;
+        float expectedX = initialX - 60;
         assertEquals("Position after move", expectedX, cZombie.getPosX(), 0.1f);
     }
 
@@ -117,7 +117,7 @@ public class CZombieTest {
     public void testMoveWithRealisticDelta() {
         float initialX = cZombie.getPosX();
         cZombie.move(0.016f);
-        float expectedX = initialX - (40 * 0.016f);
+        float expectedX = initialX - (60 * 0.016f);
         assertEquals("Position with realistic delta", expectedX, cZombie.getPosX(), 0.01f);
     }
 
@@ -127,7 +127,7 @@ public class CZombieTest {
         cZombie.move(0.1f);
         cZombie.move(0.1f);
         cZombie.move(0.1f);
-        float expectedX = initialX - (40 * 0.3f);
+        float expectedX = initialX - (60 * 0.3f);
         assertEquals("Position after multiple moves", expectedX, cZombie.getPosX(), 0.1f);
     }
 
@@ -136,13 +136,13 @@ public class CZombieTest {
     @Test
     public void testTakeDamage() {
         cZombie.takeDamage(100);
-        assertEquals("Health should decrease by 100", 200, cZombie.getHealth());
+        assertEquals("Health should decrease by 100", 40, cZombie.getHealth());
         assertFalse("CZombie should not be dead", cZombie.isDead());
     }
 
     @Test
     public void testTakeDamageUntilDeath() {
-        cZombie.takeDamage(300);
+        cZombie.takeDamage(140);
         assertEquals("Health should be 0", 0, cZombie.getHealth());
         assertTrue("CZombie should be dead", cZombie.isDead());
     }
