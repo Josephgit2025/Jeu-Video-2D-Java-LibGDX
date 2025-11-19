@@ -25,8 +25,8 @@ public class gold implements Disposable {
     private boolean hasIcon;
     
     // Display settings
-    private static final float ICON_SIZE = 26f;
-    private static final float TEXT_OFFSET_X = 32f; // Offset for text if icon is present
+    private static final float ICON_SIZE = 45f;
+    private static final float TEXT_OFFSET_X = 49f; // Écritures rapprochées de l'icône gold
     
     // Colors
     private static final Color GOLD_COLOR = new Color(1f, 0.84f, 0f, 1f); // Gold color
@@ -50,7 +50,7 @@ public class gold implements Disposable {
         // Initialize font
         font = new BitmapFont();
         font.setColor(GOLD_COLOR);
-        font.getData().setScale(1.5f);
+        font.getData().setScale(1.8f);
     }
     
     /**
@@ -96,7 +96,7 @@ public class gold implements Disposable {
         }
         
         // Draw gold text (sans le label "Gold:")
-        String goldText = ": " + gold;
+        String goldText = " " + gold;
         font.draw(batch, goldText, textX, y);
         
         batch.end();

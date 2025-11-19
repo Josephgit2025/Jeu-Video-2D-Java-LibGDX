@@ -35,12 +35,12 @@ public class hud implements Disposable {
     private gold goldDisplay;
     
     // UI positions and dimensions
-    private static final float HEALTH_BAR_X = 50f;
-    private static final float HEALTH_BAR_Y = 550f;
-    private static final float GOLD_X = 20f;
+    private static final float HEALTH_BAR_X = 20f;
+    private static final float HEALTH_BAR_Y = 525f; 
+    private static final float GOLD_X = 40f;
     private static final float GOLD_Y = 535f;
     
-    // Base health bar positions and dimensions (barres verticales)
+    // Base health bar positions and dimensions (barres verticales pour les bases)
     private static final float BASE_HEALTH_BAR_WIDTH = 8f;   // Largeur fine pour barre verticale
     private static final float BASE_HEALTH_BAR_HEIGHT = 150f; // Hauteur pour barre verticale
     
