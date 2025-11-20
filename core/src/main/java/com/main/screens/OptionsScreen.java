@@ -42,6 +42,12 @@ public class OptionsScreen implements Screen {
     private boolean isDraggingVolume = false;
     private float musicVolume;
 
+    // Brightness slider
+    private Rectangle brightnessSlider;
+    private Rectangle brightnessHandle;
+    private boolean isDraggingBrightness = false;
+    private float brightness = 1.0f; // Default brightness (1.0 = normal)
+
     // Sound effects toggle button
     private Rectangle soundButton;
     private boolean soundEnabled;
@@ -131,6 +137,12 @@ public class OptionsScreen implements Screen {
         float handleX = sliderX + (sliderWidth * musicVolume) - 10f;
         volumeHandle = new Rectangle(handleX, sliderY - 10f, 20f, 30f);
 
+        // Initialize brightness slider (just below volume)
+        float brightnessSliderY = sliderY - 60f;
+        brightnessSlider = new Rectangle(sliderX, brightnessSliderY, sliderWidth, sliderHeight);
+        float brightnessHandleX = sliderX + (sliderWidth * ((brightness - 0.5f) / 1.5f)) - 10f; // brightness range 0.5-2.0
+        brightnessHandle = new Rectangle(brightnessHandleX, brightnessSliderY - 10f, 20f, 30f);
+
         // Initialize sound toggle button
         soundButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 130f, 200f, 50f);
 
@@ -183,6 +195,11 @@ public class OptionsScreen implements Screen {
         float labelX = (WORLD_WIDTH - volumeLabel.width) / 2f;
         font.draw(batch, volumeLabel, labelX, 330f);
 
+        // Draw brightness label
+        GlyphLayout brightnessLabel = new GlyphLayout(font, "BRIGHTNESS");
+        float brightnessLabelX = (WORLD_WIDTH - brightnessLabel.width) / 2f;
+        font.draw(batch, brightnessLabel, brightnessLabelX, 270f);
+
         // Draw sound effects label
         GlyphLayout soundLabel = new GlyphLayout(font, "SOUND EFFECTS");
         float soundLabelX = (WORLD_WIDTH - soundLabel.width) / 2f;
@@ -212,6 +229,14 @@ public class OptionsScreen implements Screen {
         // Slider handle
         shapeRenderer.setColor(Color.YELLOW);
         shapeRenderer.rect(volumeHandle.x, volumeHandle.y, volumeHandle.width, volumeHandle.height);
+
+        // Brightness slider background
+        shapeRenderer.setColor(0.3f, 0.3f, 0.3f, 1f);
+        shapeRenderer.rect(brightnessSlider.x, brightnessSlider.y, brightnessSlider.width, brightnessSlider.height);
+
+        // Brightness slider handle
+        shapeRenderer.setColor(Color.CYAN);
+        shapeRenderer.rect(brightnessHandle.x, brightnessHandle.y, brightnessHandle.width, brightnessHandle.height);
         
         // Sound toggle button background
         if (soundEnabled) {
@@ -309,8 +334,17 @@ public class OptionsScreen implements Screen {
             if (isDraggingVolume) {
                 updateVolumeSlider(mx);
             }
+
+            // Handle brightness slider dragging
+            if (!isDraggingBrightness && brightnessHandle.contains(mx, my)) {
+                isDraggingBrightness = true;
+            }
+            if (isDraggingBrightness) {
+                updateBrightnessSlider(mx);
+            }
         } else {
             isDraggingVolume = false;
+            isDraggingBrightness = false;
         }
 
         // Handle clicks
@@ -330,6 +364,21 @@ public class OptionsScreen implements Screen {
                 }
             }
         }
+    }
+    /**
+     * Updates the brightness slider position and applies the new brightness value.
+     * @param mouseX The current mouse X position
+     */
+    private void updateBrightnessSlider(float mouseX) {
+        float newHandleX = Math.max(brightnessSlider.x - 10f, Math.min(mouseX - 10f, brightnessSlider.x + brightnessSlider.width - 10f));
+        brightnessHandle.x = newHandleX;
+
+        // brightness range: 0.5 (min) to 2.0 (max)
+        float percent = (brightnessHandle.x - brightnessSlider.x + 10f) / brightnessSlider.width;
+        brightness = 0.5f + percent * 1.5f;
+        brightness = Math.max(0.5f, Math.min(2.0f, brightness));
+        // Synchronise la luminosité globale du jeu
+        game.setBrightness(brightness);
     }
 
     /**

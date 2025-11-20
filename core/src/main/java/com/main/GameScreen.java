@@ -294,6 +294,9 @@ public class GameScreen implements Screen {
         map.setView(camera);
         map.render();
         batch.setProjectionMatrix(camera.combined);
+        // Appliquer la luminosité globale
+        float brightness = game.getBrightness();
+        batch.setColor(brightness, brightness, brightness, 1f);
         batch.begin();
         // Render toutes les unités
         for (Unit elem : enemyBase.getUnits()) {

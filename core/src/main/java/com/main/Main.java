@@ -11,6 +11,13 @@ import com.main.screens.TitleScreen;
  * Responsible for initializing, switching, and disposing screens.
  */
 public class Main extends Game {
+        /**
+         * Global brightness value for game rendering (0.5 = dark, 2.0 = bright, 1.0 = normal)
+         */
+        private float brightness = 1.0f;
+
+        public float getBrightness() { return brightness; }
+        public void setBrightness(float value) { brightness = Math.max(0.5f, Math.min(2.0f, value)); }
     /**
      * The main game screen, responsible for gameplay.
      */

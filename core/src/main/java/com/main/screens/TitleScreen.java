@@ -32,79 +32,20 @@ import com.main.Main;
 public class TitleScreen implements Screen {
 
 
-    /**
-     * Reference to the main game instance for screen transitions.
-     */
     protected Main game;
-
-    /**
-     * SpriteBatch used for rendering all visual elements.
-     */
     protected SpriteBatch batch;
-
-    /**
-     * Orthographic camera for 2D rendering.
-     */
     protected OrthographicCamera camera;
-
-    /**
-     * Viewport for scaling and resizing the screen.
-     */
     protected Viewport viewport;
-
-    /**
-     * BitmapFont for rendering menu text.
-     */
     protected BitmapFont font;
-
-    /**
-     * Background texture for the title screen.
-     */
     protected Texture background;
-
-    /**
-     * Main logo texture displayed at the top of the screen.
-     */
     protected Texture titleLogo;
-
-    /**
-     * Logical width of the game world for layout.
-     */
     private static final float WORLD_WIDTH = 800f;
-
-    /**
-     * Logical height of the game world for layout.
-     */
     private static final float WORLD_HEIGHT = 480f;
-
-    /**
-     * Array of menu item labels (PLAY, OPTIONS, QUIT).
-     */
     private String[] menuItems = {"PLAY", "OPTIONS", "QUIT"};
-
-    /**
-     * Index of the currently selected menu item (-1 if none).
-     */
     protected int selectedIndex = -1;
-
-    /**
-     * Index of the last hovered menu item for tracking hover changes.
-     */
     private int lastHoveredIndex = -1;
-
-    /**
-     * Time elapsed since hover started, used for smooth zoom transition.
-     */
     private float hoverTime = 0f;
-
-    /**
-     * Duration of the hover zoom transition animation in seconds.
-     */
     private static final float ZOOM_TRANSITION_DURATION = 0.15f;
-
-    /**
-     * Maximum scale factor when button is fully hovered (1.2 = 20% bigger).
-     */
     private static final float MAX_ZOOM_SCALE = 1.2f;
 
     /**
