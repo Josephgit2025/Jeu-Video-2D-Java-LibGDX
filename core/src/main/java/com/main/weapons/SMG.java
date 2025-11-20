@@ -13,5 +13,7 @@ public class SMG extends Weapon {
      */
     public SMG() {
         super(20, 200, 0.5f, 35);
+        this.reloadSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/ReloadSMG.mp3"));
+        this.reloadTimer = 1.2f;
     }
 }

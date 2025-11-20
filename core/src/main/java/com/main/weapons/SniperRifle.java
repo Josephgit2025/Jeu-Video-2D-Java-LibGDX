@@ -13,5 +13,7 @@ public class SniperRifle extends Weapon {
      */
     public SniperRifle() {
         super(150, 450, 3f, 5);
+        this.reloadSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/ReloadSniper.mp3"));
+        this.reloadTimer = 2.5f;
     }
 }

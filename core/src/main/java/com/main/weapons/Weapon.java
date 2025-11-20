@@ -1,5 +1,7 @@
 package com.main.weapons;
 
+import com.badlogic.gdx.audio.Sound;
+
 /**
  * Abstract base class for all weapons in the game.
  * <p>
@@ -33,6 +35,16 @@ public abstract class Weapon {
     protected int maxMunition;
 
     /**
+     * Reload sound
+     */
+    protected Sound reloadSound;
+
+    /**
+     * Reload timer
+     */
+    protected float reloadTimer;
+
+    /**
      * Constructs a Weapon with specified damage, range, attack speed, and maximum ammunition.
      * Initializes ammunition to maximum capacity.
      *
@@ -53,6 +65,7 @@ public abstract class Weapon {
      * Reloads the weapon, restoring ammunition to maximum capacity.
      */
     public void reload(){
+        this.playReloadSound();
         this.munitions = this.maxMunition;
     }
 
@@ -102,6 +115,15 @@ public abstract class Weapon {
     }
 
     /**
+     * Return the reload time of the weapon.
+     * 
+     * @return Reload time
+     */
+    public float getReloadTimer() {
+        return reloadTimer;
+    }
+
+    /**
      * Returns the maximum ammunition capacity for the weapon.
      *
      * @return Maximum ammunition count
@@ -112,5 +134,9 @@ public abstract class Weapon {
 
     public void setMunition(int mun){
         this.munitions = mun;
+    }
+
+    public void playReloadSound(){
+        this.reloadSound.play(1.0f);
     }
 }

@@ -807,6 +807,7 @@ public class Hero extends Unit {
             }
             else {
                 weapon.reload();
+                attackCooldown = weapon.getReloadTimer();
             }
         }
     }
