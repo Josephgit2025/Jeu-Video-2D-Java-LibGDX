@@ -212,6 +212,17 @@ public class Hero extends Unit {
     private final float retargetInterval = 0.1f; // 100ms
 
     /**
+     * Time for gaining gold
+     */
+
+    private float goldTimer = 0f;
+
+    /**
+     * Interval before gaining gold passively
+     */
+    private final float goldInterval = 3f;
+
+    /**
      * Sound effect played when the hero shoots.
      */
     private Sound shootSound;
@@ -373,6 +384,12 @@ public class Hero extends Unit {
 
                 target = closest;
             }
+        }
+
+        goldTimer += delta;
+        if (goldTimer >= goldInterval){
+            this.addGold(10);
+            goldTimer = 0f;
         }
 
         // --- ATTAQUE ---
