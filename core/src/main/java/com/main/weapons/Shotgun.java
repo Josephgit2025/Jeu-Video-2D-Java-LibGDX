@@ -13,5 +13,7 @@ public class Shotgun extends Weapon {
      */
     public Shotgun() {
         super(70, 100, 1.5f, 6);
+        this.reloadSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/ReloadShotgun.mp3"));
+        this.reloadTimer = 1.6f;
     }
 }
