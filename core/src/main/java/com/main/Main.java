@@ -1,6 +1,7 @@
 package com.main;
 
 import com.badlogic.gdx.Game;
+import com.main.screens.OptionsScreen;
 import com.main.screens.TitleScreen;
 
 /**
@@ -18,6 +19,10 @@ public class Main extends Game {
      * The title screen, shown at startup and when returning to menu.
      */
     private TitleScreen titleScreen;
+    /**
+     * The options screen for audio settings.
+     */
+    private OptionsScreen optionsScreen;
 
     /**
      * Initializes the game, creating and setting the title and game screens.
@@ -46,6 +51,40 @@ public class Main extends Game {
     }
 
     /**
+     * Shows the options screen for audio settings.
+     * @param fromPause True if accessed from pause menu, false if from title screen
+     */
+    public void showOptionsScreen(boolean fromPause) {
+        optionsScreen = new OptionsScreen(this, fromPause);
+        setScreen(optionsScreen);
+    }
+
+    /**
+     * Resumes the game from pause state, returning to the game screen.
+     */
+    public void resumeGame() {
+        setScreen(gameScreen);
+        gameScreen.resumeFromPause();
+    }
+
+    /**
+     * Returns to the pause menu from options screen.
+     */
+    public void returnToPauseMenu() {
+        setScreen(gameScreen);
+        // Game will remain paused, showing pause overlay
+    }
+
+    /**
+     * Updates the music volume in the game screen when changed in options.
+     */
+    public void updateGameMusicVolume() {
+        if (gameScreen != null) {
+            gameScreen.updateMusicVolume();
+        }
+    }
+
+    /**
      * Disposes of all resources used by the game, including screens.
      * Called when the application is closing.
      */
@@ -54,6 +93,9 @@ public class Main extends Game {
         super.dispose();
         if (gameScreen != null) {
             gameScreen.dispose();
+        }
+        if (optionsScreen != null) {
+            optionsScreen.dispose();
         }
     }
 }
