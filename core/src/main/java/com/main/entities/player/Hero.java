@@ -781,8 +781,8 @@ public class Hero extends Unit {
                 if (shootSound != null) {
                     shootSound.play(0.7f); // Volume à 70%
                 }
-
-            } else {
+            }
+            else {
                 weapon.reload();
             }
         }

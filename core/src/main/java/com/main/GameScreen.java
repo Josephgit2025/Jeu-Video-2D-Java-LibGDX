@@ -320,7 +320,6 @@ public class GameScreen implements Screen {
 
         // Render base health bars in game world (with game camera)
         hudDisplay.renderBaseHealthBars(camera);
-
         hudDisplay.render();
 
         // Render Pause overlay if in Pause state
@@ -379,23 +378,6 @@ public class GameScreen implements Screen {
 
             shapeRenderer.end();
         }
-
-        // DEBUG: Dessiner les rectangles de collision (décommenter pour debug)
-        /*
-         * shapeRenderer.setProjectionMatrix(camera.combined);
-         * shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-         * shapeRenderer.setColor(1, 0, 0, 1); // Rouge
-         * for (Rectangle rect : map.getCollisionRects()) {
-         * shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
-         * }
-         * 
-         * // DEBUG: Dessiner le rectangle du héro en vert
-         * shapeRenderer.setColor(0, 1, 0, 1); // Vert
-         * shapeRenderer.rect(hero.getPosX(), hero.getPosY(), hero.getWidth(),
-         * hero.getHeight());
-         * 
-         * shapeRenderer.end();
-         */
     }
 
     /**
@@ -411,7 +393,6 @@ public class GameScreen implements Screen {
                 pauseKeyPressed = true;
                 if (gameState == GameState.PLAYING) {
                     gameState = GameState.PAUSE;
-                    
                 } else if (gameState == GameState.PAUSE) {
                     gameState = GameState.PLAYING;
                     
@@ -466,10 +447,8 @@ public class GameScreen implements Screen {
                     com.badlogic.gdx.Gdx.input.getY());
 
             if ("replay".equals(action)) {
-                
                 reset();
             } else if ("quit".equals(action)) {
-                
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
@@ -481,10 +460,8 @@ public class GameScreen implements Screen {
                     com.badlogic.gdx.Gdx.input.getY());
 
             if ("replay".equals(action)) {
-                
                 reset();
             } else if ("quit".equals(action)) {
-                
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
@@ -496,17 +473,11 @@ public class GameScreen implements Screen {
                     com.badlogic.gdx.Gdx.input.getY());
 
             if ("resume".equals(action)) {
-                
                 gameState = GameState.PLAYING;
                 pauseOverlay.resetConfirmation();
             } else if ("quit".equals(action)) {
-                
                 pauseOverlay.resetConfirmation();
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
-            } else if ("confirm".equals(action)) {
-                
-            } else if ("cancel".equals(action)) {
-                
             }
         }
 
@@ -519,13 +490,13 @@ public class GameScreen implements Screen {
         // Toggle range display with 'R' key
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.R)) {
             showRanges = !showRanges;
-            
         }
 
+        
+        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
+        
         // Remove dead enemies and give gold to hero
         removeDeadEnemiesAndGiveGold();
-
-        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
 
         // Spawn des ennemis
         enemyBase.spawnUnit(this, delta);
@@ -559,7 +530,6 @@ public class GameScreen implements Screen {
                 // Give gold to hero when enemy dies
                 int goldReward = 10;
                 hero.addGold(goldReward);
-                // 
             }
         }
     }
