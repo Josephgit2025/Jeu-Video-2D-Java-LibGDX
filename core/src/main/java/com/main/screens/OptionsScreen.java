@@ -50,6 +50,12 @@ public class OptionsScreen implements Screen {
     private Rectangle backButton;
     private int selectedIndex = -1; // 0 = back button
 
+    // Hover animation variables
+    private int lastHoveredIndex = -1;
+    private float hoverTime = 0f;
+    private static final float ZOOM_TRANSITION_DURATION = 0.15f;
+    private static final float MAX_ZOOM_SCALE = 1.2f;
+
     private boolean fromPause;
 
     /**
@@ -182,17 +188,14 @@ public class OptionsScreen implements Screen {
         float soundLabelX = (WORLD_WIDTH - soundLabel.width) / 2f;
         font.draw(batch, soundLabel, soundLabelX, 215f);
 
-        // Draw back button
-        font.getData().setScale(0.8f);
-        GlyphLayout backLayout = new GlyphLayout(font, "BACK");
-        float backX = (WORLD_WIDTH - backLayout.width) / 2f;
-        
-        if (selectedIndex == 0) {
-            font.setColor(Color.YELLOW);
-        } else {
-            font.setColor(Color.WHITE);
-        }
-        font.draw(batch, backLayout, backX, backButton.y + 35f);
+        // Draw back button with zoom effect
+        float backScale = getZoomScale(0);
+        font.getData().setScale(0.8f * backScale);
+        font.setColor(Color.WHITE);
+        GlyphLayout backScaledLayout = new GlyphLayout(font, "BACK");
+        float backX = (WORLD_WIDTH - backScaledLayout.width) / 2f;
+        font.draw(batch, backScaledLayout, backX, backButton.y + 35f);
+        font.getData().setScale(1f);
 
         batch.end();
 
@@ -240,6 +243,7 @@ public class OptionsScreen implements Screen {
         float mx = mouse.x;
         float my = mouse.y;
 
+        int previousIndex = selectedIndex;
         selectedIndex = -1;
 
         font.getData().setScale(0.8f);
@@ -252,12 +256,40 @@ public class OptionsScreen implements Screen {
             backLayout.width + 20,
             backLayout.height + 10
         );
-
+        
         if (backHitbox.contains(mx, my)) {
             selectedIndex = 0;
         }
         
+        // Reset hover time if we changed button or stopped hovering
+        if (selectedIndex != previousIndex) {
+            hoverTime = 0f;
+            lastHoveredIndex = selectedIndex;
+        }
+        
         font.getData().setScale(1f);
+    }
+
+    /**
+     * Calculates the zoom scale factor for a button based on hover time.
+     * Creates a smooth zoom transition effect when hovering over buttons.
+     *
+     * @param buttonIndex The index of the button to get the scale for
+     * @return The scale factor (1.0 = normal size, MAX_ZOOM_SCALE = fully zoomed)
+     */
+    private float getZoomScale(int buttonIndex) {
+        if (selectedIndex != buttonIndex) {
+            return 1.0f;
+        }
+        
+        // Calculate interpolation factor (0.0 to 1.0)
+        float t = Math.min(hoverTime / ZOOM_TRANSITION_DURATION, 1.0f);
+        
+        // Smooth interpolation using ease-out cubic function
+        t = 1f - (float)Math.pow(1f - t, 3);
+        
+        // Interpolate between 1.0 (normal) and MAX_ZOOM_SCALE (zoomed)
+        return 1.0f + (MAX_ZOOM_SCALE - 1.0f) * t;
     }
 
     /**

@@ -225,40 +225,34 @@ public class TitleScreen implements Screen {
             // Position de départ pour centrer l'ensemble
             float startX = (WORLD_WIDTH - totalWidth) / 2f;
             
-            // Dessiner PLAY
+            // Dessiner PLAY avec zoom fluide
             float playX = startX;
             float playScale = getZoomScale(0);
             font.getData().setScale(0.8f * playScale);
             font.setColor(Color.WHITE);
             GlyphLayout playScaledLayout = new GlyphLayout(font, "PLAY");
-            // Centrer le texte zoomé autour de la position originale
-            float playCenterX = playX + playLayout.width / 2f;
-            float playCenterY = buttonY;
-            font.draw(batch, playScaledLayout, playCenterX - playScaledLayout.width / 2f, playCenterY);
+            float playDrawX = playX + (playLayout.width * playScale - playScaledLayout.width) / 2f;
+            font.draw(batch, playScaledLayout, playDrawX, buttonY);
+            font.getData().setScale(1f);
             
-            // Dessiner OPTIONS
+            // Dessiner OPTIONS avec zoom fluide
             float optionsX = startX + playLayout.width + buttonSpacing;
             float optionsScale = getZoomScale(1);
             font.getData().setScale(0.8f * optionsScale);
             font.setColor(Color.WHITE);
             GlyphLayout optionsScaledLayout = new GlyphLayout(font, "OPTIONS");
-            // Centrer le texte zoomé autour de la position originale
-            float optionsCenterX = optionsX + optionsLayout.width / 2f;
-            float optionsCenterY = buttonY;
-            font.draw(batch, optionsScaledLayout, optionsCenterX - optionsScaledLayout.width / 2f, optionsCenterY);
+            float optionsDrawX = optionsX + (optionsLayout.width * optionsScale - optionsScaledLayout.width) / 2f;
+            font.draw(batch, optionsScaledLayout, optionsDrawX, buttonY);
+            font.getData().setScale(1f);
             
-            // Dessiner QUIT
+            // Dessiner QUIT avec zoom fluide
             float quitX = startX + playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing;
             float quitScale = getZoomScale(2);
             font.getData().setScale(0.8f * quitScale);
             font.setColor(Color.WHITE);
             GlyphLayout quitScaledLayout = new GlyphLayout(font, "QUIT");
-            // Centrer le texte zoomé autour de la position originale
-            float quitCenterX = quitX + quitLayout.width / 2f;
-            float quitCenterY = buttonY;
-            font.draw(batch, quitScaledLayout, quitCenterX - quitScaledLayout.width / 2f, quitCenterY);
-            
-            // Reset scale
+            float quitDrawX = quitX + (quitLayout.width * quitScale - quitScaledLayout.width) / 2f;
+            font.draw(batch, quitScaledLayout, quitDrawX, buttonY);
             font.getData().setScale(1f);
         }
 

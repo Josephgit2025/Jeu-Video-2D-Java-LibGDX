@@ -569,9 +569,9 @@ public class GameScreen implements Screen {
         for (Unit enemy : enemyBase.getUnits()) {
             if (enemy.isDead()) {
                 // Give gold to hero when enemy dies
-                int goldReward = 10;
+                int goldReward = 40;
                 hero.addGold(goldReward);
-                // System.out.println("Enemy killed! +10 gold. Total: " + hero.getGold());
+                // System.out.println("Enemy killed! +40 gold. Total: " + hero.getGold());
             }
         }
     }
