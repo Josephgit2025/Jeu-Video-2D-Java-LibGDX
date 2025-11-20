@@ -23,6 +23,7 @@ import com.main.weapons.SMG;
 import com.main.weapons.Shotgun;
 import com.main.weapons.Weapon;
 import com.utils.AudioSettings;
+import com.ui.Inventory;
 
 /**
  * Represents the main playable hero unit in the game.
@@ -212,9 +213,21 @@ public class Hero extends Unit {
     private final float retargetInterval = 0.1f; // 100ms
 
     /**
+     * Time for gaining gold
+     */
+
+    private float goldTimer = 0f;
+
+    /**
+     * Interval before gaining gold passively
+     */
+    private final float goldInterval = 3f;
+
+    /**
      * Sound effect played when the hero shoots.
      */
     private Sound shootSound;
+    private Inventory inventory;
 
     /**
      * Constructs a new Hero instance with initial position, map, and allied base.
@@ -372,6 +385,12 @@ public class Hero extends Unit {
 
                 target = closest;
             }
+        }
+
+        goldTimer += delta;
+        if (goldTimer >= goldInterval){
+            this.addGold(10);
+            goldTimer = 0f;
         }
 
         // --- ATTAQUE ---
@@ -729,13 +748,11 @@ public class Hero extends Unit {
     @Override
     public void attack() {
         if (target == null || target.isDead()) {
-            System.out.print("Target null");
             return;
         }
         double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) +
                 Math.pow(this.posY - target.getPosY(), 2));
         if (distance > weapon.getRange()) {
-            System.out.println("Out of range");
             return;
         }
         if (attackCooldown <= 0 && weapon != null) {
@@ -779,9 +796,15 @@ public class Hero extends Unit {
                     shootSound.play(0.7f); // Volume à 70%
                 } else if (shootSound == null) {
                     System.out.println("❌ ERREUR: shootSound est NULL!");
-                }
+                target.takeDamage(totalDamage);
+                attackCooldown = weapon.getAttackSpeed();
 
-            } else {
+                // Jouer le son de tir
+                if (shootSound != null) {
+                    shootSound.play(0.7f); // Volume à 70%
+                }
+            }
+            else {
                 weapon.reload();
             }
         }

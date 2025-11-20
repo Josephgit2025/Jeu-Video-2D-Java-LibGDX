@@ -19,6 +19,7 @@ import com.main.map.WarMap;
 import com.ui.BaseDestroyedOverlay;
 import com.ui.BaseZombieDestroyedOverlay;
 import com.ui.GameOverOverlay;
+import com.ui.Inventory;
 import com.ui.PauseOverlay;
 import com.ui.UnitShop;
 import com.ui.hud;
@@ -113,6 +114,7 @@ public class GameScreen implements Screen {
      * UI component for buying units during gameplay.
      */
     private UnitShop unitShop;
+    private Inventory inventory;
 
     /**
      * Background music for the game.
@@ -187,43 +189,35 @@ public class GameScreen implements Screen {
         // Initialize Unit Shop
         this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         this.unitShop = new UnitShop(playerBase, hero);
-        
+        this.inventory = new Inventory(hero);
+
         // Load audio
         loadSounds();
     }
-    
+
     /**
      * Loads all game sounds and music, assigns audio resources to hero and overlays.
      * Handles errors and missing files gracefully.
      */
     private void loadSounds() {
-        try {
-            System.out.println("🎵 CHARGEMENT DES SONS...");
-            
+        try {            
             // Musique de fond
-            backgroundMusic = com.badlogic.gdx.Gdx.audio.newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
+            backgroundMusic = com.badlogic.gdx.Gdx.audio
+                    .newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
             backgroundMusic.setLooping(true);
             backgroundMusic.setVolume(AudioSettings.getMusicVolume());
             backgroundMusic.play();
-            System.out.println("✅ Musique de fond chargée et démarrée");
             
             // Son de tir
             shootSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/coup de feu heros.mp3"));
-            System.out.println("✅ Son de tir chargé: " + (shootSound != null ? "OK" : "NULL"));
             
             // Passer le son au héros
             hero.setShootSound(shootSound);
-            System.out.println("✅ Son assigné au héros");
             
             // TEST: Jouer le son une fois au démarrage pour vérifier
-            System.out.println("🔊 TEST: Lecture du son de tir au démarrage...");
             shootSound.play(1.0f);
-            
+
         } catch (Exception e) {
-            System.out.println("Erreur lors du chargement des sons : " + e.getMessage());
-            System.out.println("Assurez-vous d'avoir les fichiers :");
-            System.out.println("  - assets/sounds/debut.mp3");
-            System.out.println("  - assets/sounds/coup de feu heros.mp3");
             e.printStackTrace();
         }
     }
@@ -239,18 +233,17 @@ public class GameScreen implements Screen {
         this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
         this.playerBase.setHero(hero);
         this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
-        
+        this.inventory = new Inventory(hero);
+
         // ✅ IMPORTANT: Réassigner le son au nouveau héros
-        System.out.println("🔄 RESET: Réassignation du son au nouveau héros...");
-        if (shootSound != null) {
-            hero.setShootSound(shootSound);
-            System.out.println("✅ Son réassigné après reset");
-        } else {
-            System.out.println("❌ ERREUR: shootSound est NULL dans reset()!");
-        }
         
+        if (shootSound != null) {
+            hero.setShootSound(shootSound);   
+        }
+
         // Resize the new unitShop to match current window size
         this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
+        this.inventory.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
     }
 
@@ -314,6 +307,7 @@ public class GameScreen implements Screen {
 
         // Render Unit Shop buttons
         unitShop.render(shapeRenderer, batch);
+        inventory.render(shapeRenderer, batch);
 
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
@@ -327,7 +321,6 @@ public class GameScreen implements Screen {
 
         // Render base health bars in game world (with game camera)
         hudDisplay.renderBaseHealthBars(camera);
-
         hudDisplay.render();
 
         // Render Pause overlay if in Pause state
@@ -386,23 +379,6 @@ public class GameScreen implements Screen {
 
             shapeRenderer.end();
         }
-
-        // DEBUG: Dessiner les rectangles de collision (décommenter pour debug)
-        /*
-         * shapeRenderer.setProjectionMatrix(camera.combined);
-         * shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-         * shapeRenderer.setColor(1, 0, 0, 1); // Rouge
-         * for (Rectangle rect : map.getCollisionRects()) {
-         * shapeRenderer.rect(rect.x, rect.y, rect.width, rect.height);
-         * }
-         * 
-         * // DEBUG: Dessiner le rectangle du héro en vert
-         * shapeRenderer.setColor(0, 1, 0, 1); // Vert
-         * shapeRenderer.rect(hero.getPosX(), hero.getPosY(), hero.getWidth(),
-         * hero.getHeight());
-         * 
-         * shapeRenderer.end();
-         */
     }
 
     /**
@@ -418,10 +394,9 @@ public class GameScreen implements Screen {
                 pauseKeyPressed = true;
                 if (gameState == GameState.PLAYING) {
                     gameState = GameState.PAUSE;
-                    System.out.println("Game PAUSED");
                 } else if (gameState == GameState.PAUSE) {
                     gameState = GameState.PLAYING;
-                    System.out.println("Game RESUMED");
+                    
                 }
             }
         } else {
@@ -438,19 +413,19 @@ public class GameScreen implements Screen {
         // Check if hero is dead
         if (hero.getCurrentHealth() <= 0 && gameState == GameState.PLAYING) {
             gameState = GameState.GAME_OVER;
-            System.out.println("GAME OVER - Hero died!");
+            
         }
 
         // Check if player base is destroyed
         if (playerBase.isDestroyed() && gameState == GameState.PLAYING) {
             gameState = GameState.BASE_DESTROYED;
-            System.out.println("BASE DESTROYED - Player base has been destroyed!");
+            
         }
 
         // Check if enemy base is destroyed (Victory!)
         if (enemyBase.isDestroyed() && gameState == GameState.PLAYING) {
             gameState = GameState.ZOMBIE_BASE_DESTROYED;
-            System.out.println("VICTORY - Enemy base has been destroyed!");
+            
         }
 
         // Handle Game Over clicks
@@ -460,10 +435,8 @@ public class GameScreen implements Screen {
                     com.badlogic.gdx.Gdx.input.getY());
 
             if ("replay".equals(action)) {
-                System.out.println("Replay clicked!");
                 reset();
             } else if ("quit".equals(action)) {
-                System.out.println("Quit clicked - Returning to Title Screen!");
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
@@ -475,10 +448,8 @@ public class GameScreen implements Screen {
                     com.badlogic.gdx.Gdx.input.getY());
 
             if ("replay".equals(action)) {
-                System.out.println("Replay clicked from Base Destroyed!");
                 reset();
             } else if ("quit".equals(action)) {
-                System.out.println("Quit clicked from Base Destroyed - Returning to Title Screen!");
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
@@ -490,10 +461,8 @@ public class GameScreen implements Screen {
                     com.badlogic.gdx.Gdx.input.getY());
 
             if ("replay".equals(action)) {
-                System.out.println("Replay clicked from Zombie Base Destroyed!");
                 reset();
             } else if ("quit".equals(action)) {
-                System.out.println("Quit clicked from Zombie Base Destroyed - Returning to Title Screen!");
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
@@ -505,20 +474,14 @@ public class GameScreen implements Screen {
                     com.badlogic.gdx.Gdx.input.getY());
 
             if ("resume".equals(action)) {
-                System.out.println("Resume clicked!");
                 gameState = GameState.PLAYING;
                 pauseOverlay.resetConfirmation();
             } else if ("options".equals(action)) {
                 System.out.println("Options clicked from pause!");
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showOptionsScreen(true));
             } else if ("quit".equals(action)) {
-                System.out.println("Quit to menu confirmed - Returning to Title Screen!");
                 pauseOverlay.resetConfirmation();
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
-            } else if ("confirm".equals(action)) {
-                System.out.println("Showing quit confirmation...");
-            } else if ("cancel".equals(action)) {
-                System.out.println("Quit cancelled, back to pause menu");
             }
         }
 
@@ -531,31 +494,31 @@ public class GameScreen implements Screen {
         // Toggle range display with 'R' key
         if (com.badlogic.gdx.Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.R)) {
             showRanges = !showRanges;
-            System.out.println("Range display: " + (showRanges ? "ON" : "OFF"));
         }
 
+        
+        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
+        
         // Remove dead enemies and give gold to hero
         removeDeadEnemiesAndGiveGold();
 
-        hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
-
         // Spawn des ennemis
         enemyBase.spawnUnit(this, delta);
-        
+
         // Spawn des alliés
         playerBase.spawnUnit(this, delta);
-        
+
         // Update : les ennemis attaquent les alliés (et leur base) et vice-versa
         enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase, this.hero);
         playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase, null);
 
         // Check for game over conditions
         if (playerBase.isDestroyed()) {
-            // System.out.println("GAME OVER - Player base destroyed!");
+            // 
             // TODO: Implement game over screen
         }
         if (enemyBase.isDestroyed()) {
-            // System.out.println("VICTORY - Enemy base destroyed!");
+            // 
             // TODO: Implement victory screen
         }
 
@@ -601,6 +564,9 @@ public class GameScreen implements Screen {
             pauseOverlay.resize(width, height);
             if (unitShop != null) {
                 unitShop.resize(width, height);
+            }
+            if (inventory != null) {
+                inventory.resize(width, height);
             }
         }
     }
@@ -654,9 +620,11 @@ public class GameScreen implements Screen {
             baseZombieDestroyedOverlay.dispose();
         if (pauseOverlay != null)
             pauseOverlay.dispose();
+        if (inventory != null)
+            inventory.dispose();
         if (pauseFont != null)
             pauseFont.dispose();
-        
+
         // Dispose audio resources
         if (backgroundMusic != null)
             backgroundMusic.dispose();

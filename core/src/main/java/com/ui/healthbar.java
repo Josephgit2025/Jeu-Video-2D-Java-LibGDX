@@ -159,9 +159,7 @@ public class healthbar implements Disposable {
         try {
             this.heartIcon = new Texture(heartIconPath);
             this.hasIcon = true;
-            System.out.println("Heart icon loaded: " + heartIconPath);
         } catch (Exception e) {
-            System.err.println("Could not load heart icon: " + heartIconPath);
             this.hasIcon = false;
         }
 
@@ -169,9 +167,7 @@ public class healthbar implements Disposable {
         try {
             this.healthbarTexture = new Texture(Gdx.files.internal("ui/healthbar.png"));
             this.useCustomTexture = true;
-            System.out.println("Custom health bar texture loaded: healthbar.png");
         } catch (Exception e) {
-            System.out.println("Custom texture not found, using default style.");
             this.useCustomTexture = false;
         }
     }

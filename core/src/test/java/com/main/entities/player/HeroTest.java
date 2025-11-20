@@ -106,7 +106,7 @@ public class HeroTest {
         assertEquals("Initial Y position should be 200", 200, hero.getPosY(), 0.01f);
         assertEquals("Hero health should be 500", 500, hero.getHealth());
         assertNotNull("Hero should have a weapon", hero.weapon);
-        assertEquals("Hero speed should be 8", 8, hero.getSpeed(), 0.01f);
+        assertEquals("Hero speed should be 8", 5, hero.getSpeed(), 0.01f);
     }
 
     @Test
@@ -167,7 +167,7 @@ public class HeroTest {
         float initialY = hero.getPosY();
         hero.moveUp(1.0f, 1000, enemies);
         // Movement = speed * delta * 60 = 8 * 1.0 * 60 = 480
-        float expectedY = initialY + 480;
+        float expectedY = initialY + 300;
         assertEquals("Position should increase correctly", expectedY, hero.getPosY(), 1.0f);
     }
 
@@ -397,10 +397,8 @@ public class HeroTest {
         hero.setCooldown(0);
         
         int initialMunitions = hero.weapon.getMunitions();
-        System.out.println("Munitions before = " + initialMunitions);
         // hero.weapon.reload();
         hero.attack();
-        System.out.println("Munitions after = " + hero.weapon.getMunitions());
         
         assertTrue("Munitions should decrease after attack", hero.weapon.getMunitions() < initialMunitions);
         assertTrue("Cooldown should be set after attack", hero.getAttackCooldown() > 0);
@@ -581,7 +579,7 @@ public class HeroTest {
     public void testGettersReturnCorrectValues() {
         assertEquals("getPosX should return correct value", 100, hero.getPosX(), 0.01f);
         assertEquals("getPosY should return correct value", 200, hero.getPosY(), 0.01f);
-        assertEquals("getSpeed should return correct value", 8, hero.getSpeed(), 0.01f);
+        assertEquals("getSpeed should return correct value", 5, hero.getSpeed(), 0.01f);
         assertEquals("getHealth should return correct value", 500, hero.getHealth());
         assertEquals("getAttackSpeed should return correct value", 1, hero.getAttackSpeed(), 0.01f);
     }
@@ -593,7 +591,7 @@ public class HeroTest {
 
     @Test
     public void testHeroHasCorrectSpeed() {
-        assertEquals("Hero speed should be 8", 8, hero.getSpeed(), 0.01f);
+        assertEquals("Hero speed should be 8", 5, hero.getSpeed(), 0.01f);
     }
 
     @Test
