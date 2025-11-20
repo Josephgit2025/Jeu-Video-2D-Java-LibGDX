@@ -19,6 +19,7 @@ import com.main.map.WarMap;
 import com.ui.BaseDestroyedOverlay;
 import com.ui.BaseZombieDestroyedOverlay;
 import com.ui.GameOverOverlay;
+import com.ui.Inventory;
 import com.ui.PauseOverlay;
 import com.ui.UnitShop;
 import com.ui.hud;
@@ -112,6 +113,7 @@ public class GameScreen implements Screen {
      * UI component for buying units during gameplay.
      */
     private UnitShop unitShop;
+    private Inventory inventory;
 
     /**
      * Background music for the game.
@@ -186,11 +188,12 @@ public class GameScreen implements Screen {
         // Initialize Unit Shop
         this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         this.unitShop = new UnitShop(playerBase, hero);
-        
+        this.inventory = new Inventory(hero);
+
         // Load audio
         loadSounds();
     }
-    
+
     /**
      * Loads all game sounds and music, assigns audio resources to hero and overlays.
      * Handles errors and missing files gracefully.
@@ -198,7 +201,8 @@ public class GameScreen implements Screen {
     private void loadSounds() {
         try {            
             // Musique de fond
-            backgroundMusic = com.badlogic.gdx.Gdx.audio.newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
+            backgroundMusic = com.badlogic.gdx.Gdx.audio
+                    .newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
             backgroundMusic.setLooping(true);
             backgroundMusic.setVolume(0.4f);
             backgroundMusic.play();
@@ -211,7 +215,7 @@ public class GameScreen implements Screen {
             
             // TEST: Jouer le son une fois au démarrage pour vérifier
             shootSound.play(1.0f);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -228,15 +232,17 @@ public class GameScreen implements Screen {
         this.hero = new Hero(map.getMapWidthInPixels() / 2, map.getMapHeightInPixels() / 2, this.map, this.playerBase);
         this.playerBase.setHero(hero);
         this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
-        
+        this.inventory = new Inventory(hero);
+
         // ✅ IMPORTANT: Réassigner le son au nouveau héros
         
         if (shootSound != null) {
             hero.setShootSound(shootSound);   
         }
-        
+
         // Resize the new unitShop to match current window size
         this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
+        this.inventory.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
     }
 
@@ -300,6 +306,7 @@ public class GameScreen implements Screen {
 
         // Render Unit Shop buttons
         unitShop.render(shapeRenderer, batch);
+        inventory.render(shapeRenderer, batch);
 
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
@@ -524,10 +531,10 @@ public class GameScreen implements Screen {
 
         // Spawn des ennemis
         enemyBase.spawnUnit(this, delta);
-        
+
         // Spawn des alliés
         playerBase.spawnUnit(this, delta);
-        
+
         // Update : les ennemis attaquent les alliés (et leur base) et vice-versa
         enemyBase.updateUnits(delta, playerBase.getUnits(), playerBase, this.hero);
         playerBase.updateUnits(delta, enemyBase.getUnits(), enemyBase, null);
@@ -585,6 +592,9 @@ public class GameScreen implements Screen {
             if (unitShop != null) {
                 unitShop.resize(width, height);
             }
+            if (inventory != null) {
+                inventory.resize(width, height);
+            }
         }
     }
 
@@ -637,9 +647,11 @@ public class GameScreen implements Screen {
             baseZombieDestroyedOverlay.dispose();
         if (pauseOverlay != null)
             pauseOverlay.dispose();
+        if (inventory != null)
+            inventory.dispose();
         if (pauseFont != null)
             pauseFont.dispose();
-        
+
         // Dispose audio resources
         if (backgroundMusic != null)
             backgroundMusic.dispose();

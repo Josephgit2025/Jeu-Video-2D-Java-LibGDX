@@ -22,6 +22,7 @@ import com.main.weapons.Pistol;
 import com.main.weapons.SMG;
 import com.main.weapons.Shotgun;
 import com.main.weapons.Weapon;
+import com.ui.Inventory;
 
 /**
  * Represents the main playable hero unit in the game.
@@ -214,6 +215,7 @@ public class Hero extends Unit {
      * Sound effect played when the hero shoots.
      */
     private Sound shootSound;
+    private Inventory inventory;
 
     /**
      * Constructs a new Hero instance with initial position, map, and allied base.
