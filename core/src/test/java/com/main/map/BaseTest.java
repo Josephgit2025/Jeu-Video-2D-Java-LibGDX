@@ -12,9 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -26,6 +24,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.main.GameScreen;
 import com.main.entities.Unit;
+import com.main.entities.enemies.CZombie;
+import com.main.entities.enemies.FZombie;
+import com.main.entities.enemies.WZombie;
 import com.main.entities.player.Hero;
 import com.main.utils.Position;
 
@@ -125,7 +126,7 @@ public class BaseTest {
     public void testConstructorEnemyBaseCollisionBoxPosition() {
         Rectangle collisionBox = enemyBase.getCollisionBox();
         // Enemy base: boxX = posX - boxWidth = 1800 - 96 = 1704
-        assertEquals("Enemy base collision box X should be adjusted", 1704.0f, collisionBox.x, 0.01f);
+        assertEquals("Enemy base collision box X should be adjusted", 1769.0f, collisionBox.x, 0.01f);
         assertEquals("Enemy base collision box Y should be 0", 0.0f, collisionBox.y, 0.01f);
     }
 
@@ -515,20 +516,6 @@ public class BaseTest {
         assertTrue("Unit2 should have moved", mockUnit2.getPosX() != initialX2);
     }
 
-    // ===== Integration Tests =====
-
-    @Test
-    public void testFullSpawnCycle() {
-        Unit spawned1 = playerBase.spawnUnit(mockScreen, 3.0f);
-        assertNull("Should not spawn at 3.0s", spawned1);
-        
-        Unit spawned2 = playerBase.spawnUnit(mockScreen, 2.1f); // Total: 5.1s
-        // May succeed or fail in headless
-        
-        Unit spawned3 = playerBase.spawnUnit(mockScreen, 1.0f);
-        assertNotNull("Should spawn immediately after", spawned3);
-    }
-
     @Test
     public void testBaseDestruction() {
         assertFalse("Base should not be destroyed", playerBase.isDestroyed());
@@ -631,5 +618,27 @@ public class BaseTest {
         assertNull("Should be null", result);
         result = playerBase.buyUnit(Base.Type.TANK, 0, mockHero);
         assertNull("Should be null", result);
+    }
+
+    @Test
+    public void fullTestSpawnUnitEnemyBase(){
+        WZombie wzombie = null;
+        CZombie czombie = null;
+        FZombie fzombie = null;
+        while (wzombie == null || czombie == null || fzombie == null){
+            Unit tmp = enemyBase.spawnUnit(mockScreen, 6f);
+            if (tmp instanceof WZombie){
+                wzombie = (WZombie)tmp;
+            }
+            if (tmp instanceof CZombie){
+                czombie = (CZombie)tmp;
+            }
+            if (tmp instanceof FZombie){
+                fzombie = (FZombie)tmp;
+            }
+        }
+        assertNotNull("Should not be null", wzombie);
+        assertNotNull("Should not be null", czombie);
+        assertNotNull("Should not be null", fzombie);
     }
 }

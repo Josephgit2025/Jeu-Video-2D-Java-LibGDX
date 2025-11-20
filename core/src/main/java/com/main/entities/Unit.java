@@ -10,49 +10,109 @@ import com.badlogic.gdx.math.Rectangle;
 import com.main.entities.player.Hero;
 import com.main.map.Base;
 
+/**
+ * Abstract base class for all units in the game (player, enemy, etc).
+ * Handles position, health, attack, movement, and rendering logic.
+ */
 public abstract class Unit {
-    // Stats de base pour l'équilibrage global
-    public static final int HP_BASE = 200;
-    public static final float DAMAGE_BASE = 30f;
-    public static final float ATTACK_SPEED_BASE = 1.5f;
+    /**
+     * Lane index for lane-based movement and targeting.
+     */
+    private int lane;
+    /**
+     * Base health value for global unit balancing.
+     */
+    protected static final int HP_BASE = 200;
+    /**
+     * Base attack damage for global unit balancing.
+     */
+    protected static final float DAMAGE_BASE = 30f;
+    /**
+     * Base attack speed (seconds between attacks) for global unit balancing.
+     */
+    protected static final float ATTACK_SPEED_BASE = 1.5f;
 
-    // Unit states for animation control
+    /**
+     * Unit states for animation and behavior control.
+     */
     public enum UnitState {
-        IDLE, // Standing still
-        WALKING, // Moving towards target
-        ATTACKING // Playing attack animation
+        /**
+         * Unit is standing still.
+         */
+        IDLE,
+        /**
+         * Unit is moving towards its target.
+         */
+        WALKING,
+        /**
+         * Unit is performing an attack animation.
+         */
+        ATTACKING
     }
 
+    /** X position of the unit. */
     protected float posX;
+    /** Y position of the unit. */
     protected float posY;
+    /** Sprite used for rendering the unit. */
     protected Sprite sprite;
+    /** Current health of the unit. */
     protected int health;
+    /** Attack damage value. */
     protected float attackDamage;
-    protected float attackSpeed; // Time in seconds between attacks
+    /**
+     * Time in seconds between attacks (attack speed).
+     */
+    protected float attackSpeed;
+    /** Movement speed of the unit. */
     protected float speed;
-    public Unit target;
-    protected Base targetBase; // Reference to enemy base
+    /** Current target of the unit. */
+    protected Unit target;
+    /**
+     * Reference to the enemy base for attack logic.
+     */
+    protected Base targetBase;
     protected Base allyBase;
     protected int range;
-    protected float attackCooldown = 0f; // Current cooldown in seconds
+    /**
+     * Current attack cooldown in seconds.
+     */
+    protected float attackCooldown = 0f;
     protected Texture texture;
     protected float width, height;
-    private int lane;
+
+    /**
+     * Index of the unit within its lane (used for collision and movement).
+     */
     private int index;
 
     // State management
     protected UnitState currentState = UnitState.WALKING;
-    protected float attackAnimationTimer = 0f; // Tracks attack animation progress
-    protected static final float ATTACK_ANIMATION_DURATION = 0.5f; // Duration of attack animation
+    /**
+     * Tracks attack animation progress in seconds.
+     */
+    protected float attackAnimationTimer = 0f;
+    /**
+     * Duration of attack animation in seconds.
+     */
+    protected static final float ATTACK_ANIMATION_DURATION = 0.5f;
     // Shared animation time counter for subclasses to use when rendering
+    /**
+     * Shared animation time counter for rendering and animation updates.
+     */
     protected float stateTime = 0f;
-    protected static final int BASE_ATTACK_RANGE = 100; // Range to attack base
+    /**
+     * Default range for attacking a base (pixels).
+     */
+    protected static final int BASE_ATTACK_RANGE = 100;
 
     /**
      * Hook for subclasses to override the duration of their attack animation.
      * Default implementation returns the global ATTACK_ANIMATION_DURATION.
+     *
+     * @return Duration of the attack animation in seconds
      */
-    protected float getAttackAnimationDuration() {
+    public float getAttackAnimationDuration() {
         return ATTACK_ANIMATION_DURATION;
     }
 
@@ -60,7 +120,7 @@ public abstract class Unit {
         this.posX = posX;
         this.posY = posY;
 
-        // Gérer le cas null pour les tests
+        // Handle null texture for testing purposes
         if (filePath != null) {
             this.texture = new Texture(filePath);
             this.sprite = new Sprite(texture);
@@ -71,10 +131,10 @@ public abstract class Unit {
 
         if (this.sprite != null) {
             this.sprite.setPosition(posX, posY);
-            this.sprite.setSize(32, 48); // Taille visuelle
+            this.sprite.setSize(32, 48); // Visual size of the sprite
         }
-        this.width = 32; // Hitbox correspond à la largeur
-        this.height = 48; // Hitbox complète
+        this.width = 32; // Hitbox width
+        this.height = 48; // Hitbox height
     }
 
     public float getPosX() {
@@ -174,22 +234,26 @@ public abstract class Unit {
 
     @lombok.Generated
     /**
-     * Dessine le sprite de l'unité
+     * Renders the unit's sprite using the provided SpriteBatch.
+     *
+     * @param batch SpriteBatch used for rendering.
      */
     public void render(SpriteBatch batch) {
         batch.draw(this.texture, posX, posY);
     }
 
     /**
-     * Libère les ressources (texture)
+     * Releases resources used by the unit (such as texture).
      */
     public void dispose() {
         texture.dispose();
     }
 
     /**
-     * Vérifie si un mouvement vers newX causerait une collision avec la hitbox de
-     * la base ennemie
+     * Checks if moving to newX would cause a collision with the enemy base's hitbox.
+     *
+     * @param newX Proposed new X position.
+     * @return True if collision would occur, false otherwise.
      */
     protected boolean wouldCollideWithBase(float newX) {
         if (targetBase == null || targetBase.getCollisionBox() == null) {
@@ -206,7 +270,10 @@ public abstract class Unit {
     }
 
     /**
-     * Calcule la distance entre cette unité et une autre
+     * Calculates the Euclidean distance between this unit and another unit.
+     *
+     * @param other The other unit to measure distance to.
+     * @return Distance in pixels.
      */
     protected double calculateDistance(Unit other) {
         float dx = this.posX - other.getPosX();
@@ -215,9 +282,12 @@ public abstract class Unit {
     }
 
     /**
-     * Détecte tous les ennemis à portée d'attaque
+     * Detects all enemy units within attack range.
+     *
+     * @param enemies List of enemy units to check.
+     * @return List of units within attack range.
      */
-    public List<Unit> detectEnemiesInRange(List<Unit> enemies) {
+    protected List<Unit> detectEnemiesInRange(List<Unit> enemies) {
         List<Unit> inRange = new ArrayList<>();
         for (Unit unit : enemies) {
             if (unit != this && !unit.isDead()) {
@@ -231,7 +301,10 @@ public abstract class Unit {
     }
 
     /**
-     * Trouve l'ennemi le plus proche dans une liste
+     * Finds the closest enemy unit in the provided list.
+     *
+     * @param enemies List of enemy units.
+     * @return Closest enemy unit, or null if none found.
      */
     protected Unit findClosestEnemy(List<Unit> enemies) {
         Unit closest = null;
@@ -247,8 +320,10 @@ public abstract class Unit {
     }
 
     /**
-     * Sélectionne automatiquement la cible la plus proche
-     * Si aucune unité ennemie n'est disponible, cible la base ennemie
+     * Automatically selects the closest target from available enemies.
+     * If no enemy units are available, targets the enemy base.
+     *
+     * @param enemies List of enemy units.
      */
     public void selectTarget(List<Unit> enemies) {
         List<Unit> inRange = detectEnemiesInRange(enemies);
@@ -282,7 +357,9 @@ public abstract class Unit {
     }
 
     /**
-     * Inflige des dégâts à cette unité
+     * Inflicts damage to this unit and triggers death logic if health reaches zero.
+     *
+     * @param damage Amount of damage to apply.
      */
     public void takeDamage(int damage) {
         this.health -= damage;
@@ -293,7 +370,9 @@ public abstract class Unit {
     }
 
     /**
-     * Met à jour le cooldown d'attaque
+     * Updates the attack cooldown timer.
+     *
+     * @param delta Time elapsed since last update (seconds).
      */
     public void updateCooldown(float delta) {
         if (attackCooldown > 0) {
@@ -305,22 +384,25 @@ public abstract class Unit {
     }
 
     /**
-     * Appelé quand l'unité meurt
+     * Called when the unit dies. Subclasses may override to implement death animation or effects.
+     * Example: trigger animation, play sound, etc.
      */
     protected void onDeath() {
-        // Animation ou effet visuel de mort à personnaliser ici
-        // Exemple : déclencher une animation, jouer un son, etc.
+        // Override in subclasses to implement death animation or effects.
     }
 
     /**
-     * Vérifie si l'unité est morte
+     * Checks if the unit is dead (health is zero or less).
+     *
+     * @return True if dead, false otherwise.
      */
     public boolean isDead() {
         return this.health <= 0;
     }
 
     /**
-     * Attaque la cible actuelle (unité)
+     * Attacks the current target unit if in range and cooldown is ready.
+     * Handles attack animation, cooldown, and state changes.
      */
     public void attack() {
         if (target != null && !target.isDead() && attackCooldown <= 0) {
@@ -333,29 +415,17 @@ public abstract class Unit {
                 currentState = UnitState.ATTACKING;
                 attackAnimationTimer = getAttackAnimationDuration();
                 this.stateTime = 0f;
-                return;
             }
         }
-
-        // Priority 2: Attack enemy base if in range and no units to fight
-        // if (targetBase != null && target == null) {
-        //     double distanceToBase = calculateDistanceToBase();
-        //     if (distanceToBase <= BASE_ATTACK_RANGE && attackCooldown <= 0) {
-        //         System.out.println(this.getClass().getSimpleName() + " attacks enemy BASE" +
-        //                 " (HP: " + targetBase.getHealth() + " -> " + (targetBase.getHealth() - attackDamage) + ")");
-        //         targetBase.takeDamage(attackDamage);
-        //         attackCooldown = attackSpeed;
-        //         currentState = UnitState.ATTACKING;
-        //         attackAnimationTimer = getAttackAnimationDuration();
-        //         this.stateTime = 0f;
-        //         return;
-        //     }
-        // }
-        // No default fallback here; attacks are handled above for targets or base.
     }
 
 
-    // Méthode pour attaquer la base
+    /**
+     * Attacks the specified enemy base if cooldown is ready.
+     * Handles base damage, cooldown, and attack animation.
+     *
+     * @param enemyBase Enemy base to attack.
+     */
     public void attackBase(Base enemyBase) {
         if (enemyBase != null && attackCooldown <= 0) {
             enemyBase.takeDamage((int)this.attackDamage);
@@ -367,7 +437,12 @@ public abstract class Unit {
         }
     }
 
-    // Méthode pour vérifier si proche de la base
+    /**
+     * Checks if the unit is near the specified enemy base (within attack range).
+     *
+     * @param base Enemy base to check proximity.
+     * @return True if near the base, false otherwise.
+     */
     public boolean isNearEnemyBase(Base base) {
         if (base == null)
             return false;
@@ -384,9 +459,9 @@ public abstract class Unit {
     }
 
     /**
-     * Vérifie si l'unité doit s'arrêter (cible à portée ou base à portée)
-     * 
-     * @return true si l'unité doit s'arrêter
+     * Checks if the unit should stop moving (target in range, attacking, or near base).
+     *
+     * @return True if the unit should stop moving, false otherwise.
      */
     protected boolean shouldStopMoving() {
         // Stop if attacking
@@ -416,12 +491,19 @@ public abstract class Unit {
         return false;
     }
 
+    /**
+     * Checks for collisions with other units or the hero when moving to a new position.
+     * Handles lane-based collision logic and hero proximity.
+     *
+     * @param newX Proposed new X position.
+     * @param newY Proposed new Y position.
+     * @return True if a collision would occur, false otherwise.
+     */
     protected boolean checkUnitCollisions(float newX, float newY) {
 
         float distance = 0;
         float distanceHero = 0;
         if (this.getIndex() == 0){
-            System.out.println(this);
             if (this.allyBase.getHero() != null){
                 float dxH = newX - this.allyBase.getHero().getPosX();
                 float dyH = newY - this.allyBase.getHero().getPosY();
@@ -452,12 +534,11 @@ public abstract class Unit {
     }
 
     /**
-     * Calcule la nouvelle position X après mouvement, en tenant compte de la
-     * direction
-     * 
-     * @param delta     temps écoulé
-     * @param direction direction du mouvement (1 = droite, -1 = gauche)
-     * @return nouvelle position X, ou position actuelle si collision
+     * Calculates the new X position after movement, considering direction and collision.
+     *
+     * @param delta     Time elapsed since last frame (seconds).
+     * @param direction Movement direction (1 = right, -1 = left).
+     * @return New X position, or current position if collision occurs.
      */
     protected float calculateNewPositionX(float delta, int direction) {
         float newX = this.posX + (this.speed * delta * direction);
@@ -470,15 +551,19 @@ public abstract class Unit {
         return newX;
     }
 
+    /**
+     * Executes the unit's special ability. Subclasses should override to implement specific logic.
+     */
     public void specialAbility() {
         // Implement special ability logic here
     }
 
     /**
-     * Move the unit for this frame. Default implementation moves right.
-     * Subclasses should override to provide specific movement behavior.
-     * 
-     * @param delta Le temps écoulé depuis la dernière frame
+     * Moves the unit for the current frame. Default implementation moves right.
+     * Handles attack animation, cooldown, state changes, and movement logic.
+     * Subclasses may override to provide specific movement behavior.
+     *
+     * @param delta Time elapsed since last frame (seconds).
      */
     public void move(float delta) {
         if (currentState == UnitState.ATTACKING) {
@@ -494,13 +579,17 @@ public abstract class Unit {
                 return;
             }
             if (target != null && !target.isDead()) {
+                System.out.println("On entre la ? " + this.target);
                 if (attackCooldown <= 0) {
                     attack();
-                } else {
+                }
+                else {
                     currentState = UnitState.IDLE;
                 }
-            } else {
+            }
+            else {
                 // Cible morte → repasser à WALKING
+                System.out.println("Allo ?");
                 currentState = UnitState.WALKING;
                 target = null;
             }
@@ -559,7 +648,9 @@ public abstract class Unit {
     }
 
     /**
-     * Get the current state of the unit (for animation purposes)
+     * Returns the current state of the unit (for animation and logic).
+     *
+     * @return Current UnitState.
      */
     public UnitState getCurrentState() {
         return currentState;

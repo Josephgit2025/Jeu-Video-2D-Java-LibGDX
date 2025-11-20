@@ -27,8 +27,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.main.entities.Unit.UnitState;
 import com.main.entities.player.Hero;
 import com.main.map.Base;
+import com.main.utils.Position;
 
 public class UnitTest {
 
@@ -37,6 +39,9 @@ public class UnitTest {
     private TestUnit enemy1;
     private TestUnit enemy2;
     private TestUnit enemy3;
+
+    @Mock
+    private Base mockEnemyBase;
     
     @Mock
     private SpriteBatch mockBatch;
@@ -663,6 +668,51 @@ public class UnitTest {
         assertEquals("Should move left", 50.0f, newX, 0.1f);
     }
 
+    @Test
+    public void testCalculateNewPositionXRightWouldCollideBase(){
+        when(mockBase.getCollisionBox()).thenReturn(new Rectangle(101, 200, 1000, 1000));
+        unit.setTargetBase(mockBase);
+        float initialX = unit.getPosX();
+        float newX = unit.calculateNewPositionX(1.0f, 1);
+        assertEquals("Should not move", initialX, newX, 0.01f);
+    }
+
+    @Test
+    public void testCalculateNewPositionXRightUnitCollision(){
+        
+        List<Unit> lane1Units = new ArrayList<>();
+        TestUnit testunit = new TestUnit(99, 200);
+        when(mockBase.getCollisionBox()).thenReturn(new Rectangle(500,200,1000,1000));
+        when(mockBase.getHero()).thenReturn(null);
+        when(mockEnemyBase.getCollisionBox()).thenReturn(new Rectangle(500,200,1000,1000));
+        lane1Units.add(unit);        // Index 0
+        lane1Units.add(testunit);    // Index 1
+        
+        testunit.setIndex(1);
+        testunit.setLane(1);
+        testunit.setAllyBase(mockBase);
+        testunit.setTargetBase(mockEnemyBase);
+        
+        unit.posX = 100;
+        unit.posY = 200;
+        unit.setIndex(0);
+        unit.setLane(1);
+        unit.setAllyBase(mockBase);
+        testunit.setTargetBase(mockEnemyBase);
+        
+        List<List<Unit>> allLanes = new ArrayList<>();
+        allLanes.add(new ArrayList<>()); // Lane 0 (vide)
+        allLanes.add(lane1Units);        // Lane 1 (avec nos units)
+        
+        when(mockBase.getUnitsPerLane()).thenReturn(allLanes); // ✅ Retourner la vraie structure
+        float initialX = testunit.getPosX();
+        System.out.println("checkpoint");
+        float newX = testunit.calculateNewPositionX(0.16f, 1);
+
+        
+        assertEquals("Should not move", initialX, newX, 0.01f);;
+    }
+
     // ===== Utility Tests =====
 
     @Test
@@ -875,5 +925,79 @@ public class UnitTest {
         
         // Test: l'unité à l'index 1 vérifie la collision avec l'unité à l'index 0
         assertFalse("Should not collide", testunit.checkUnitCollisions(10f, 200f));
+    }
+
+    @Test
+    public void testGetBase(){
+        unit.setAllyBase(mockBase);
+        assertEquals("AllyBase should be set", mockBase, unit.getAllyBase());
+    }
+
+    @Test
+    public void testMoveStateAttackingCooldownZero(){
+        when(mockUnit.getPosY()).thenReturn(200f);
+        when(mockUnit.getPosX()).thenReturn(110f);
+        when(mockUnit.isDead()).thenReturn(false);
+        unit.setTarget(mockUnit);
+        unit.attack();
+        unit.setCooldown(0);
+        unit.move(1.16f);
+        assertEquals("Unit should be attacking", UnitState.ATTACKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testMoveStateAttackingTargetDead(){
+        when(mockUnit.getPosY()).thenReturn(200f);
+        when(mockUnit.getPosX()).thenReturn(110f);
+        when(mockUnit.isDead()).thenReturn(false);
+        unit.setTarget(mockUnit);
+        unit.attack();
+        unit.setCooldown(0);
+        when(mockUnit.isDead()).thenReturn(true);
+        unit.move(1.16f);
+        assertEquals("Unit should be walking", UnitState.WALKING, unit.getCurrentState());
+    }
+
+
+    @Test
+    public void testMoveStateAttackingTargetNull(){
+        when(mockUnit.getPosY()).thenReturn(200f);
+        when(mockUnit.getPosX()).thenReturn(110f);
+        when(mockUnit.isDead()).thenReturn(false);
+        unit.setTarget(mockUnit);
+        unit.attack();
+        unit.setCooldown(0);
+        unit.target = null;
+        unit.move(1.16f);
+        assertEquals("Unit should be walking", UnitState.WALKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testMoveTargetNullBaseNotNullCooldownZero(){
+        unit.target = null;
+        unit.setTargetBase(mockEnemyBase);
+        when(mockEnemyBase.getPosition()).thenReturn(new Position(110, 200));
+        unit.move(0.16f);
+        assertEquals("Should be attacking", UnitState.ATTACKING, unit.getCurrentState());
+    }
+
+    @Test
+    public void testMoveTargetNullBaseNotNullCooldownNotZero(){
+        unit.target = null;
+        unit.setTargetBase(mockEnemyBase);
+        unit.setCooldown(4);
+        when(mockEnemyBase.getPosition()).thenReturn(new Position(110, 200));
+        unit.move(0.16f);
+        assertEquals("Should be idle", UnitState.IDLE, unit.getCurrentState());
+    }
+
+    @Test
+    public void testMoveTargetNullBaseNull(){
+        unit.target = null;
+        unit.setTargetBase(mockEnemyBase);
+        unit.setCooldown(4);
+        when(mockEnemyBase.getPosition()).thenReturn(new Position(5000, 200));
+        unit.move(0.16f);
+        assertEquals("Should be walking", UnitState.WALKING, unit.getCurrentState());
     }
 }

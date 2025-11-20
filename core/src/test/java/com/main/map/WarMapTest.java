@@ -1,18 +1,22 @@
 package com.main.map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.backends.headless.HeadlessApplicationConfiguration;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import org.mockito.Mockito;
 
 public class WarMapTest {
 
@@ -82,24 +86,6 @@ public class WarMapTest {
         // largeur tiles * 16 pixels * 2 scale
         int expectedWidth = warMap.getMapWidth() * 16 * 2;
         assertEquals("Map width should be calculated correctly", expectedWidth, widthPixels);
-    }
-
-    @Test
-    public void testIsCollisionPoint_FreeSpace() {
-        // Tester un point dans un espace libre (coin supérieur gauche)
-        boolean collision = warMap.isCollision(10, 10);
-        // Le résultat dépend de la carte, mais on vérifie que la méthode fonctionne
-        assertTrue("Method should return a boolean value", collision || !collision);
-    }
-
-    @Test
-    public void testIsCollisionPoint_WithCoordinates() {
-        // Tester plusieurs points pour vérifier le fonctionnement
-        warMap.isCollision(0, 0);
-        warMap.isCollision(100, 100);
-        warMap.isCollision(500, 300);
-        // Si aucune exception n'est levée, le test passe
-        assertTrue("isCollision should work without throwing exceptions", true);
     }
 
     @Test
@@ -224,20 +210,5 @@ public class WarMapTest {
                      expectedWidthPixels, widthPixels);
         assertEquals("Height in pixels should match tiles * tileHeight * scale", 
                      expectedHeightPixels, heightPixels);
-    }
-
-    @Test
-    public void testCollisionDetection_Consistency() {
-        // Tester que isCollision et isCollisionRect sont cohérents
-        float x = 100;
-        float y = 100;
-        
-        boolean pointCollision = warMap.isCollision(x, y);
-        boolean rectCollision = warMap.isCollisionRect(x, y, 1, 1);
-        
-        // Si un point est en collision, un rectangle de 1x1 au même endroit devrait l'être aussi
-        if (pointCollision) {
-            assertTrue("Rectangle collision should match point collision", rectCollision);
-        }
     }
 }

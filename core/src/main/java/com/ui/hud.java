@@ -10,48 +10,112 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
- * HUD (Heads-Up Display) class for displaying game UI elements
- * such as health bar and gold counter.
+ * The {@code hud} class manages the Heads-Up Display (HUD) for the game.
+ * It is responsible for rendering and updating all user interface elements,
+ * including health bars, gold counter, and base health indicators.
+ * The HUD provides essential player and base information during gameplay.
+ * Implements {@link Disposable} for proper resource management.
  */
 public class hud implements Disposable {
     
-    // Viewport and camera for UI rendering
+    /**
+     * Viewport for scaling and positioning UI elements.
+     */
     private Viewport viewport;
+
+    /**
+     * Orthographic camera for rendering HUD elements in 2D.
+     */
     private OrthographicCamera camera;
-    
-    // Rendering components
+
+    /**
+     * SpriteBatch for drawing textures and fonts.
+     */
     private SpriteBatch batch;
+
+    /**
+     * ShapeRenderer for drawing shapes (bars, overlays).
+     */
     private ShapeRenderer shapeRenderer;
+
+    /**
+     * BitmapFont for rendering text in the HUD.
+     */
     private BitmapFont font;
-    
-    // Health bar component
+
+    /**
+     * Health bar component for displaying player health.
+     */
     private healthbar healthBar;
-    
-    // Base health bars (verticales)
+
+    /**
+     * Vertical health bar for the player's base.
+     */
     private BaseHealthBar playerBaseHealthBar;
+
+    /**
+     * Vertical health bar for the enemy base.
+     */
     private BaseHealthBar enemyBaseHealthBar;
-    
-    // Gold display
+
+    /**
+     * Gold display component for showing current gold amount.
+     */
     private gold goldDisplay;
-    
-    // UI positions and dimensions
+
+    /**
+     * X position for the player health bar.
+     */
     private static final float HEALTH_BAR_X = 20f;
-    private static final float HEALTH_BAR_Y = 525f; 
+
+    /**
+     * Y position for the player health bar.
+     */
+    private static final float HEALTH_BAR_Y = 525f;
+
+    /**
+     * X position for the gold display.
+     */
     private static final float GOLD_X = 40f;
+
+    /**
+     * Y position for the gold display.
+     */
     private static final float GOLD_Y = 535f;
-    
-    // Base health bar positions and dimensions (barres verticales pour les bases)
-    private static final float BASE_HEALTH_BAR_WIDTH = 8f;   // Largeur fine pour barre verticale
-    private static final float BASE_HEALTH_BAR_HEIGHT = 150f; // Hauteur pour barre verticale
-    
-    // Ces valeurs seront calculées dynamiquement en fonction de la caméra et des bases
+
+    /**
+     * Width of the vertical base health bars.
+     */
+    private static final float BASE_HEALTH_BAR_WIDTH = 8f;
+
+    /**
+     * Height of the vertical base health bars.
+     */
+    private static final float BASE_HEALTH_BAR_HEIGHT = 150f;
+
+    /**
+     * X position for the player base health bar (updated dynamically).
+     */
     private float playerBaseHealthBarX = 20f;
-    private float playerBaseHealthBarY = 150f;  // Position verticale à côté de la base
+
+    /**
+     * Y position for the player base health bar (updated dynamically).
+     */
+    private float playerBaseHealthBarY = 150f;
+
+    /**
+     * X position for the enemy base health bar (updated dynamically).
+     */
     private float enemyBaseHealthBarX = 755f;
-    private float enemyBaseHealthBarY = 150f;   // Position verticale à côté de la base
+
+    /**
+     * Y position for the enemy base health bar (updated dynamically).
+     */
+    private float enemyBaseHealthBarY = 150f;
     
     /**
-     * Constructor for HUD
+     * Constructs the HUD and initializes all UI components, rendering tools, and positions.
+     * Sets up camera, viewport, health bars, and gold display.
      */
     public hud() {
         // Initialize camera and viewport
@@ -80,7 +144,13 @@ public class hud implements Disposable {
     }
     
     /**
-     * Constructor for dependency injection (testing)
+     * Constructs the HUD for testing or dependency injection, allowing custom rendering components.
+     *
+     * @param batch SpriteBatch for drawing
+     * @param shapeRenderer ShapeRenderer for shapes
+     * @param font BitmapFont for text
+     * @param healthBar Health bar component
+     * @param goldDisplay Gold display component
      */
     protected hud(SpriteBatch batch, ShapeRenderer shapeRenderer, BitmapFont font,
                   healthbar healthBar, gold goldDisplay) {
@@ -96,9 +166,10 @@ public class hud implements Disposable {
     }
     
     /**
-     * Update HUD with current player stats
-     * @param currentHealth Current health of the hero
-     * @param maxHealth Maximum health of the hero
+     * Updates the HUD with the current player health and gold values.
+     *
+     * @param currentHealth Current health of the player
+     * @param maxHealth Maximum health of the player
      * @param currentGold Current gold amount
      */
     public void update(int currentHealth, int maxHealth, int currentGold) {
@@ -107,11 +178,12 @@ public class hud implements Disposable {
     }
     
     /**
-     * Update base health bars
-     * @param playerBaseHealth Current health of player base
-     * @param playerBaseMaxHealth Maximum health of player base
-     * @param enemyBaseHealth Current health of enemy base
-     * @param enemyBaseMaxHealth Maximum health of enemy base
+     * Updates the health bars for both player and enemy bases.
+     *
+     * @param playerBaseHealth Current health of the player base
+     * @param playerBaseMaxHealth Maximum health of the player base
+     * @param enemyBaseHealth Current health of the enemy base
+     * @param enemyBaseMaxHealth Maximum health of the enemy base
      */
     public void updateBaseHealth(int playerBaseHealth, int playerBaseMaxHealth, 
                                   int enemyBaseHealth, int enemyBaseMaxHealth) {
@@ -120,12 +192,14 @@ public class hud implements Disposable {
     }
     
     /**
-     * Update base health bar positions (appelé depuis GameScreen avec positions des bases)
-     * @param playerBaseX Position X de la base du joueur (dans le monde)
-     * @param playerBaseY Position Y de la base du joueur
-     * @param enemyBaseX Position X de la base ennemie
-     * @param enemyBaseY Position Y de la base ennemie
-     * @param gameCamera Caméra du jeu pour convertir les coordonnées monde en UI
+     * Updates the positions of the base health bars based on the world coordinates of the bases.
+     * Called from GameScreen to synchronize UI with game world.
+     *
+     * @param playerBaseX X position of the player base in world coordinates
+     * @param playerBaseY Y position of the player base in world coordinates
+     * @param enemyBaseX X position of the enemy base in world coordinates
+     * @param enemyBaseY Y position of the enemy base in world coordinates
+     * @param gameCamera Game camera for coordinate conversion
      */
     public void updateBaseHealthBarPositions(float playerBaseX, float playerBaseY,
                                               float enemyBaseX, float enemyBaseY,
@@ -155,7 +229,8 @@ public class hud implements Disposable {
     }
     
     /**
-     * Render the HUD
+     * Renders the HUD, including health bar and gold display.
+     * Should be called every frame to update UI elements.
      */
     public void render() {
         // Update camera
@@ -173,8 +248,9 @@ public class hud implements Disposable {
     }
     
     /**
-     * Render base health bars in game world (with game camera)
-     * @param gameCamera Camera from the game world
+     * Renders the base health bars in the game world using the provided camera.
+     *
+     * @param gameCamera Camera from the game world for correct positioning
      */
     public void renderBaseHealthBars(OrthographicCamera gameCamera) {
         // Set projection matrix to game camera for world-space rendering
@@ -187,9 +263,10 @@ public class hud implements Disposable {
     }
     
     /**
-     * Resize the viewport when window size changes
-     * @param width New width
-     * @param height New height
+     * Resizes the HUD viewport when the window size changes.
+     *
+     * @param width New width of the window
+     * @param height New height of the window
      */
     public void resize(int width, int height) {
         viewport.update(width, height);
@@ -197,32 +274,36 @@ public class hud implements Disposable {
     }
     
     /**
-     * Add gold to the current amount
-     * @param amount Amount to add
+     * Adds gold to the current amount displayed in the HUD.
+     *
+     * @param amount Amount of gold to add
      */
     public void addGold(int amount) {
         goldDisplay.addGold(amount);
     }
     
     /**
-     * Remove gold from the current amount
-     * @param amount Amount to remove
-     * @return true if successful, false if not enough gold
+     * Removes gold from the current amount displayed in the HUD.
+     *
+     * @param amount Amount of gold to remove
+     * @return {@code true} if gold was successfully removed, {@code false} if not enough gold
      */
     public boolean removeGold(int amount) {
         return goldDisplay.removeGold(amount);
     }
     
     /**
-     * Get current gold amount
-     * @return Current gold
+     * Gets the current gold amount displayed in the HUD.
+     *
+     * @return Current gold value
      */
     public int getGold() {
         return goldDisplay.getGold();
     }
     
     /**
-     * Set gold amount directly
+     * Sets the gold amount directly in the HUD.
+     *
      * @param gold Gold amount to set
      */
     public void setGold(int gold) {
@@ -230,13 +311,18 @@ public class hud implements Disposable {
     }
     
     /**
-     * Getter for goldDisplay
-     * @return Current gold display object
+     * Gets the gold display component for direct access.
+     *
+     * @return The {@link gold} display object
      */
     public gold getGoldDisplay() {
         return goldDisplay;
     }
     
+    /**
+     * Disposes all resources used by the HUD, including rendering components and UI elements.
+     * Should be called when the HUD is no longer needed to free memory.
+     */
     @Override
     public void dispose() {
         batch.dispose();
