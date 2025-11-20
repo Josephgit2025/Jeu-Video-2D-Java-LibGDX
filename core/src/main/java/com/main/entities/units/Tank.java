@@ -85,7 +85,7 @@ public class Tank extends Soldier {
      * @return Duration of the attack animation in seconds.
      */
     @Override
-    protected float getAttackAnimationDuration() {
+    public float getAttackAnimationDuration() {
         if (attackAnimation != null) {
             return attackAnimation.getAnimationDuration();
         }
