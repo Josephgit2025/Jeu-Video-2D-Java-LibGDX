@@ -39,4 +39,8 @@ public abstract class Weapon {
     public int getMaxMunitions(){
         return maxMunition;
     }
+
+    public void setMunition(int mun){
+        this.munitions = mun;
+    }
 }

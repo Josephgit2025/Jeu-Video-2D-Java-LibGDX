@@ -421,7 +421,6 @@ public abstract class Unit {
         float distance = 0;
         float distanceHero = 0;
         if (this.getIndex() == 0){
-            System.out.println(this);
             if (this.allyBase.getHero() != null){
                 float dxH = newX - this.allyBase.getHero().getPosX();
                 float dyH = newY - this.allyBase.getHero().getPosY();
@@ -494,13 +493,17 @@ public abstract class Unit {
                 return;
             }
             if (target != null && !target.isDead()) {
+                System.out.println("On entre la ? " + this.target);
                 if (attackCooldown <= 0) {
                     attack();
-                } else {
+                }
+                else {
                     currentState = UnitState.IDLE;
                 }
-            } else {
+            }
+            else {
                 // Cible morte → repasser à WALKING
+                System.out.println("Allo ?");
                 currentState = UnitState.WALKING;
                 target = null;
             }

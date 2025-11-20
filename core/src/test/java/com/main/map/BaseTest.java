@@ -26,7 +26,13 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.main.GameScreen;
 import com.main.entities.Unit;
+import com.main.entities.enemies.CZombie;
+import com.main.entities.enemies.FZombie;
+import com.main.entities.enemies.WZombie;
 import com.main.entities.player.Hero;
+import com.main.entities.units.Melee;
+import com.main.entities.units.Sniper;
+import com.main.entities.units.Tank;
 import com.main.utils.Position;
 
 public class BaseTest {
@@ -631,5 +637,49 @@ public class BaseTest {
         assertNull("Should be null", result);
         result = playerBase.buyUnit(Base.Type.TANK, 0, mockHero);
         assertNull("Should be null", result);
+    }
+
+    @Test
+    public void fullTestSpawnUnitPlayerBase(){
+        Tank tank = null;
+        Melee melee = null;
+        Sniper sniper = null;
+        while (tank == null || melee == null || sniper == null){
+            Unit tmp = playerBase.spawnUnit(mockScreen, 6f);
+            if (tmp instanceof Tank){
+                tank = (Tank)tmp;
+            }
+            if (tmp instanceof Melee){
+                melee = (Melee)tmp;
+            }
+            if (tmp instanceof Sniper){
+                sniper = (Sniper)tmp;
+            }
+        }
+        assertNotNull("Should not be null", tank);
+        assertNotNull("Should not be null", sniper);
+        assertNotNull("Should not be null", melee);
+    }
+
+    @Test
+    public void fullTestSpawnUnitEnemyBase(){
+        WZombie wzombie = null;
+        CZombie czombie = null;
+        FZombie fzombie = null;
+        while (wzombie == null || czombie == null || fzombie == null){
+            Unit tmp = enemyBase.spawnUnit(mockScreen, 6f);
+            if (tmp instanceof WZombie){
+                wzombie = (WZombie)tmp;
+            }
+            if (tmp instanceof CZombie){
+                czombie = (CZombie)tmp;
+            }
+            if (tmp instanceof FZombie){
+                fzombie = (FZombie)tmp;
+            }
+        }
+        assertNotNull("Should not be null", wzombie);
+        assertNotNull("Should not be null", czombie);
+        assertNotNull("Should not be null", fzombie);
     }
 }

@@ -386,7 +386,7 @@ public class Hero extends Unit {
         return false;
     }
 
-    private boolean checkHeroSoldierCollisions(float newX, float newY, Unit soldier) {
+    protected boolean checkHeroSoldierCollisions(float newX, float newY, Unit soldier) {
         if (soldier == null || soldier.isDead()) {
             return false;
         }
@@ -754,5 +754,13 @@ public class Hero extends Unit {
      */
     public void setShootSound(Sound shootSound) {
         this.shootSound = shootSound;
+    }
+
+    public Sound getShootSound() {
+        return shootSound;
+    }
+
+    public Weapon getWeapon(){
+        return this.weapon;
     }
 }
