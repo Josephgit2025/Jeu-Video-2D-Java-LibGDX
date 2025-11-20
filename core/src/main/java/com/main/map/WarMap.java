@@ -150,23 +150,6 @@ public class WarMap {
     }
 
     /**
-     * Checks if the given point (posX, posY) is inside any collision rectangle.
-     * Used for point-based collision detection (e.g., player position).
-     *
-     * @param posX X coordinate of the point
-     * @param posY Y coordinate of the point
-     * @return True if the point is inside a collision rectangle, false otherwise
-     */
-    public boolean isCollision(float posX, float posY){
-        for (Rectangle rect : collisionRects) {
-            if (rect.contains(posX, posY)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Checks if a rectangle (entity hitbox) overlaps any collision rectangle (obstacle).
      * Used for entity-based collision detection (player, enemy, etc.).
      *

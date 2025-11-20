@@ -572,7 +572,7 @@ public class SniperTest {
         assertEquals("Sniper specific range", 150, sniper.getRange()); // Longue portée
         assertEquals("Sniper slower attack", 3f, sniper.getAttackSpeed(), 0.01f);
     }
-
+    
     @Test
     public void testSniperHasAnimations() {
         assertNotNull("Walk animation should be loaded", sniper.walkAnimation);

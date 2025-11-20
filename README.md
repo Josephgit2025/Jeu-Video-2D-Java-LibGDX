@@ -10,7 +10,7 @@ Clone le projet puis utilise le wrapper Gradle :
 ```bash
 git clone <repo-url>
 cd T-JAV-501-NAN_2
-./gradlew build
+make
 ```
 
 ## Structure des modules / Platforms

@@ -15,22 +15,22 @@ import com.main.map.Base;
  * Handles position, health, attack, movement, and rendering logic.
  */
 public abstract class Unit {
-        /**
-         * Lane index for lane-based movement and targeting.
-         */
-        private int lane;
+    /**
+     * Lane index for lane-based movement and targeting.
+     */
+    private int lane;
     /**
      * Base health value for global unit balancing.
      */
-    public static final int HP_BASE = 200;
+    protected static final int HP_BASE = 200;
     /**
      * Base attack damage for global unit balancing.
      */
-    public static final float DAMAGE_BASE = 30f;
+    protected static final float DAMAGE_BASE = 30f;
     /**
      * Base attack speed (seconds between attacks) for global unit balancing.
      */
-    public static final float ATTACK_SPEED_BASE = 1.5f;
+    protected static final float ATTACK_SPEED_BASE = 1.5f;
 
     /**
      * Unit states for animation and behavior control.
@@ -67,7 +67,7 @@ public abstract class Unit {
     /** Movement speed of the unit. */
     protected float speed;
     /** Current target of the unit. */
-    public Unit target;
+    protected Unit target;
     /**
      * Reference to the enemy base for attack logic.
      */
@@ -112,7 +112,7 @@ public abstract class Unit {
      *
      * @return Duration of the attack animation in seconds
      */
-    protected float getAttackAnimationDuration() {
+    public float getAttackAnimationDuration() {
         return ATTACK_ANIMATION_DURATION;
     }
 
@@ -287,7 +287,7 @@ public abstract class Unit {
      * @param enemies List of enemy units to check.
      * @return List of units within attack range.
      */
-    public List<Unit> detectEnemiesInRange(List<Unit> enemies) {
+    protected List<Unit> detectEnemiesInRange(List<Unit> enemies) {
         List<Unit> inRange = new ArrayList<>();
         for (Unit unit : enemies) {
             if (unit != this && !unit.isDead()) {
@@ -415,25 +415,8 @@ public abstract class Unit {
                 currentState = UnitState.ATTACKING;
                 attackAnimationTimer = getAttackAnimationDuration();
                 this.stateTime = 0f;
-                return;
             }
         }
-
-        // Priority 2: Attack enemy base if in range and no units to fight
-        // if (targetBase != null && target == null) {
-        //     double distanceToBase = calculateDistanceToBase();
-        //     if (distanceToBase <= BASE_ATTACK_RANGE && attackCooldown <= 0) {
-        //         System.out.println(this.getClass().getSimpleName() + " attacks enemy BASE" +
-        //                 " (HP: " + targetBase.getHealth() + " -> " + (targetBase.getHealth() - attackDamage) + ")");
-        //         targetBase.takeDamage(attackDamage);
-        //         attackCooldown = attackSpeed;
-        //         currentState = UnitState.ATTACKING;
-        //         attackAnimationTimer = getAttackAnimationDuration();
-        //         this.stateTime = 0f;
-        //         return;
-        //     }
-        // }
-        // No default fallback here; attacks are handled above for targets or base.
     }
 
 
@@ -521,7 +504,6 @@ public abstract class Unit {
         float distance = 0;
         float distanceHero = 0;
         if (this.getIndex() == 0){
-            // System.out.println(this);
             if (this.allyBase.getHero() != null){
                 float dxH = newX - this.allyBase.getHero().getPosX();
                 float dyH = newY - this.allyBase.getHero().getPosY();
@@ -597,13 +579,17 @@ public abstract class Unit {
                 return;
             }
             if (target != null && !target.isDead()) {
+                System.out.println("On entre la ? " + this.target);
                 if (attackCooldown <= 0) {
                     attack();
-                } else {
+                }
+                else {
                     currentState = UnitState.IDLE;
                 }
-            } else {
+            }
+            else {
                 // Cible morte → repasser à WALKING
+                System.out.println("Allo ?");
                 currentState = UnitState.WALKING;
                 target = null;
             }
