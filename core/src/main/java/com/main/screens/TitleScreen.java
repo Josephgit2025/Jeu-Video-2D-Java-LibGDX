@@ -88,6 +88,26 @@ public class TitleScreen implements Screen {
     protected int selectedIndex = -1;
 
     /**
+     * Index of the last hovered menu item for tracking hover changes.
+     */
+    private int lastHoveredIndex = -1;
+
+    /**
+     * Time elapsed since hover started, used for smooth zoom transition.
+     */
+    private float hoverTime = 0f;
+
+    /**
+     * Duration of the hover zoom transition animation in seconds.
+     */
+    private static final float ZOOM_TRANSITION_DURATION = 0.15f;
+
+    /**
+     * Maximum scale factor when button is fully hovered (1.2 = 20% bigger).
+     */
+    private static final float MAX_ZOOM_SCALE = 1.2f;
+
+    /**
      * Constructs the TitleScreen and initializes all resources (background, logo, font, camera, viewport).
      * Handles resource loading and fallback for headless mode.
      *
@@ -160,6 +180,12 @@ public class TitleScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
 
         updateHover();
+        
+        // Update zoom animation time
+        if (selectedIndex != -1 && selectedIndex == lastHoveredIndex) {
+            hoverTime = Math.min(hoverTime + delta, ZOOM_TRANSITION_DURATION);
+        }
+        
         handleInput();
 
         batch.begin();
@@ -201,30 +227,39 @@ public class TitleScreen implements Screen {
             
             // Dessiner PLAY
             float playX = startX;
-            if (selectedIndex == 0) {
-                font.setColor(Color.YELLOW);
-            } else {
-                font.setColor(Color.WHITE);
-            }
-            font.draw(batch, playLayout, playX, buttonY);
+            float playScale = getZoomScale(0);
+            font.getData().setScale(0.8f * playScale);
+            font.setColor(Color.WHITE);
+            GlyphLayout playScaledLayout = new GlyphLayout(font, "PLAY");
+            // Centrer le texte zoomé autour de la position originale
+            float playCenterX = playX + playLayout.width / 2f;
+            float playCenterY = buttonY;
+            font.draw(batch, playScaledLayout, playCenterX - playScaledLayout.width / 2f, playCenterY);
             
             // Dessiner OPTIONS
             float optionsX = startX + playLayout.width + buttonSpacing;
-            if (selectedIndex == 1) {
-                font.setColor(Color.YELLOW);
-            } else {
-                font.setColor(Color.WHITE);
-            }
-            font.draw(batch, optionsLayout, optionsX, buttonY);
+            float optionsScale = getZoomScale(1);
+            font.getData().setScale(0.8f * optionsScale);
+            font.setColor(Color.WHITE);
+            GlyphLayout optionsScaledLayout = new GlyphLayout(font, "OPTIONS");
+            // Centrer le texte zoomé autour de la position originale
+            float optionsCenterX = optionsX + optionsLayout.width / 2f;
+            float optionsCenterY = buttonY;
+            font.draw(batch, optionsScaledLayout, optionsCenterX - optionsScaledLayout.width / 2f, optionsCenterY);
             
             // Dessiner QUIT
             float quitX = startX + playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing;
-            if (selectedIndex == 2) {
-                font.setColor(Color.YELLOW);
-            } else {
-                font.setColor(Color.WHITE);
-            }
-            font.draw(batch, quitLayout, quitX, buttonY);
+            float quitScale = getZoomScale(2);
+            font.getData().setScale(0.8f * quitScale);
+            font.setColor(Color.WHITE);
+            GlyphLayout quitScaledLayout = new GlyphLayout(font, "QUIT");
+            // Centrer le texte zoomé autour de la position originale
+            float quitCenterX = quitX + quitLayout.width / 2f;
+            float quitCenterY = buttonY;
+            font.draw(batch, quitScaledLayout, quitCenterX - quitScaledLayout.width / 2f, quitCenterY);
+            
+            // Reset scale
+            font.getData().setScale(1f);
         }
 
         batch.end();
@@ -290,6 +325,7 @@ public class TitleScreen implements Screen {
         float mx = mouse.x;
         float my = mouse.y;
 
+        int previousIndex = selectedIndex;
         selectedIndex = -1;
         
         // Position Y des boutons (même que dans render)
@@ -347,7 +383,35 @@ public class TitleScreen implements Screen {
             selectedIndex = 2;
         }
         
+        // Reset hover time if we changed button or stopped hovering
+        if (selectedIndex != previousIndex) {
+            hoverTime = 0f;
+            lastHoveredIndex = selectedIndex;
+        }
+        
         font.getData().setScale(1f);
+    }
+
+    /**
+     * Calculates the zoom scale factor for a button based on hover time.
+     * Creates a smooth zoom transition effect when hovering over menu items.
+     *
+     * @param buttonIndex The index of the button to get the scale for
+     * @return The scale factor (1.0 = normal size, MAX_ZOOM_SCALE = fully zoomed)
+     */
+    private float getZoomScale(int buttonIndex) {
+        if (selectedIndex != buttonIndex) {
+            return 1.0f;
+        }
+        
+        // Calculate interpolation factor (0.0 to 1.0)
+        float t = Math.min(hoverTime / ZOOM_TRANSITION_DURATION, 1.0f);
+        
+        // Smooth interpolation using ease-out cubic function
+        t = 1f - (float)Math.pow(1f - t, 3);
+        
+        // Interpolate between 1.0 (normal) and MAX_ZOOM_SCALE (zoomed)
+        return 1.0f + (MAX_ZOOM_SCALE - 1.0f) * t;
     }
 
     /**
