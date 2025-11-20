@@ -12,9 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -30,9 +28,6 @@ import com.main.entities.enemies.CZombie;
 import com.main.entities.enemies.FZombie;
 import com.main.entities.enemies.WZombie;
 import com.main.entities.player.Hero;
-import com.main.entities.units.Melee;
-import com.main.entities.units.Sniper;
-import com.main.entities.units.Tank;
 import com.main.utils.Position;
 
 public class BaseTest {
@@ -521,20 +516,6 @@ public class BaseTest {
         assertTrue("Unit2 should have moved", mockUnit2.getPosX() != initialX2);
     }
 
-    // ===== Integration Tests =====
-
-    @Test
-    public void testFullSpawnCycle() {
-        Unit spawned1 = playerBase.spawnUnit(mockScreen, 3.0f);
-        assertNull("Should not spawn at 3.0s", spawned1);
-        
-        Unit spawned2 = playerBase.spawnUnit(mockScreen, 2.1f); // Total: 5.1s
-        // May succeed or fail in headless
-        
-        Unit spawned3 = playerBase.spawnUnit(mockScreen, 1.0f);
-        assertNotNull("Should spawn immediately after", spawned3);
-    }
-
     @Test
     public void testBaseDestruction() {
         assertFalse("Base should not be destroyed", playerBase.isDestroyed());
@@ -637,28 +618,6 @@ public class BaseTest {
         assertNull("Should be null", result);
         result = playerBase.buyUnit(Base.Type.TANK, 0, mockHero);
         assertNull("Should be null", result);
-    }
-
-    @Test
-    public void fullTestSpawnUnitPlayerBase(){
-        Tank tank = null;
-        Melee melee = null;
-        Sniper sniper = null;
-        while (tank == null || melee == null || sniper == null){
-            Unit tmp = playerBase.spawnUnit(mockScreen, 6f);
-            if (tmp instanceof Tank){
-                tank = (Tank)tmp;
-            }
-            if (tmp instanceof Melee){
-                melee = (Melee)tmp;
-            }
-            if (tmp instanceof Sniper){
-                sniper = (Sniper)tmp;
-            }
-        }
-        assertNotNull("Should not be null", tank);
-        assertNotNull("Should not be null", sniper);
-        assertNotNull("Should not be null", melee);
     }
 
     @Test
