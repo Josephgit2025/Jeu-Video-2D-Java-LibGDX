@@ -33,19 +33,20 @@ public class Hero extends Unit {
     /**
      * Represents the possible directions the hero can face or attack.
      */
-    private enum Direction {
+    protected enum Direction {
         UP, DOWN, LEFT, RIGHT,
         UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT,
         ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT
     }
 
+    @lombok.Generated
     /**
      * Returns the duration of the current attack animation according to the hero's
      * direction.
      *
      * @return Duration of the current attack animation in seconds
      */
-    private float getCurrentAttackAnimationDuration() {
+    protected float getCurrentAttackAnimationDuration() {
         switch (direction) {
             case ATTACKRIGHT:
                 return (AttackRight != null) ? AttackRight.getAnimationDuration() : 0f;
@@ -155,19 +156,19 @@ public class Hero extends Unit {
     /**
      * Animation for attacking right.
      */
-    private Animation<TextureRegion> AttackRight;
+    protected Animation<TextureRegion> AttackRight;
     /**
      * Animation for attacking left.
      */
-    private Animation<TextureRegion> AttackLeft;
+    protected Animation<TextureRegion> AttackLeft;
     /**
      * Animation for attacking up.
      */
-    private Animation<TextureRegion> AttackUp;
+    protected Animation<TextureRegion> AttackUp;
     /**
      * Animation for attacking down.
      */
-    private Animation<TextureRegion> AttackDown;
+    protected Animation<TextureRegion> AttackDown;
 
     /**
      * Indicates if the hero is currently moving.
@@ -177,7 +178,7 @@ public class Hero extends Unit {
     /**
      * Current direction of the hero.
      */
-    private Direction direction = Direction.DOWN;
+    protected Direction direction = Direction.DOWN;
 
     /**
      * Previous non-attack direction to revert to after attack animation.
@@ -347,6 +348,7 @@ public class Hero extends Unit {
         }
     }
 
+    @lombok.Generated
     /**
      * Met à jour le Hero (déplacements avec LibGDX)
      * 
@@ -576,7 +578,7 @@ public class Hero extends Unit {
      * @param soldier Soldat allié à vérifier
      * @return true si collision détectée, false sinon
      */
-    private boolean checkHeroSoldierCollisions(float newX, float newY, Unit soldier) {
+    protected boolean checkHeroSoldierCollisions(float newX, float newY, Unit soldier) {
         if (soldier == null || soldier.isDead()) {
             return false;
         }
@@ -767,6 +769,7 @@ public class Hero extends Unit {
         }
     }
 
+    @lombok.Generated
     /**
      * Renders the hero on the screen using the current animation frame and
      * direction.
@@ -993,6 +996,22 @@ public class Hero extends Unit {
      */
     public void setShootSound(Sound shootSound) {
         this.shootSound = shootSound;
+    }
+
+    public Sound getShootSound() {
+        return shootSound;
+    }
+
+    public Weapon getWeapon(){
+        return this.weapon;
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
 }

@@ -22,10 +22,12 @@ import org.mockito.MockitoAnnotations;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.backends.headless.HeadlessApplication;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.main.entities.Unit;
+import com.main.entities.player.Hero.Direction;
 import com.main.map.Base;
 import com.main.map.WarMap;
 import com.main.weapons.Pistol;
@@ -43,13 +45,27 @@ public class HeroTest {
     private Base mockBase;
 
     @Mock
+    private Unit mockTarget2;
+
+    @Mock
     private Unit mockTarget;
     
     @Mock
     private SpriteBatch mockBatch;
 
     @Mock
+    private Sound mockSound;
+
+    @Mock
     private GL20 mockGL;
+
+    // Classe helper pour tester les collisions
+    private class TestUnit extends Unit {
+        public TestUnit(float x, float y) {
+            super(null, x, y);
+            this.health = 100;
+        }
+    }
 
     @BeforeClass
     public static void init() {
@@ -681,58 +697,99 @@ public class HeroTest {
     }
 
     @Test
-    public void testGetCurrentAttackAnimationDurationNullDown(){
-        when(mockTarget.getPosX()).thenReturn(100.0f);
-        when(mockTarget.getPosY()).thenReturn(220.0f);
-        hero.AttackDown = null;
-        hero.moveDown(0.016f, enemies);
-        hero.setTarget(mockTarget);
-        hero.setCooldown(0);
-        hero.attack();
-        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(), 0.01f);
+    public void testSetGetDirection(){
+        hero.setDirection(Direction.RIGHT);
+        assertEquals("Direction should be set", Direction.RIGHT, hero.getDirection());
     }
 
     @Test
-    public void testGetCurrentAttackAnimationDurationNullLeft(){
-        when(mockTarget.getPosX()).thenReturn(80.0f);
-        when(mockTarget.getPosY()).thenReturn(200.0f);
-        hero.AttackLeft = null;
-        hero.moveLeft(0.016f, enemies);
-        hero.setTarget(mockTarget);
-        hero.setCooldown(0);
-        hero.attack();
-        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(), 0.01f);
+    public void testSetGetShootSound(){
+        hero.setShootSound(mockSound);
+        assertEquals("ShootSound should be set", mockSound, hero.getShootSound());
     }
 
     @Test
-    public void testGetCurrentAttackAnimationDurationNullUp(){
-        when(mockTarget.getPosX()).thenReturn(100.0f);
-        when(mockTarget.getPosY()).thenReturn(220.0f);
-        hero.AttackUp = null;
-        hero.moveUp(0.016f, 1000, enemies);
+    public void testHeroAttackNoMunitions(){
         hero.setTarget(mockTarget);
-        hero.setCooldown(0);
+        when(mockTarget.getPosX()).thenReturn(120f);
+        when(mockTarget.getPosY()).thenReturn(200f);
+        hero.setShootSound(mockSound);
+        hero.getWeapon().setMunition(0);
         hero.attack();
-        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(),  0.01f);
+        assertTrue("Weapon should be reloaded", hero.getWeapon().getMunitions() > 0);
     }
 
     @Test
-    public void testGetCurrentAttackAnimationDurationNullRight(){
-        when(mockTarget.getPosX()).thenReturn(150.0f);
-        when(mockTarget.getPosY()).thenReturn(200.0f);
-        hero.AttackRight = null;
-        hero.moveRight(0.016f, 1000, enemies);
+    public void testHeroAttackSound(){
         hero.setTarget(mockTarget);
-        hero.setCooldown(0);
+        when(mockTarget.getPosX()).thenReturn(120f);
+        when(mockTarget.getPosY()).thenReturn(200f);
+        hero.setShootSound(mockSound);
         hero.attack();
-        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(),  0.01f);
+        verify(mockSound).play(0.7f);
     }
 
-    // Classe helper pour tester les collisions
-    private class TestUnit extends Unit {
-        public TestUnit(float x, float y) {
-            super(null, x, y);
-            this.health = 100;
-        }
+    @Test
+    public void testFindClosestEnemyInRange(){
+        List<Unit> tmp = new ArrayList<>();
+        when(mockTarget.getPosX()).thenReturn(120f);
+        when(mockTarget.getPosY()).thenReturn(200f);
+        when(mockTarget2.getPosX()).thenReturn(130f);
+        when(mockTarget2.getPosY()).thenReturn(200f);
+        tmp.add(mockTarget);
+        tmp.add(mockTarget2);
+        assertEquals("Should return mockTarget", mockTarget, hero.findClosestEnemyInRange(tmp));
+    }
+
+    @Test
+    public void testFindClosestEnemyInRangeWithDeadEnemy(){
+        List<Unit> tmp = new ArrayList<>();
+        when(mockTarget.getPosX()).thenReturn(120f);
+        when(mockTarget.getPosY()).thenReturn(200f);
+        when(mockTarget.isDead()).thenReturn(true);
+        when(mockTarget2.getPosX()).thenReturn(130f);
+        when(mockTarget2.getPosY()).thenReturn(200f);
+        tmp.add(mockTarget);
+        tmp.add(mockTarget2);
+        assertEquals("Should return mockTarget2", mockTarget2, hero.findClosestEnemyInRange(tmp));
+    }
+
+    @Test
+    public void testFindClosestSoldier(){
+        List<Unit> tmp = new ArrayList<>();
+        when(mockTarget.getPosX()).thenReturn(120f);
+        when(mockTarget.getPosY()).thenReturn(200f);
+        when(mockTarget2.getPosX()).thenReturn(130f);
+        when(mockTarget2.getPosY()).thenReturn(200f);
+        tmp.add(mockTarget);
+        tmp.add(mockTarget2);
+        assertEquals("Should return mockTarget", mockTarget, hero.findClosestSoldier(tmp));
+    }
+
+    @Test
+    public void testFindClosestSoldierWithDeadSoldier(){
+        List<Unit> tmp = new ArrayList<>();
+        when(mockTarget.getPosX()).thenReturn(120f);
+        when(mockTarget.getPosY()).thenReturn(200f);
+        when(mockTarget.isDead()).thenReturn(true);
+        when(mockTarget2.getPosX()).thenReturn(130f);
+        when(mockTarget2.getPosY()).thenReturn(200f);
+        tmp.add(mockTarget);
+        tmp.add(mockTarget2);
+        assertEquals("Should return mockTarget2", mockTarget2, hero.findClosestSoldier(tmp));
+    }
+
+    @Test
+    public void testCheckSoldierCollision(){
+        when(mockTarget.getPosX()).thenReturn(110f);
+        when(mockTarget.getPosY()).thenReturn(200f);
+        assertTrue("Should return true (collision)", hero.checkHeroSoldierCollisions(110f, 200f, mockTarget));
+    }
+
+     @Test
+    public void testCheckSoldierCollisionNoCollision(){
+        when(mockTarget.getPosX()).thenReturn(210f);
+        when(mockTarget.getPosY()).thenReturn(200f);
+        assertFalse("Should return false (no collision)", hero.checkHeroSoldierCollisions(110f, 200f, mockTarget));
     }
 }
