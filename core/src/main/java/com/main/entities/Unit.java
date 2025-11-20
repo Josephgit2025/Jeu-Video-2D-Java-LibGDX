@@ -329,12 +329,6 @@ public abstract class Unit {
         List<Unit> inRange = detectEnemiesInRange(enemies);
         if (!inRange.isEmpty()) {
             Unit newTarget = findClosestEnemy(inRange);
-            if (this.target != newTarget && newTarget != null) {
-                System.out.println(this.getClass().getSimpleName() + " at (" + (int) posX + "," + (int) posY +
-                        ") targets " + newTarget.getClass().getSimpleName() +
-                        " at (" + (int) newTarget.getPosX() + "," + (int) newTarget.getPosY() +
-                        ") - distance: " + (int) calculateDistance(newTarget) + "/" + range);
-            }
             this.target = newTarget;
         } else {
             // No enemy units available, target enemy base if set
@@ -408,8 +402,6 @@ public abstract class Unit {
         if (target != null && !target.isDead() && attackCooldown <= 0) {
             double distance = calculateDistance(target);
             if (distance <= this.range) {
-                System.out.println(this.getClass().getSimpleName() + " attacks " + target.getClass().getSimpleName() +
-                        " (HP: " + target.getHealth() + " -> " + (target.getHealth() - attackDamage) + ")");
                 target.takeDamage((int)attackDamage);
                 attackCooldown = attackSpeed;
                 currentState = UnitState.ATTACKING;
@@ -547,7 +539,6 @@ public abstract class Unit {
         if (wouldCollideWithBase(newX) || checkUnitCollisions(newX, posY)) {
             return this.posX; // Stay in place
         }
-
         return newX;
     }
 
@@ -572,14 +563,10 @@ public abstract class Unit {
             // advance shared animation timer so attack animations progress when
             // using default move implementation
             this.stateTime += delta;
-            if (before > 0 && attackAnimationTimer <= 0) {
-                System.out.println("[ANIM] " + this.getClass().getSimpleName() + " attack animation finished (was " + before + ")");
-            }
             if (attackAnimationTimer > 0) {
                 return;
             }
             if (target != null && !target.isDead()) {
-                System.out.println("On entre la ? " + this.target);
                 if (attackCooldown <= 0) {
                     attack();
                 }
@@ -589,7 +576,6 @@ public abstract class Unit {
             }
             else {
                 // Cible morte → repasser à WALKING
-                System.out.println("Allo ?");
                 currentState = UnitState.WALKING;
                 target = null;
             }

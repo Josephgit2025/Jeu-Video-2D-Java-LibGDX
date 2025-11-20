@@ -101,21 +101,12 @@ public class WarMap {
 
         for (String layerName : possibleNames) {
             if (tiledMap.getLayers().get(layerName) != null) {
-                System.out.println("Found collision layer: " + layerName);
 
                 for (MapObject object : tiledMap.getLayers().get(layerName).getObjects()) {
                     float x = object.getProperties().get("x", Float.class);
                     float y = object.getProperties().get("y", Float.class);
                     float width = object.getProperties().get("width", Float.class);
                     float height = object.getProperties().get("height", Float.class);
-
-                    // Do not modify Y - Tiled coordinates are correct for LibGDX
-
-                    // DEBUG: Show first few collisions
-                    if (collisionRects.size() < 3) {
-                        System.out.println("Collision object: x=" + x + ", y=" + y + ", width=" + width + ", height=" + height);
-                        System.out.println("Scaled: x=" + (x*scale) + ", y=" + (y*scale) + ", w=" + (width*scale) + ", h=" + (height*scale));
-                    }
 
                     // Apply scale to rectangles
                     Rectangle scaledRect = new Rectangle(
@@ -127,17 +118,9 @@ public class WarMap {
 
                     collisionRects.add(scaledRect);
                 }
-
-                System.out.println("Loaded " + collisionRects.size() + " collision objects");
-                System.out.println("Map dimensions: " + mapWidth + "x" + mapHeight + " tiles");
-                System.out.println("Tile size: " + tileWidth + "x" + tileHeight + " pixels");
-                System.out.println("Scale factor: " + scale);
-                System.out.println("Map size in pixels (scaled): " + (mapWidth*tileWidth*scale) + "x" + (mapHeight*tileHeight*scale));
                 return;
             }
         }
-
-        System.out.println("Warning: No collision layer found!");
     }
 
     /**
