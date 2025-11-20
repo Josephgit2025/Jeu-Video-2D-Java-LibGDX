@@ -19,7 +19,7 @@ public class AssaultRifleTest {
         assertNotNull(rifle);
         assertEquals(30, rifle.getDamage());
         assertEquals(200, rifle.getRange());
-        assertEquals(1f, rifle.getAttackSpeed(), 0.01f);
+        assertEquals(0.7f, rifle.getAttackSpeed(), 0.01f);
         assertEquals(30, rifle.getMaxMunitions());
         assertEquals(30, rifle.getMunitions());
     }
