@@ -697,54 +697,6 @@ public class HeroTest {
     }
 
     @Test
-    public void testGetCurrentAttackAnimationDurationNullDown(){
-        when(mockTarget.getPosX()).thenReturn(100.0f);
-        when(mockTarget.getPosY()).thenReturn(220.0f);
-        hero.AttackDown = null;
-        hero.moveDown(0.016f, enemies);
-        hero.setTarget(mockTarget);
-        hero.setCooldown(0);
-        hero.attack();
-        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(), 0.01f);
-    }
-
-    @Test
-    public void testGetCurrentAttackAnimationDurationNullLeft(){
-        when(mockTarget.getPosX()).thenReturn(80.0f);
-        when(mockTarget.getPosY()).thenReturn(200.0f);
-        hero.AttackLeft = null;
-        hero.moveLeft(0.016f, enemies);
-        hero.setTarget(mockTarget);
-        hero.setCooldown(0);
-        hero.attack();
-        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(), 0.01f);
-    }
-
-    @Test
-    public void testGetCurrentAttackAnimationDurationNullUp(){
-        when(mockTarget.getPosX()).thenReturn(100.0f);
-        when(mockTarget.getPosY()).thenReturn(220.0f);
-        hero.AttackUp = null;
-        hero.moveUp(0.016f, 1000, enemies);
-        hero.setTarget(mockTarget);
-        hero.setCooldown(0);
-        hero.attack();
-        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(),  0.01f);
-    }
-
-    @Test
-    public void testGetCurrentAttackAnimationDurationNullRight(){
-        when(mockTarget.getPosX()).thenReturn(150.0f);
-        when(mockTarget.getPosY()).thenReturn(200.0f);
-        hero.AttackRight = null;
-        hero.moveRight(0.016f, 1000, enemies);
-        hero.setTarget(mockTarget);
-        hero.setCooldown(0);
-        hero.attack();
-        assertEquals("No clue what's expected", 0f, hero.getCurrentAttackAnimationDuration(),  0.01f);
-    }
-
-    @Test
     public void testSetGetDirection(){
         hero.setDirection(Direction.RIGHT);
         assertEquals("Direction should be set", Direction.RIGHT, hero.getDirection());

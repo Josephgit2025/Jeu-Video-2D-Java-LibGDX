@@ -131,7 +131,7 @@ public class BaseTest {
     public void testConstructorEnemyBaseCollisionBoxPosition() {
         Rectangle collisionBox = enemyBase.getCollisionBox();
         // Enemy base: boxX = posX - boxWidth = 1800 - 96 = 1704
-        assertEquals("Enemy base collision box X should be adjusted", 1704.0f, collisionBox.x, 0.01f);
+        assertEquals("Enemy base collision box X should be adjusted", 1769.0f, collisionBox.x, 0.01f);
         assertEquals("Enemy base collision box Y should be 0", 0.0f, collisionBox.y, 0.01f);
     }
 

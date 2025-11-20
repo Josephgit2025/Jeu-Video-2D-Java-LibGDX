@@ -62,8 +62,12 @@ public class UnitShop {
 
         createButtons();
     }
-
-    // Ajout d'un constructeur rétrocompatible pour ne pas casser l'ancien code
+    /**
+     * Constructs a UnitShop with default gold display (for backward compatibility).
+     *
+     * @param playerBase The player's base for unit spawning and purchasing
+     * @param hero The hero entity associated with the shop
+     */
     public UnitShop(Base playerBase, Hero hero) {
         this(playerBase, hero, null);
     }
@@ -91,60 +95,57 @@ public class UnitShop {
                     BUTTON_WIDTH,
                     BUTTON_HEIGHT,
                     i);
-            // Sélectionner le premier bouton par défaut
+            // Select the first button by default
             if (i == selectedSpawnPoint) {
                 spawnBtn.setSelected(true);
             }
             spawnPointButtons.add(spawnBtn);
         }
-
     }
 
+    /**
+     * Renders the unit shop UI, including all unit type and spawn point buttons.
+     * Updates camera and sets projection matrices for UI rendering.
+     *
+     * @param shapeRenderer ShapeRenderer for drawing button backgrounds and shapes
+     * @param batch SpriteBatch for drawing button textures and labels
+     */
     public void render(ShapeRenderer shapeRenderer, SpriteBatch batch) {
-
-        // Update camera
         camera.update();
-
-        // Set projection matrices to UI camera
         shapeRenderer.setProjectionMatrix(camera.combined);
         batch.setProjectionMatrix(camera.combined);
-
-        // Render spawn point buttons
         for (UnitShopButton button : spawnPointButtons) {
             button.render(shapeRenderer, batch);
         }
-
-        // Render unit type buttons
         for (UnitShopButton button : unitTypeButtons) {
             button.render(shapeRenderer, batch);
         }
-
     }
 
+    /**
+     * Handles mouse click events on the shop UI.
+     * Determines if a spawn point or unit type button was clicked and updates selection or purchases units accordingly.
+     *
+     * @param screenX Screen X coordinate of the click
+     * @param screenY Screen Y coordinate of the click
+     * @return true if a button was clicked and handled, false otherwise
+     */
     public boolean handleClick(int screenX, int screenY) {
-        // Convert screen coordinates to UI viewport coordinates
         touchPos.set(screenX, screenY, 0);
         viewport.unproject(touchPos);
-
-        // Check spawn point buttons first
         for (int i = 0; i < spawnPointButtons.size(); i++) {
             UnitShopButton button = spawnPointButtons.get(i);
             if (button.isClicked(touchPos.x, touchPos.y)) {
-                // Deselect all spawn buttons
                 for (UnitShopButton btn : spawnPointButtons) {
                     btn.setSelected(false);
                 }
-                // Select clicked button
                 button.setSelected(true);
                 selectedSpawnPoint = i;
                 return true;
             }
         }
-
-        // Check unit type buttons
         for (UnitShopButton button : unitTypeButtons) {
             if (button.isClicked(touchPos.x, touchPos.y)) {
-                // Buy unit with selected spawn point
                 Unit newUnit = playerBase.buyUnit(button.getUnitType(), selectedSpawnPoint, hero);
                 if (newUnit != null) {
                     playerBase.addUnit(newUnit);
@@ -155,15 +156,19 @@ public class UnitShop {
                 return true;
             }
         }
-
         return false;
     }
 
     /**
-     * Resize the viewport when window size changes
+     * Resizes the shop UI viewport when the window size changes.
+     * Ensures UI elements remain properly scaled and positioned.
+     *
+     * @param width New screen width
+     * @param height New screen height
      */
     public void resize(int width, int height) {
         viewport.update(width, height);
         camera.position.set(UI_WIDTH / 2, UI_HEIGHT / 2, 0);
     }
+
 }

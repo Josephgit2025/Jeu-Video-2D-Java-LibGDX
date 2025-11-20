@@ -1,4 +1,11 @@
 package com.ui;
+/**
+ * Represents the game over overlay displayed when the player's hero dies.
+ * <p>
+ * This overlay renders a semi-transparent background, a central panel, a title, and interactive buttons (REPLAY, QUIT).
+ * It manages rendering, input detection, hover effects, and resource cleanup. Integrates with libGDX's viewport and camera system for consistent UI scaling.
+ * Implements {@link Disposable} for proper resource management.
+ */
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -18,28 +25,82 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 public class GameOverOverlay implements Disposable {
     
-
+    /**
+     * Viewport for scaling and positioning overlay elements.
+     * Ensures the overlay is rendered consistently across different screen sizes.
+     */
     private Viewport viewport;
+
+    /**
+     * Orthographic camera for rendering overlay elements in 2D space.
+     */
     private OrthographicCamera camera;
+
+    /**
+     * Layout for measuring and positioning the title text.
+     */
     private GlyphLayout titleLayout;
+
+    /**
+     * SpriteBatch for drawing textures and fonts.
+     */
     private SpriteBatch batch;
+
+    /**
+     * ShapeRenderer for drawing shapes (background, overlays, buttons).
+     */
     private ShapeRenderer shapeRenderer;
+
+    /**
+     * Font for rendering the title text.
+     */
     private BitmapFont titleFont;
+
+    /**
+     * Font for rendering button text.
+     */
     private BitmapFont buttonFont;
-    
-    // Button rectangles for click detection
+
+    /**
+     * Rectangle representing the REPLAY button for click detection and hover effect.
+     */
     private Rectangle replayButton;
+
+    /**
+     * Rectangle representing the QUIT button for click detection and hover effect.
+     */
     private Rectangle quitButton;
-    
-    // Hover effect
-    private int selectedIndex = -1; // -1 = rien, 0 = REPLAY, 1 = QUIT
-    
-    // UI dimensions
+
+    /**
+     * Index of the currently hovered button (-1 = none, 0 = REPLAY, 1 = QUIT).
+     * Used to manage hover effects and highlight the correct button.
+     */
+    private int selectedIndex = -1;
+
+    /**
+     * Logical width of the overlay in pixels.
+     */
     private static final float OVERLAY_WIDTH = 800f;
+
+    /**
+     * Logical height of the overlay in pixels.
+     */
     private static final float OVERLAY_HEIGHT = 600f;
+
+    /**
+     * Width of the buttons in pixels.
+     */
     private static final float BUTTON_WIDTH = 200f;
+
+    /**
+     * Height of the buttons in pixels.
+     */
     private static final float BUTTON_HEIGHT = 60f;
-    
+
+    /**
+     * Constructs the GameOverOverlay and initializes all rendering resources, fonts, and button positions.
+     * Sets up camera, viewport, rendering tools, and interactive elements for the overlay.
+     */
     public GameOverOverlay() {
         // Initialize camera and viewport (fixed overlay)
         camera = new OrthographicCamera();
@@ -55,7 +116,7 @@ public class GameOverOverlay implements Disposable {
         titleFont.setColor(Color.RED);
         titleFont.getData().setScale(3f);
         
-        // Police identique à TitleScreen avec bordure et ombre
+        // Font identical to TitleScreen with border and shadow
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/PressStart2P.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 32;
@@ -88,6 +149,12 @@ public class GameOverOverlay implements Disposable {
         );
     }
 
+    /**
+     * Renders the game over overlay, including background, title, and buttons.
+     * Handles hover effects and button highlighting.
+     * <p>
+     * This method should be called every frame while the overlay is active.
+     */
     public void render() {
         // Update hover effect
         updateHover();
@@ -119,13 +186,12 @@ public class GameOverOverlay implements Disposable {
         );
         shapeRenderer.end();
         
-        
         Gdx.gl.glDisable(GL20.GL_BLEND);
         
         // Draw text
         batch.begin();
         
-        // Title: "Votre Héros est mort - Game Over"
+        // Title: "Game Over"
         GlyphLayout titleLayout = new GlyphLayout(titleFont, "Game Over");
         float titleX = (OVERLAY_WIDTH - titleLayout.width) / 2f;
         titleFont.draw(batch, "Game Over", 
@@ -133,14 +199,14 @@ public class GameOverOverlay implements Disposable {
             OVERLAY_HEIGHT / 2 + 120
         );
         
-        // Effet d'hover pour REPLAY (visually on top, but index 1 due to Y inversion)
+        // Hover effect for REPLAY (visually on top, but index 1 due to Y inversion)
         GlyphLayout replayLayout = new GlyphLayout(buttonFont, "REPLAY");
         float replayX = (OVERLAY_WIDTH - replayLayout.width) / 2f;
         Color replayColor = (selectedIndex == 1) ? Color.YELLOW : Color.WHITE;
         buttonFont.setColor(replayColor);
         buttonFont.draw(batch, replayLayout, replayX, replayButton.y + 40);
 
-        // Effet d'hover pour QUIT (visually on bottom, but index 0 due to Y inversion)
+        // Hover effect for QUIT (visually on bottom, but index 0 due to Y inversion)
         GlyphLayout quitLayout = new GlyphLayout(buttonFont, "QUIT");
         float quitX = (OVERLAY_WIDTH - quitLayout.width) / 2f;
         Color quitColor = (selectedIndex == 0) ? Color.YELLOW : Color.WHITE;
@@ -149,7 +215,14 @@ public class GameOverOverlay implements Disposable {
         
         batch.end();
     }
-    
+
+    /**
+     * Draws a button with background and border using the specified color.
+     * Used for custom button rendering and highlighting.
+     *
+     * @param button Rectangle representing the button area
+     * @param color Color for the button background
+     */
     private void drawButton(Rectangle button, Color color) {
         // Draw button background
         shapeRenderer.begin(ShapeType.Filled);
@@ -163,12 +236,14 @@ public class GameOverOverlay implements Disposable {
         shapeRenderer.rect(button.x, button.y, button.width, button.height);
         shapeRenderer.end();
     }
-    
+
     /**
-     * Handle click on overlay
-     * @param screenX Screen X coordinate
-     * @param screenY Screen Y coordinate
-     * @return "replay" if replay button clicked, "quit" if quit button clicked, null otherwise
+     * Handles mouse click events on the overlay and determines which button was clicked.
+     * Converts screen coordinates to overlay coordinates and checks button hitboxes.
+     *
+     * @param screenX Screen X coordinate of the click
+     * @param screenY Screen Y coordinate of the click
+     * @return "replay" if REPLAY button was clicked, "quit" if QUIT button was clicked, {@code null} otherwise
      */
     public String handleClick(int screenX, int screenY) {
         // Convert screen coordinates to viewport coordinates using unproject (same as TitleScreen)
@@ -186,7 +261,12 @@ public class GameOverOverlay implements Disposable {
         
         return null;
     }
-    
+
+    /**
+     * Updates the hover effect for buttons based on mouse position.
+     * Sets {@code selectedIndex} to the hovered button index for visual feedback.
+     * Should be called every frame before rendering.
+     */
     private void updateHover() {
         Vector2 mouse = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         float mx = mouse.x;
@@ -194,44 +274,49 @@ public class GameOverOverlay implements Disposable {
 
         selectedIndex = -1;
 
-        // QUIT button (en bas, index 1) - utilise le Rectangle pour la détection
+        // QUIT button (bottom, index 1) - uses Rectangle for detection
         GlyphLayout quitLayout = new GlyphLayout(buttonFont, "QUIT");
         float quitX = (OVERLAY_WIDTH - quitLayout.width) / 2f;
-        
-        // Créer un rectangle de collision centré sur le texte
         Rectangle quitHitbox = new Rectangle(
             quitX - 10,
             quitButton.y + 40 - quitLayout.height - 5,
             quitLayout.width + 20,
             quitLayout.height + 10
         );
-        
         if (quitHitbox.contains(mx, my)) {
             selectedIndex = 1;
         }
 
-        // REPLAY button (en haut, index 0) - utilise le Rectangle pour la détection
+        // REPLAY button (top, index 0) - uses Rectangle for detection
         GlyphLayout replayLayout = new GlyphLayout(buttonFont, "REPLAY");
         float replayX = (OVERLAY_WIDTH - replayLayout.width) / 2f;
-        
-        // Créer un rectangle de collision centré sur le texte
         Rectangle replayHitbox = new Rectangle(
             replayX - 10, 
             replayButton.y + 40 - replayLayout.height - 5,
             replayLayout.width + 20,
             replayLayout.height + 10
         );
-        
         if (replayHitbox.contains(mx, my)) {
             selectedIndex = 0;
         }
     }
-    
+
+    /**
+     * Resizes the overlay viewport when the window size changes.
+     * Updates camera position to keep the overlay centered.
+     *
+     * @param width New width of the window
+     * @param height New height of the window
+     */
     public void resize(int width, int height) {
         viewport.update(width, height);
         camera.position.set(OVERLAY_WIDTH / 2, OVERLAY_HEIGHT / 2, 0);
     }
 
+    /**
+     * Disposes all resources used by the overlay, including rendering components and fonts.
+     * Should be called when the overlay is no longer needed to free memory and GPU resources.
+     */
     @Override
     public void dispose() {
         batch.dispose();

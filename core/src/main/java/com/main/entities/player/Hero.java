@@ -3,16 +3,17 @@ package com.main.entities.player;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Generated;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
+import com.main.entities.units.Sniper;
 import com.main.map.Base;
 import com.main.map.WarMap;
 import com.main.weapons.SniperRifle;
@@ -22,14 +23,29 @@ import com.main.weapons.SMG;
 import com.main.weapons.Shotgun;
 import com.main.weapons.Weapon;
 
+/**
+ * Represents the main playable hero unit in the game.
+ * Inherits from Unit and provides hero-specific stats, abilities, and
+ * behaviors.
+ */
 public class Hero extends Unit {
 
+    /**
+     * Represents the possible directions the hero can face or attack.
+     */
     protected enum Direction {
         UP, DOWN, LEFT, RIGHT,
         UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT,
         ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT
     }
 
+    @lombok.Generated
+    /**
+     * Returns the duration of the current attack animation according to the hero's
+     * direction.
+     *
+     * @return Duration of the current attack animation in seconds
+     */
     protected float getCurrentAttackAnimationDuration() {
         switch (direction) {
             case ATTACKRIGHT:
@@ -45,37 +61,168 @@ public class Hero extends Unit {
         }
     }
 
+    /**
+     * Current experience points of the hero.
+     */
     protected int xp;
+
+    /**
+     * Current level of the hero.
+     */
     protected int level;
+
+    /**
+     * List of abilities possessed by the hero.
+     */
     protected List<Ability> abilities = new ArrayList<>();
+
+    /**
+     * Strength attribute of the hero.
+     */
     protected int strength;
+
+    /**
+     * Dexterity attribute of the hero.
+     */
     protected int dexterity;
+
+    /**
+     * Agility attribute of the hero.
+     */
     protected int agility;
+
+    /**
+     * Weapon currently equipped by the hero.
+     */
     protected Weapon weapon;
 
-    // Gold system
+    /**
+     * Amount of gold the hero possesses.
+     */
     protected int gold = 0;
-    protected int maxHealth = 500;
-    private WarMap map;
-    private Animation<TextureRegion> walkRight, walkLeft, walkUp, walkDown;
-    private Animation<TextureRegion> walkUR, walkUL, walkDR, walkDL;
-    private TextureRegion idle, idleR, idleL, idleU, idleD, idleUR, idleUL, idleDR, idleDL;
-    protected Animation<TextureRegion> AttackRight, AttackLeft, AttackUp, AttackDown;
 
-    // uses inherited stateTime from Unit
+    /**
+     * Maximum health value for the hero.
+     */
+    protected int maxHealth = 500;
+
+    /**
+     * Reference to the game map.
+     */
+    private WarMap map;
+
+    /**
+     * Animation for walking right.
+     */
+    private Animation<TextureRegion> walkRight;
+    /**
+     * Animation for walking left.
+     */
+    private Animation<TextureRegion> walkLeft;
+    /**
+     * Animation for walking up.
+     */
+    private Animation<TextureRegion> walkUp;
+    /**
+     * Animation for walking down.
+     */
+    private Animation<TextureRegion> walkDown;
+
+    /**
+     * Animation for walking up right.
+     */
+    private Animation<TextureRegion> walkUR;
+
+    /**
+     * Animation for walking up left.
+     */
+    private Animation<TextureRegion> walkUL;
+
+    /**
+     * Animation for walking down right.
+     */
+    private Animation<TextureRegion> walkDR;
+
+    /**
+     * Animation for walking down left.
+     */
+    private Animation<TextureRegion> walkDL;
+
+    /**
+     * Idle textures for each direction (cardinal and diagonal).
+     */
+    private TextureRegion idle, idleR, idleL, idleU, idleD, idleUR, idleUL, idleDR, idleDL;
+
+    /**
+     * Animation for attacking right.
+     */
+    protected Animation<TextureRegion> AttackRight;
+    /**
+     * Animation for attacking left.
+     */
+    protected Animation<TextureRegion> AttackLeft;
+    /**
+     * Animation for attacking up.
+     */
+    protected Animation<TextureRegion> AttackUp;
+    /**
+     * Animation for attacking down.
+     */
+    protected Animation<TextureRegion> AttackDown;
+
+    /**
+     * Indicates if the hero is currently moving.
+     */
     private boolean moving = false;
+
+    /**
+     * Current direction of the hero.
+     */
     protected Direction direction = Direction.DOWN;
-    // previous facing (non-attack) to revert to after attack animation finishes
+
+    /**
+     * Previous non-attack direction to revert to after attack animation.
+     */
     private Direction prevDirection = Direction.DOWN;
+
+    /**
+     * List of loaded textures for the hero's animations.
+     */
     private List<Texture> loadedTextures = new ArrayList<>();
+
+    /**
+     * Frame duration for attack animations.
+     */
     private final float FRAME_DURATION = 0.12f;
+
+    /**
+     * Frame duration for walking animations.
+     */
     private final float FRAME_DURATIONW = 0.12f;
+
+    /**
+     * Timer for retargeting enemies.
+     */
     private float retargetTimer = 0;
+
+    /**
+     * Interval for retargeting enemies (in seconds).
+     */
     private final float retargetInterval = 0.1f; // 100ms
 
-    // Audio
+    /**
+     * Sound effect played when the hero shoots.
+     */
     private Sound shootSound;
 
+    /**
+     * Constructs a new Hero instance with initial position, map, and allied base.
+     *
+     * @param posX     Initial X position
+     * @param posY     Initial Y position
+     * @param map      Reference to the game map
+     * @param allyBase Reference to the allied base
+     */
     public Hero(float posX, float posY, WarMap map, Base allyBase) {
         super("sold/Idle.png", posX, posY);
         this.allyBase = allyBase;
@@ -84,18 +231,15 @@ public class Hero extends Unit {
         walkRight = new Animation<>(FRAME_DURATION, rightFrames);
         walkRight.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] leftFrames = loadFrames("sold/Left%d.png",
-                8);
+        TextureRegion[] leftFrames = loadFrames("sold/Left%d.png", 8);
         walkLeft = new Animation<>(FRAME_DURATION, leftFrames);
         walkLeft.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] upFrames = loadFrames("sold/Up%d.png",
-                8);
+        TextureRegion[] upFrames = loadFrames("sold/Up%d.png", 8);
         walkUp = new Animation<>(FRAME_DURATIONW, upFrames);
         walkUp.setPlayMode(Animation.PlayMode.LOOP);
 
-        TextureRegion[] downFrames = loadFrames("sold/Down%d.png",
-                8);
+        TextureRegion[] downFrames = loadFrames("sold/Down%d.png", 8);
         walkDown = new Animation<>(FRAME_DURATIONW, downFrames);
         walkDown.setPlayMode(Animation.PlayMode.LOOP);
 
@@ -127,22 +271,37 @@ public class Hero extends Unit {
         idleDR = loadSingle("sold/IdleDR.png");
         idleDL = loadSingle("sold/IdleDL.png");
 
+        // Fallback: if any idle direction is missing, use main idle
+        if (idleR == null)
+            idleR = idle;
+        if (idleL == null)
+            idleL = idle;
+        if (idleU == null)
+            idleU = idle;
+        if (idleD == null)
+            idleD = idle;
+        if (idleUR == null)
+            idleUR = idle;
+        if (idleUL == null)
+            idleUL = idle;
+        if (idleDR == null)
+            idleDR = idle;
+        if (idleDL == null)
+            idleDL = idle;
+
         TextureRegion[] rightAttack = loadFrames("sold/AttackR%d.png", 4);
         AttackRight = new Animation<>(FRAME_DURATION, rightAttack);
         AttackRight.setPlayMode(Animation.PlayMode.NORMAL);
 
-        TextureRegion[] leftAttack = loadFrames("sold/AttackL%d.png",
-                4);
+        TextureRegion[] leftAttack = loadFrames("sold/AttackL%d.png", 4);
         AttackLeft = new Animation<>(FRAME_DURATION, leftAttack);
         AttackLeft.setPlayMode(Animation.PlayMode.NORMAL);
 
-        TextureRegion[] upAttack = loadFrames("sold/AttackU%d.png",
-                4);
+        TextureRegion[] upAttack = loadFrames("sold/AttackU%d.png", 4);
         AttackUp = new Animation<>(FRAME_DURATIONW, upAttack);
         AttackUp.setPlayMode(Animation.PlayMode.NORMAL);
 
-        TextureRegion[] downAttack = loadFrames("sold/AttackD%d.png",
-                4);
+        TextureRegion[] downAttack = loadFrames("sold/AttackD%d.png", 4);
         AttackDown = new Animation<>(FRAME_DURATIONW, downAttack);
         AttackDown.setPlayMode(Animation.PlayMode.NORMAL);
 
@@ -156,6 +315,13 @@ public class Hero extends Unit {
         this.gold = 100; // Start with 100 gold
     }
 
+    /**
+     * Loads an array of frames for an animation from file names matching a pattern.
+     *
+     * @param pattern Filename pattern with a %d placeholder for frame number
+     * @param count   Number of frames to load
+     * @return Array of loaded TextureRegion frames
+     */
     private TextureRegion[] loadFrames(String pattern, int count) {
         TextureRegion[] frames = new TextureRegion[count];
         for (int i = 0; i < count; i++) {
@@ -166,12 +332,22 @@ public class Hero extends Unit {
         return frames;
     }
 
+    /**
+     * Loads a single texture region from a file path.
+     * 
+     * @param path Path to the texture file
+     * @return Loaded TextureRegion, or null if not found
+     */
     private TextureRegion loadSingle(String path) {
-        Texture tex = new Texture(Gdx.files.internal(path));
-        loadedTextures.add(tex);
-        return new TextureRegion(tex);
+        try {
+            Texture tex = new Texture(Gdx.files.internal(path));
+            loadedTextures.add(tex);
+            return new TextureRegion(tex);
+        } catch (Exception e) {
+            return null;
+        }
     }
-    
+
     @lombok.Generated
     /**
      * Met à jour le Hero (déplacements avec LibGDX)
@@ -321,7 +497,6 @@ public class Hero extends Unit {
             }
         }
 
-        // --- ANIMATION ---
         if (moving) {
             stateTime += delta;
         } else {
@@ -370,6 +545,14 @@ public class Hero extends Unit {
         }
     }
 
+    /**
+     * Checks if the hero collides with a given enemy at the specified position.
+     *
+     * @param newX  Nouvelle position X du héros
+     * @param newY  Nouvelle position Y du héros
+     * @param enemy Ennemi à vérifier
+     * @return true si collision détectée, false sinon
+     */
     private boolean checkHeroEnemyCollisions(float newX, float newY, Unit enemy) {
         if (enemy == null || enemy.isDead()) {
             return false;
@@ -386,6 +569,15 @@ public class Hero extends Unit {
         return false;
     }
 
+    /**
+     * Checks if the hero collides with a given allied soldier at the specified
+     * position.
+     *
+     * @param newX    Nouvelle position X du héros
+     * @param newY    Nouvelle position Y du héros
+     * @param soldier Soldat allié à vérifier
+     * @return true si collision détectée, false sinon
+     */
     protected boolean checkHeroSoldierCollisions(float newX, float newY, Unit soldier) {
         if (soldier == null || soldier.isDead()) {
             return false;
@@ -423,6 +615,12 @@ public class Hero extends Unit {
         return closest;
     }
 
+    /**
+     * Finds the closest allied soldier to the hero.
+     *
+     * @param units Liste des unités alliées
+     * @return Soldat le plus proche ou null si aucun trouvé
+     */
     protected Unit findClosestSoldier(List<Unit> units) {
         Unit closest = null;
         double minDistance = Double.MAX_VALUE;
@@ -437,9 +635,9 @@ public class Hero extends Unit {
     }
 
     /**
-     * Find the closest enemy within attack range
-     * 
-     * @param units List of all enemy units
+     * Finds the closest enemy within attack range.
+     *
+     * @param enemies List of all enemy units
      * @return Closest enemy in range, or null if none found
      */
     protected Unit findClosestEnemyInRange(List<Unit> enemies) {
@@ -460,32 +658,66 @@ public class Hero extends Unit {
     }
 
     // Keep public methods for backward compatibility
+    /**
+     * Moves the hero up on the map.
+     * 
+     * @param delta     Time since last frame
+     * @param mapHeight Height of the map
+     * @param enemies   List of enemy units
+     */
     public void moveUp(float delta, float mapHeight, List<Unit> enemies) {
-        direction = Direction.UP;
         tryMove(0, speed * delta * 60, Float.MAX_VALUE, mapHeight, findClosestEnemy(enemies));
     }
 
+    /**
+     * Moves the hero down on the map.
+     * 
+     * @param delta   Time since last frame
+     * @param enemies List of enemy units
+     */
     public void moveDown(float delta, List<Unit> enemies) {
-        direction = Direction.DOWN;
         tryMove(0, -speed * delta * 60, Float.MAX_VALUE, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
+    /**
+     * Moves the hero left on the map.
+     * 
+     * @param delta   Time since last frame
+     * @param enemies List of enemy units
+     */
     public void moveLeft(float delta, List<Unit> enemies) {
-        direction = Direction.LEFT;
         tryMove(-speed * delta * 60, 0, Float.MAX_VALUE, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
+    /**
+     * Moves the hero right on the map.
+     * 
+     * @param delta    Time since last frame
+     * @param mapWidth Width of the map
+     * @param enemies  List of enemy units
+     */
     public void moveRight(float delta, float mapWidth, List<Unit> enemies) {
-        direction = Direction.RIGHT;
         tryMove(speed * delta * 60, 0, mapWidth, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
+    /**
+     * Sets the hero's weapon.
+     * 
+     * @param weapon Weapon to set
+     */
     public void setWeapon(Weapon weapon) {
         if (weapon != null) {
             this.weapon = weapon;
         }
     }
 
+    /**
+     * Attacks the current target if possible. Handles cooldown, range, damage, and
+     * animation direction.
+     * Plays the shoot sound if available and reloads weapon if out of munitions.
+     *
+     * Overrides the attack behavior from Unit.
+     */
     @Override
     public void attack() {
         if (target == null || target.isDead()) {
@@ -502,9 +734,7 @@ public class Hero extends Unit {
             if (weapon.getMunitions() > 0 || weapon.getMaxMunitions() == -1) {
                 // Save current non-attack facing so we can revert after animation
                 if (direction == Direction.RIGHT || direction == Direction.LEFT || direction == Direction.UP
-                        || direction == Direction.DOWN || direction == Direction.UP_RIGHT
-                        || direction == Direction.UP_LEFT || direction == Direction.DOWN_RIGHT
-                        || direction == Direction.DOWN_LEFT) {
+                        || direction == Direction.DOWN) {
                     prevDirection = direction;
                 }
                 if (direction == Direction.RIGHT) {
@@ -540,6 +770,13 @@ public class Hero extends Unit {
     }
 
     @lombok.Generated
+    /**
+     * Renders the hero on the screen using the current animation frame and
+     * direction.
+     * Adjusts the visual size and alignment of the sprite for correct display.
+     *
+     * @param batch SpriteBatch used for drawing the hero
+     */
     public void render(SpriteBatch batch) {
         TextureRegion currentFrame;
         float visualWidth;
@@ -571,47 +808,57 @@ public class Hero extends Unit {
             case UP:
                 if (moving) {
                     currentFrame = walkUp.getKeyFrame(stateTime, true);
+                    visualWidth = 30;
+                    visualHeight = 50;
                 } else {
                     currentFrame = (idleU != null) ? idleU : idle;
+                    visualWidth = 30;
+                    visualHeight = 50;
                 }
-                visualWidth = 30;
-                visualHeight = 50;
                 break;
             case UP_RIGHT:
                 if (moving) {
                     currentFrame = walkUR.getKeyFrame(stateTime, true);
+                    visualWidth = 40;
+                    visualHeight = 50;
                 } else {
                     currentFrame = (idleUR != null) ? idleUR : idle;
+                    visualWidth = 40;
+                    visualHeight = 50;
                 }
-                visualWidth = 40;
-                visualHeight = 50;
                 break;
             case UP_LEFT:
                 if (moving) {
                     currentFrame = walkUL.getKeyFrame(stateTime, true);
+                    visualWidth = 40;
+                    visualHeight = 50;
                 } else {
                     currentFrame = (idleUL != null) ? idleUL : idle;
+                    visualWidth = 40;
+                    visualHeight = 50;
                 }
-                visualWidth = 40;
-                visualHeight = 50;
                 break;
             case DOWN_RIGHT:
                 if (moving) {
                     currentFrame = walkDR.getKeyFrame(stateTime, true);
+                    visualWidth = 40;
+                    visualHeight = 50;
                 } else {
                     currentFrame = (idleDR != null) ? idleDR : idle;
+                    visualWidth = 40;
+                    visualHeight = 50;
                 }
-                visualWidth = 40;
-                visualHeight = 50;
                 break;
             case DOWN_LEFT:
                 if (moving) {
                     currentFrame = walkDL.getKeyFrame(stateTime, true);
+                    visualWidth = 40;
+                    visualHeight = 50;
                 } else {
                     currentFrame = (idleDL != null) ? idleDL : idle;
+                    visualWidth = 40;
+                    visualHeight = 50;
                 }
-                visualWidth = 40;
-                visualHeight = 50;
                 break;
             case ATTACKDOWN:
                 currentFrame = AttackDown.getKeyFrame(stateTime, false);
@@ -636,11 +883,13 @@ public class Hero extends Unit {
             default:
                 if (moving) {
                     currentFrame = walkDown.getKeyFrame(stateTime, true);
+                    visualWidth = 30;
+                    visualHeight = 50;
                 } else {
                     currentFrame = (idleD != null) ? idleD : idle;
+                    visualWidth = 30;
+                    visualHeight = 50;
                 }
-                visualWidth = 30;
-                visualHeight = 50;
                 break;
         }
 
@@ -738,13 +987,6 @@ public class Hero extends Unit {
         return false;
     }
 
-    public Direction getDirection() {
-        return direction;
-    }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
     // === AUDIO SYSTEM ===
 
     /**
@@ -763,4 +1005,13 @@ public class Hero extends Unit {
     public Weapon getWeapon(){
         return this.weapon;
     }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
 }

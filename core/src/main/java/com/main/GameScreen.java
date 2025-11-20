@@ -23,38 +23,113 @@ import com.ui.PauseOverlay;
 import com.ui.UnitShop;
 import com.ui.hud;
 
+/**
+ * Main game screen for the project, managing rendering, input, game state, and UI overlays.
+ * <p>
+ * Handles the core gameplay loop, including unit spawning, camera movement, collision rendering, HUD updates, overlays, and audio management.
+ * Interacts with all major game entities, bases, hero, map, and UI components.
+ */
 public class GameScreen implements Screen {
+    /**
+     * Main SpriteBatch used for rendering all game sprites.
+     */
     private SpriteBatch batch;
+    /**
+     * Optional background image texture (may be unused).
+     */
     private Texture image;
-    private ShapeRenderer shapeRenderer; // Pour debug des collisions
+    /**
+     * ShapeRenderer for drawing debug shapes and collision boxes.
+     */
+    private ShapeRenderer shapeRenderer;
 
+    /**
+     * Reference to the main game application.
+     */
     private Main game;
+    /**
+     * The main playable hero unit.
+     */
     private Hero hero;
+    /**
+     * The game map, including collision and rendering logic.
+     */
     private WarMap map;
+    /**
+     * Camera used for rendering and following the hero.
+     */
     private OrthographicCamera camera;
+    /**
+     * Viewport for scaling and resizing the camera view.
+     */
     private Viewport viewport;
+    /**
+     * Flag indicating if the hero is currently moving.
+     */
     private boolean moving;
+    /**
+     * Reference to the enemy base (spawns zombies).
+     */
     private Base enemyBase;
+    /**
+     * Reference to the player base (spawns soldiers).
+     */
     private Base playerBase;
+    /**
+     * Width of the map in pixels.
+     */
     private int mapWidth;
+    /**
+     * Height of the map in pixels.
+     */
     private int mapHeight;
 
+    /**
+     * HUD display for health, gold, and other game stats.
+     */
     private hud hudDisplay;
+    /**
+     * Overlay displayed when the game is over.
+     */
     private GameOverOverlay gameOverOverlay;
+    /**
+     * Overlay displayed when the player base is destroyed.
+     */
     private BaseDestroyedOverlay baseDestroyedOverlay;
+    /**
+     * Overlay displayed when the enemy base is destroyed (victory).
+     */
     private BaseZombieDestroyedOverlay baseZombieDestroyedOverlay;
+    /**
+     * Overlay displayed when the game is paused.
+     */
     private PauseOverlay pauseOverlay;
-    private boolean showRanges = false; // Toggle with 'R' key to show unit ranges
+    /**
+     * Flag to toggle display of unit attack ranges (activated with 'R' key).
+     */
+    private boolean showRanges = false;
+    /**
+     * UI component for buying units during gameplay.
+     */
     private UnitShop unitShop;
 
-    // Audio
+    /**
+     * Background music for the game.
+     */
     private Music backgroundMusic;
+    /**
+     * Sound effect for shooting.
+     */
     private Sound shootSound;
 
-    // Pause display (deprecated - using PauseOverlay now)
+    /**
+     * Font used for pause display (deprecated, replaced by PauseOverlay).
+     */
     private BitmapFont pauseFont;
 
-    // Game Over state
+    /**
+     * Enum representing the current state of the game (playing, paused, game over, etc.).
+     */
     private enum GameState {
         PLAYING,
         PAUSE,
@@ -63,9 +138,20 @@ public class GameScreen implements Screen {
         ZOMBIE_BASE_DESTROYED
     }
 
+    /**
+     * Current game state.
+     */
     private GameState gameState = GameState.PLAYING;
+    /**
+     * Tracks if the pause key is currently pressed to avoid repeated toggling.
+     */
     private boolean pauseKeyPressed = false;
 
+    /**
+     * Constructs the main game screen, initializing all game entities, overlays, HUD, audio, and UI components.
+     *
+     * @param game Reference to the main game application
+     */
     public GameScreen(Main game) {
         this.game = game;
         batch = new SpriteBatch();
@@ -106,7 +192,8 @@ public class GameScreen implements Screen {
     }
     
     /**
-     * Charge les sons et la musique du jeu
+     * Loads all game sounds and music, assigns audio resources to hero and overlays.
+     * Handles errors and missing files gracefully.
      */
     private void loadSounds() {
         try {
@@ -140,7 +227,10 @@ public class GameScreen implements Screen {
         }
     }
 
-    // Recommencer le jeu après avoir perdu
+    /**
+     * Resets the game state after losing, reinitializing map, bases, hero, unit shop, and audio.
+     * Reassigns sound resources and resizes UI components.
+     */
     public void reset() {
         this.map = new WarMap();
         this.enemyBase = new Base(1350, 300, false, this.mapHeight); // false = spawn zombies
@@ -163,10 +253,18 @@ public class GameScreen implements Screen {
         this.gameState = GameState.PLAYING;
     }
 
+    /**
+     * Called when the screen is shown. (No implementation needed.)
+     */
     @Override
     public void show() {
     }
 
+    /**
+     * Main render loop for the game screen. Handles all rendering, camera movement, overlays, HUD, and debug drawing.
+     *
+     * @param delta Time elapsed since last frame (seconds)
+     */
     @Override
     public void render(float delta) {
         update(delta);
@@ -306,6 +404,12 @@ public class GameScreen implements Screen {
          */
     }
 
+    /**
+     * Updates the game state, handles input, unit spawning, overlays, and game logic.
+     * Processes all interactions, state transitions, and checks for win/loss conditions.
+     *
+     * @param delta Time elapsed since last frame (seconds)
+     */
     private void update(float delta) {
         // Toggle pause with ESCAPE key
         if (com.badlogic.gdx.Gdx.input.isKeyPressed(com.badlogic.gdx.Input.Keys.ESCAPE)) {
@@ -455,7 +559,7 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * Remove dead enemies from the list and give gold to hero
+     * Removes dead enemies from the enemy base and rewards gold to the hero for each kill.
      */
     private void removeDeadEnemiesAndGiveGold() {
         for (Unit enemy : enemyBase.getUnits()) {
@@ -468,6 +572,12 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Handles resizing of the game screen and all overlays/UI components.
+     *
+     * @param width  New width of the screen
+     * @param height New height of the screen
+     */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
@@ -491,27 +601,36 @@ public class GameScreen implements Screen {
         }
     }
 
+    /**
+     * Pauses the game and background music.
+     */
     @Override
     public void pause() {
-        // Jeu en pause
         if (backgroundMusic != null && backgroundMusic.isPlaying()) {
             backgroundMusic.pause();
         }
     }
 
+    /**
+     * Resumes the game and background music if in playing state.
+     */
     @Override
     public void resume() {
-        // Reprendre le jeu
         if (backgroundMusic != null && !backgroundMusic.isPlaying() && gameState == GameState.PLAYING) {
             backgroundMusic.play();
         }
     }
 
+    /**
+     * Called when the screen is hidden. (No implementation needed.)
+     */
     @Override
     public void hide() {
-        // Écran caché
     }
 
+    /**
+     * Disposes of all resources used by the game screen, including textures, audio, overlays, and UI components.
+     */
     @Override
     public void dispose() {
         batch.dispose();
@@ -541,46 +660,101 @@ public class GameScreen implements Screen {
             shootSound.dispose();
     }
 
+    /**
+     * Returns the main SpriteBatch for rendering.
+     *
+     * @return SpriteBatch instance
+     */
     public SpriteBatch getBatch() {
         return batch;
     }
 
+    /**
+     * Returns the background image texture (if used).
+     *
+     * @return Texture instance or null
+     */
     public Texture getImage() {
         return image;
     }
 
+    /**
+     * Returns the main game application reference.
+     *
+     * @return Main game instance
+     */
     public Main getGame() {
         return game;
     }
 
+    /**
+     * Returns the main playable hero unit.
+     *
+     * @return Hero instance
+     */
     public Hero getHero() {
         return hero;
     }
 
+    /**
+     * Returns the game map.
+     *
+     * @return WarMap instance
+     */
     public WarMap getMap() {
         return map;
     }
 
+    /**
+     * Returns the camera used for rendering and following the hero.
+     *
+     * @return OrthographicCamera instance
+     */
     public OrthographicCamera getCamera() {
         return camera;
     }
 
+    /**
+     * Returns the viewport for scaling and resizing the camera view.
+     *
+     * @return Viewport instance
+     */
     public Viewport getViewport() {
         return viewport;
     }
 
+    /**
+     * Returns the enemy base (spawns zombies).
+     *
+     * @return Base instance
+     */
     public Base getEnemyBase() {
         return enemyBase;
     }
 
+    /**
+     * Returns the player base (spawns soldiers).
+     *
+     * @return Base instance
+     */
     public Base getPlayerBase() {
         return playerBase;
     }
 
+    /**
+     * Returns the width of the map in pixels.
+     *
+     * @return Map width in pixels
+     */
     public int getMapWidth() {
         return mapWidth;
     }
 
+    /**
+     * Returns the height of the map in pixels.
+     *
+     * @return Map height in pixels
+     */
     public int getMapHeight() {
         return mapHeight;
     }
