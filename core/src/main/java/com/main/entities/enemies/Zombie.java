@@ -20,20 +20,6 @@ import com.main.map.Base;
  * movement and combat.
  */
 public class Zombie extends Unit {
-    /**
-     * Base health value for balancing zombie difficulty.
-     */
-    public static final int HP_BASE = 200;
-
-    /**
-     * Base damage value for zombie attacks.
-     */
-    public static final float DAMAGE_BASE = 30f;
-
-    /**
-     * Base attack speed (seconds per attack) for zombies.
-     */
-    public static final float ATTACK_SPEED_BASE = 1.5f;
 
     /**
      * Animation for walking left. Shared by all zombie types.

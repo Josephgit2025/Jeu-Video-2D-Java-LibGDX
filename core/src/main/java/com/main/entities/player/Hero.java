@@ -307,7 +307,7 @@ public class Hero extends Unit {
 
         this.health = 500;
         this.weapon = new Pistol();
-        this.speed = 8;
+        this.speed = 5;
         this.attackSpeed = 1;
         this.map = map;
 
@@ -475,8 +475,6 @@ public class Hero extends Unit {
             dy -= base;
 
         if (dx != 0f || dy != 0f) {
-            tryMove(dx, dy, mapWidth, mapHeight, target);
-            moving = true;
             // determine facing based on dx/dy signs
             if (dx > 0 && dy > 0) {
                 direction = Direction.UP_RIGHT;
@@ -495,6 +493,8 @@ public class Hero extends Unit {
             } else if (dy < 0) {
                 direction = Direction.DOWN;
             }
+            tryMove(dx, dy, mapWidth, mapHeight, target);
+            moving = true;
         }
 
         if (moving) {
@@ -528,8 +528,15 @@ public class Hero extends Unit {
      * @param closestEnemy Cached closest enemy for collision
      */
     private void tryMove(float deltaX, float deltaY, float mapWidth, float mapHeight, Unit closestEnemy) {
-        float newX = this.posX + deltaX;
-        float newY = this.posY + deltaY;
+        float newX;
+        float newY;
+        if (direction == Direction.DOWN_LEFT || direction == Direction.DOWN_RIGHT || direction == Direction.UP_LEFT || direction == Direction.UP_RIGHT){
+            newX = this.posX + deltaX / 2;
+            newY = this.posY + deltaY / 2;
+        } else{
+            newX = this.posX + deltaX;
+            newY = this.posY + deltaY;
+        }
 
         // Check map collision and enemy collision
         if (!map.isCollisionRect(newX, newY, this.width, this.height) &&
@@ -665,7 +672,7 @@ public class Hero extends Unit {
      * @param mapHeight Height of the map
      * @param enemies   List of enemy units
      */
-    public void moveUp(float delta, float mapHeight, List<Unit> enemies) {
+    protected void moveUp(float delta, float mapHeight, List<Unit> enemies) {
         tryMove(0, speed * delta * 60, Float.MAX_VALUE, mapHeight, findClosestEnemy(enemies));
     }
 
@@ -675,7 +682,7 @@ public class Hero extends Unit {
      * @param delta   Time since last frame
      * @param enemies List of enemy units
      */
-    public void moveDown(float delta, List<Unit> enemies) {
+    protected void moveDown(float delta, List<Unit> enemies) {
         tryMove(0, -speed * delta * 60, Float.MAX_VALUE, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
@@ -685,7 +692,7 @@ public class Hero extends Unit {
      * @param delta   Time since last frame
      * @param enemies List of enemy units
      */
-    public void moveLeft(float delta, List<Unit> enemies) {
+    protected void moveLeft(float delta, List<Unit> enemies) {
         tryMove(-speed * delta * 60, 0, Float.MAX_VALUE, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 
@@ -696,7 +703,7 @@ public class Hero extends Unit {
      * @param mapWidth Width of the map
      * @param enemies  List of enemy units
      */
-    public void moveRight(float delta, float mapWidth, List<Unit> enemies) {
+    protected void moveRight(float delta, float mapWidth, List<Unit> enemies) {
         tryMove(speed * delta * 60, 0, mapWidth, Float.MAX_VALUE, findClosestEnemy(enemies));
     }
 

@@ -54,11 +54,11 @@ public class Base {
     /**
      * Position of the base on the map (X, Y coordinates).
      */
-    private Position position;
+    private final Position position;
     /**
      * Attack power of the base, used for damage calculations.
      */
-    private int attackPower = 50;
+    private final int attackPower = 50;
     /**
      * Timer tracking the time since the last unit spawn.
      */
@@ -74,16 +74,16 @@ public class Base {
     /**
      * Random number generator for spawning logic.
      */
-    private Random random;
+    private final Random random;
     /**
      * Flag indicating if this base is the player base (true) or enemy base (false).
      * Player bases spawn soldiers, enemy bases spawn zombies.
      */
-    private boolean isPlayerBase;
+    private final boolean isPlayerBase;
     /**
      * Name of the base, used for debugging and logging.
      */
-    private String name;
+    private final String name;
     /**
      * Collision box (hitbox) of the base, spanning 3 tiles wide and the full map height.
      */
@@ -99,7 +99,7 @@ public class Base {
     /**
      * Array of Y coordinates for unit spawn points (top, middle, bottom lanes).
      */
-    private int[] spawnPointsY;
+    private final int[] spawnPointsY;
     /**
      * Reference to the hero associated with this base (player base only).
      */
@@ -362,41 +362,7 @@ public class Base {
         if (lastSpawn >= 5.0f) {
             lastSpawn = 0.0f;
 
-            if (isPlayerBase) {
-                // Spawn soldiers (left side)
-                Type[] soldierTypes = { Type.TANK, Type.MELEE, Type.SNIPER };
-                Type type = soldierTypes[random.nextInt(soldierTypes.length)];
-                int rand = random.nextInt(3);
-                int lane = spawnPointsY[rand];
-                switch (type) {
-                    case TANK:
-                        System.out.println("Tank spawned");
-                        Unit tank = new Tank(100, lane, this);
-                        this.unitsPerLane.get(rand).add(tank);
-                        tank.setLane(rand);
-                        tank.setIndex(this.unitsPerLane.get(rand).size()- 1);
-                        this.units.add(tank);
-                        return tank;
-                    case MELEE:
-                        System.out.println("Melee spawned");
-                        Unit melee = new Melee(100, lane, this);
-                        this.unitsPerLane.get(rand).add(melee);
-                        melee.setLane(rand);
-                        melee.setIndex(this.unitsPerLane.get(rand).size()- 1);
-                        this.units.add(melee);
-                        return melee;
-                    case SNIPER:
-                        System.out.println("Sniper spawned");
-                        Unit sniper = new Sniper(100, lane, this);
-                        this.unitsPerLane.get(rand).add(sniper);
-                        sniper.setLane(rand);
-                        sniper.setIndex(this.unitsPerLane.get(rand).size()- 1);
-                        this.units.add(sniper);
-                        return sniper;
-                    default:
-                        return null;
-                }
-            } else {
+            if (!isPlayerBase) {
                 // Spawn zombies (right side)
                 Type[] zombieTypes = { Type.WOMAN, Type.CRAWL, Type.FAST };
                 Type type = zombieTypes[random.nextInt(zombieTypes.length)];
@@ -488,7 +454,7 @@ public class Base {
             unit.updateCooldown(delta);
 
             // If no target and near enemy base, attack the base
-            if (unit.target == null && unit.isNearEnemyBase(enemyBase)) {
+            if (unit.getTarget() == null && unit.isNearEnemyBase(enemyBase)) {
                 unit.attackBase(enemyBase);
             }
 
