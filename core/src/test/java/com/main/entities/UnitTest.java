@@ -468,10 +468,7 @@ public class UnitTest {
         
         // Deuxième attaque
         int healthBefore = enemy1.getHealth(); // Devrait être 90
-        System.out.println("Health before second attack: " + healthBefore);
-        System.out.println("CD = " + unit.getAttackCooldown());
         unit.attack();
-        System.out.println("Health after second attack: " + enemy1.getHealth());
         assertEquals("Enemy should take damage again", healthBefore - unit.getAttackDamage(), enemy1.getHealth()); // 80
     }
 
@@ -706,7 +703,6 @@ public class UnitTest {
         
         when(mockBase.getUnitsPerLane()).thenReturn(allLanes); // ✅ Retourner la vraie structure
         float initialX = testunit.getPosX();
-        System.out.println("checkpoint");
         float newX = testunit.calculateNewPositionX(0.16f, 1);
 
         

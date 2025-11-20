@@ -397,10 +397,8 @@ public class HeroTest {
         hero.setCooldown(0);
         
         int initialMunitions = hero.weapon.getMunitions();
-        System.out.println("Munitions before = " + initialMunitions);
         // hero.weapon.reload();
         hero.attack();
-        System.out.println("Munitions after = " + hero.weapon.getMunitions());
         
         assertTrue("Munitions should decrease after attack", hero.weapon.getMunitions() < initialMunitions);
         assertTrue("Cooldown should be set after attack", hero.getAttackCooldown() > 0);

@@ -140,8 +140,6 @@ public class Base {
         float boxY = 0; // Du bas de la map
 
         this.collisionBox = new Rectangle(boxX, boxY, boxWidth, boxHeight);
-        // System.out.println(
-        //         name + " collision box: x=" + boxX + " y=" + boxY + " width=" + boxWidth + " height=" + boxHeight);
     }
 
     /**
@@ -228,8 +226,6 @@ public class Base {
         if (this.health < 0) {
             this.health = 0;
         }
-        System.out.println(
-                ">>> " + name + " takes " + damage + " damage! (HP: " + oldHealth + " -> " + this.health + ")");
     }
 
     /**
@@ -303,48 +299,34 @@ public class Base {
             case MELEE:
                 if (hero.getGold() >= Melee.COST) {
                     hero.removeGold(Melee.COST);
-                    System.out.println(
-                            "Melee unit bought for " + Melee.COST + " gold. Hero gold left: " + hero.getGold());
                     Unit melee = new Melee(100, spawnY, this);
                     this.unitsPerLane.get(spawnIndex).add(melee);
                     melee.setLane(spawnIndex);
                     melee.setIndex(this.unitsPerLane.get(spawnIndex).size()- 1);
                     return melee;
-                } else {
-                    System.out.println("Not enough gold to buy Melee unit.");
                 }
                 break;
             case TANK:
                 if (hero.getGold() >= Tank.COST) {
                     hero.removeGold(Tank.COST);
-                    System.out
-                            .println("Tank unit bought for " + Tank.COST + " gold. Hero gold left: " + hero.getGold());
                     Unit tank = new Tank(100, spawnY, this);
                     this.unitsPerLane.get(spawnIndex).add(tank);
                     tank.setLane(spawnIndex);
                     tank.setIndex(this.unitsPerLane.get(spawnIndex).size() - 1);
                     return tank;
-                } else {
-                    System.out.println("Not enough gold to buy Tank unit.");
                 }
                 break;
             case SNIPER:
                 if (hero.getGold() >= Sniper.COST) {
                     hero.removeGold(Sniper.COST);
-                    System.out
-                            .println("Sniper unit bought for " + Sniper.COST + " gold. Hero gold left: "
-                                    + hero.getGold());
                     Unit sniper = new Sniper(100, spawnY, this);
                     this.unitsPerLane.get(spawnIndex).add(sniper);
                     sniper.setLane(spawnIndex);
                     sniper.setIndex(this.unitsPerLane.get(spawnIndex).size() - 1);
                     return sniper;
-                } else {
-                    System.out.println("Not enough gold to buy Sniper unit.");
                 }
                 break;
             default:
-                System.out.println("Unknown unit type.");
                 break;
         }
         return null;
@@ -370,7 +352,6 @@ public class Base {
                 int lane = spawnPointsY[rand];
                 switch (type) {
                     case WOMAN:
-                        System.out.println("Zombie women spawned");
                         Unit wzombie = new WZombie(screen.getMapWidth(), lane, this);
                         this.unitsPerLane.get(rand).add(wzombie);
                         wzombie.setLane(rand);
@@ -378,7 +359,6 @@ public class Base {
                         this.units.add(wzombie);
                         return wzombie;
                     case CRAWL:
-                        System.out.println("Zombie crawler spawned");
                         Unit czombie = new CZombie(screen.getMapWidth(), lane, this);
                         this.unitsPerLane.get(rand).add(czombie);
                         czombie.setLane(rand);
@@ -386,7 +366,6 @@ public class Base {
                         this.units.add(czombie);
                         return czombie;
                     case FAST:
-                        System.out.println("Zombie fast spawned");
                         Unit fzombie = new FZombie(screen.getMapWidth(), lane, this);
                         this.unitsPerLane.get(rand).add(fzombie);
                         fzombie.setLane(rand);

@@ -728,13 +728,11 @@ public class Hero extends Unit {
     @Override
     public void attack() {
         if (target == null || target.isDead()) {
-            System.out.print("Target null");
             return;
         }
         double distance = Math.sqrt(Math.pow(this.posX - target.getPosX(), 2) +
                 Math.pow(this.posY - target.getPosY(), 2));
         if (distance > weapon.getRange()) {
-            System.out.println("Out of range");
             return;
         }
         if (attackCooldown <= 0 && weapon != null) {
@@ -757,20 +755,15 @@ public class Hero extends Unit {
 
                 weapon.attack();
                 int totalDamage = weapon.getDamage();
-                System.out.println(
-                        "Hero attacks " + target.getClass().getSimpleName() + " for " + totalDamage + " damage");
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
 
                 // Jouer le son de tir
                 if (shootSound != null) {
-                    System.out.println("🔊 SON DE TIR: Lecture du son...");
                     shootSound.play(0.7f); // Volume à 70%
-                } else {
-                    System.out.println("❌ ERREUR: shootSound est NULL!");
                 }
-
-            } else {
+            }
+            else {
                 weapon.reload();
             }
         }
