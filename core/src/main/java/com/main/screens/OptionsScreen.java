@@ -118,7 +118,7 @@ public class OptionsScreen implements Screen {
         float sliderWidth = 400f;
         float sliderHeight = 10f;
         float sliderX = (WORLD_WIDTH - sliderWidth) / 2f;
-        float sliderY = 200f;
+        float sliderY = 280f;
 
         volumeSlider = new Rectangle(sliderX, sliderY, sliderWidth, sliderHeight);
         
@@ -126,10 +126,10 @@ public class OptionsScreen implements Screen {
         volumeHandle = new Rectangle(handleX, sliderY - 10f, 20f, 30f);
 
         // Initialize sound toggle button
-        soundButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 100f, 200f, 50f);
+        soundButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 130f, 200f, 50f);
 
         // Initialize back button
-        backButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 30f, 200f, 50f);
+        backButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 20f, 200f, 50f);
     }
 
     @Override
@@ -144,10 +144,23 @@ public class OptionsScreen implements Screen {
         updateHover();
         handleInput();
 
+        // Draw semi-transparent background overlay if from pause
+        if (fromPause) {
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+            shapeRenderer.setColor(0, 0, 0, 0.7f);
+            shapeRenderer.rect(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
+            shapeRenderer.end();
+            
+            Gdx.gl.glDisable(GL20.GL_BLEND);
+        }
+
         batch.begin();
 
         // Draw background
-        if (background != null) {
+        if (background != null && !fromPause) {
             batch.draw(background, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         }
 
@@ -162,12 +175,12 @@ public class OptionsScreen implements Screen {
         font.setColor(Color.WHITE);
         GlyphLayout volumeLabel = new GlyphLayout(font, "MUSIC VOLUME");
         float labelX = (WORLD_WIDTH - volumeLabel.width) / 2f;
-        font.draw(batch, volumeLabel, labelX, 250f);
+        font.draw(batch, volumeLabel, labelX, 330f);
 
         // Draw sound effects label
         GlyphLayout soundLabel = new GlyphLayout(font, "SOUND EFFECTS");
         float soundLabelX = (WORLD_WIDTH - soundLabel.width) / 2f;
-        font.draw(batch, soundLabel, soundLabelX, 160f);
+        font.draw(batch, soundLabel, soundLabelX, 215f);
 
         // Draw back button
         font.getData().setScale(0.8f);
@@ -279,7 +292,7 @@ public class OptionsScreen implements Screen {
             // Back button
             if (selectedIndex == 0) {
                 if (fromPause) {
-                    game.resumeGame();
+                    game.returnToPauseMenu();
                 } else {
                     game.showTitleScreen();
                 }

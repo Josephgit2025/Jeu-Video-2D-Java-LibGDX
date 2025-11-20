@@ -68,6 +68,14 @@ public class Main extends Game {
     }
 
     /**
+     * Returns to the pause menu from options screen.
+     */
+    public void returnToPauseMenu() {
+        setScreen(gameScreen);
+        // Game will remain paused, showing pause overlay
+    }
+
+    /**
      * Updates the music volume in the game screen when changed in options.
      */
     public void updateGameMusicVolume() {
