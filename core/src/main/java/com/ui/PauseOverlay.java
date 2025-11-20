@@ -57,6 +57,10 @@ public class PauseOverlay implements Disposable {
      */
     private Rectangle resumeButton;
     /**
+     * Rectangle for OPTIONS button hitbox.
+     */
+    private Rectangle optionsButton;
+    /**
      * Rectangle for QUIT button hitbox.
      */
     private Rectangle quitButton;
@@ -70,7 +74,7 @@ public class PauseOverlay implements Disposable {
     private Rectangle noButton;
 
     /**
-     * Index of the currently hovered button (-1 = none, 0 = RESUME/YES, 1 = QUIT/NO).
+     * Index of the currently hovered button (-1 = none, 0 = RESUME/YES, 1 = OPTIONS, 2 = QUIT/NO).
      */
     private int selectedIndex = -1;
 
@@ -160,9 +164,16 @@ public class PauseOverlay implements Disposable {
             BUTTON_HEIGHT
         );
         
-        quitButton = new Rectangle(
+        optionsButton = new Rectangle(
             centerX - BUTTON_WIDTH / 2, 
             centerY - 100, 
+            BUTTON_WIDTH, 
+            BUTTON_HEIGHT
+        );
+        
+        quitButton = new Rectangle(
+            centerX - BUTTON_WIDTH / 2, 
+            centerY - 180, 
             BUTTON_WIDTH, 
             BUTTON_HEIGHT
         );
@@ -222,24 +233,33 @@ public class PauseOverlay implements Disposable {
             
             titleFont.draw(batch, title, titleX, titleY);
             
-            // Draw buttons RESUME and QUIT with hover effect
+            // Draw buttons RESUME, OPTIONS, and QUIT with hover effect
             GlyphLayout resumeLayout = new GlyphLayout(buttonFont, "RESUME");
             float resumeX = (screenWidth - resumeLayout.width) / 2f;
             if (selectedIndex == 0) {
-                drawTextInverted("RESUME", resumeX, resumeButton.y + 40);
+                buttonFont.setColor(Color.YELLOW);
             } else {
                 buttonFont.setColor(Color.WHITE);
-                buttonFont.draw(batch, resumeLayout, resumeX, resumeButton.y + 40);
             }
+            buttonFont.draw(batch, resumeLayout, resumeX, resumeButton.y + 40);
+
+            GlyphLayout optionsLayout = new GlyphLayout(buttonFont, "OPTIONS");
+            float optionsX = (screenWidth - optionsLayout.width) / 2f;
+            if (selectedIndex == 1) {
+                buttonFont.setColor(Color.YELLOW);
+            } else {
+                buttonFont.setColor(Color.WHITE);
+            }
+            buttonFont.draw(batch, optionsLayout, optionsX, optionsButton.y + 40);
 
             GlyphLayout quitLayout = new GlyphLayout(buttonFont, "QUIT");
             float quitX = (screenWidth - quitLayout.width) / 2f;
-            if (selectedIndex == 1) {
-                drawTextInverted("QUIT", quitX, quitButton.y + 40);
+            if (selectedIndex == 2) {
+                buttonFont.setColor(Color.YELLOW);
             } else {
                 buttonFont.setColor(Color.WHITE);
-                buttonFont.draw(batch, quitLayout, quitX, quitButton.y + 40);
             }
+            buttonFont.draw(batch, quitLayout, quitX, quitButton.y + 40);
         } else {
             // Confirmation screen
             String confirmText = "RETURN TO MENU ?";
@@ -254,20 +274,20 @@ public class PauseOverlay implements Disposable {
             GlyphLayout yesLayout = new GlyphLayout(buttonFont, "YES");
             float yesX = yesButton.x + (BUTTON_WIDTH - yesLayout.width) / 2f;
             if (selectedIndex == 0) {
-                drawTextInverted("YES", yesX, yesButton.y + 40);
+                buttonFont.setColor(Color.YELLOW);
             } else {
                 buttonFont.setColor(Color.WHITE);
-                buttonFont.draw(batch, yesLayout, yesX, yesButton.y + 40);
             }
+            buttonFont.draw(batch, yesLayout, yesX, yesButton.y + 40);
 
             GlyphLayout noLayout = new GlyphLayout(buttonFont, "NO");
             float noX = noButton.x + (BUTTON_WIDTH - noLayout.width) / 2f;
             if (selectedIndex == 1) {
-                drawTextInverted("NO", noX, noButton.y + 40);
+                buttonFont.setColor(Color.YELLOW);
             } else {
                 buttonFont.setColor(Color.WHITE);
-                buttonFont.draw(batch, noLayout, noX, noButton.y + 40);
             }
+            buttonFont.draw(batch, noLayout, noX, noButton.y + 40);
         }
         
         batch.end();
@@ -325,6 +345,21 @@ public class PauseOverlay implements Disposable {
                 selectedIndex = 0;
             }
 
+            // OPTIONS button
+            GlyphLayout optionsLayout = new GlyphLayout(buttonFont, "OPTIONS");
+            float optionsX = (OVERLAY_WIDTH - optionsLayout.width) / 2f;
+
+            Rectangle optionsHitbox = new Rectangle(
+                optionsX - 10,
+                optionsButton.y + 40 - optionsLayout.height - 5,
+                optionsLayout.width + 20,
+                optionsLayout.height + 10
+            );
+
+            if (optionsHitbox.contains(mx, my)) {
+                selectedIndex = 1;
+            }
+
             // QUIT button
             GlyphLayout quitLayout = new GlyphLayout(buttonFont, "QUIT");
             float quitX = (OVERLAY_WIDTH - quitLayout.width) / 2f;
@@ -337,7 +372,7 @@ public class PauseOverlay implements Disposable {
             );
 
             if (quitHitbox.contains(mx, my)) {
-                selectedIndex = 1;
+                selectedIndex = 2;
             }
         } else {
             // YES button
@@ -378,7 +413,7 @@ public class PauseOverlay implements Disposable {
      *
      * @param screenX The screen X coordinate of the click event.
      * @param screenY The screen Y coordinate of the click event.
-     * @return "resume" if RESUME is clicked, "confirm" if QUIT is clicked (shows confirmation), "quit" if YES is confirmed, "cancel" if NO is selected, null otherwise.
+     * @return "resume" if RESUME is clicked, "options" if OPTIONS is clicked, "confirm" if QUIT is clicked (shows confirmation), "quit" if YES is confirmed, "cancel" if NO is selected, null otherwise.
      */
     public String handleClick(int screenX, int screenY) {
         Vector2 mouse = viewport.unproject(new Vector2(screenX, screenY));
@@ -399,6 +434,21 @@ public class PauseOverlay implements Disposable {
 
             if (resumeHitbox.contains(worldX, worldY)) {
                 return "resume";
+            }
+
+            // Check OPTIONS button
+            GlyphLayout optionsLayout = new GlyphLayout(buttonFont, "OPTIONS");
+            float optionsX = (OVERLAY_WIDTH - optionsLayout.width) / 2f;
+
+            Rectangle optionsHitbox = new Rectangle(
+                optionsX - 10,
+                optionsButton.y + 40 - optionsLayout.height - 5,
+                optionsLayout.width + 20,
+                optionsLayout.height + 10
+            );
+
+            if (optionsHitbox.contains(worldX, worldY)) {
+                return "options";
             }
 
             // Check QUIT button

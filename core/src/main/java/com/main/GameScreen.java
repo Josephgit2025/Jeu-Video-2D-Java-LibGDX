@@ -22,6 +22,7 @@ import com.ui.GameOverOverlay;
 import com.ui.PauseOverlay;
 import com.ui.UnitShop;
 import com.ui.hud;
+import com.utils.AudioSettings;
 
 /**
  * Main game screen for the project, managing rendering, input, game state, and UI overlays.
@@ -202,7 +203,7 @@ public class GameScreen implements Screen {
             // Musique de fond
             backgroundMusic = com.badlogic.gdx.Gdx.audio.newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
             backgroundMusic.setLooping(true);
-            backgroundMusic.setVolume(0.4f);
+            backgroundMusic.setVolume(AudioSettings.getMusicVolume());
             backgroundMusic.play();
             System.out.println("✅ Musique de fond chargée et démarrée");
             
@@ -507,6 +508,9 @@ public class GameScreen implements Screen {
                 System.out.println("Resume clicked!");
                 gameState = GameState.PLAYING;
                 pauseOverlay.resetConfirmation();
+            } else if ("options".equals(action)) {
+                System.out.println("Options clicked from pause!");
+                com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showOptionsScreen(true));
             } else if ("quit".equals(action)) {
                 System.out.println("Quit to menu confirmed - Returning to Title Screen!");
                 pauseOverlay.resetConfirmation();
@@ -757,5 +761,23 @@ public class GameScreen implements Screen {
      */
     public int getMapHeight() {
         return mapHeight;
+    }
+
+    /**
+     * Updates the background music volume based on AudioSettings.
+     * Called when volume is changed in the options menu.
+     */
+    public void updateMusicVolume() {
+        if (backgroundMusic != null) {
+            backgroundMusic.setVolume(AudioSettings.getMusicVolume());
+        }
+    }
+
+    /**
+     * Resumes the game from pause state.
+     * Sets the game state back to PLAYING.
+     */
+    public void resumeFromPause() {
+        gameState = GameState.PLAYING;
     }
 }

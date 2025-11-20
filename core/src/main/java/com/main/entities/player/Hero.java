@@ -22,6 +22,7 @@ import com.main.weapons.Pistol;
 import com.main.weapons.SMG;
 import com.main.weapons.Shotgun;
 import com.main.weapons.Weapon;
+import com.utils.AudioSettings;
 
 /**
  * Represents the main playable hero unit in the game.
@@ -678,11 +679,11 @@ public class Hero extends Unit {
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
                 
-                // Jouer le son de tir
-                if (shootSound != null) {
+                // Jouer le son de tir si les sons sont activés
+                if (shootSound != null && AudioSettings.isSoundEnabled()) {
                     System.out.println("🔊 SON DE TIR: Lecture du son...");
                     shootSound.play(0.7f); // Volume à 70%
-                } else {
+                } else if (shootSound == null) {
                     System.out.println("❌ ERREUR: shootSound est NULL!");
                 }
 

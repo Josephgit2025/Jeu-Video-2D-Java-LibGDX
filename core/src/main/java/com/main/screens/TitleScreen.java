@@ -78,9 +78,9 @@ public class TitleScreen implements Screen {
     private static final float WORLD_HEIGHT = 480f;
 
     /**
-     * Array of menu item labels (PLAY, QUIT).
+     * Array of menu item labels (PLAY, OPTIONS, QUIT).
      */
-    private String[] menuItems = {"PLAY", "QUIT"};
+    private String[] menuItems = {"PLAY", "OPTIONS", "QUIT"};
 
     /**
      * Index of the currently selected menu item (-1 if none).
@@ -185,34 +185,46 @@ public class TitleScreen implements Screen {
             // Position Y avec espace entre le logo et les boutons
             float buttonY = 60f; // Position descendue
             
-            // Calculer les layouts pour centrer les deux boutons
+            // Calculer les layouts pour centrer les trois boutons
             GlyphLayout playLayout = new GlyphLayout(font, "PLAY");
+            GlyphLayout optionsLayout = new GlyphLayout(font, "OPTIONS");
             GlyphLayout quitLayout = new GlyphLayout(font, "QUIT");
             
             // Espacement entre les boutons
             float buttonSpacing = 80f;
             
-            // Largeur totale occupée par les deux boutons
-            float totalWidth = playLayout.width + buttonSpacing + quitLayout.width;
+            // Largeur totale occupée par les trois boutons
+            float totalWidth = playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing + quitLayout.width;
             
             // Position de départ pour centrer l'ensemble
             float startX = (WORLD_WIDTH - totalWidth) / 2f;
             
-            // Dessiner PLAY avec effet d'inversion
+            // Dessiner PLAY
             float playX = startX;
             if (selectedIndex == 0) {
-                drawTextWithShadowInverted("PLAY", playX, buttonY);
+                font.setColor(Color.YELLOW);
             } else {
-                drawTextWithShadow("PLAY", playX, buttonY, Color.WHITE);
+                font.setColor(Color.WHITE);
             }
+            font.draw(batch, playLayout, playX, buttonY);
             
-            // Dessiner QUIT avec effet d'inversion
-            float quitX = startX + playLayout.width + buttonSpacing;
+            // Dessiner OPTIONS
+            float optionsX = startX + playLayout.width + buttonSpacing;
             if (selectedIndex == 1) {
-                drawTextWithShadowInverted("QUIT", quitX, buttonY);
+                font.setColor(Color.YELLOW);
             } else {
-                drawTextWithShadow("QUIT", quitX, buttonY, Color.WHITE);
+                font.setColor(Color.WHITE);
             }
+            font.draw(batch, optionsLayout, optionsX, buttonY);
+            
+            // Dessiner QUIT
+            float quitX = startX + playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing;
+            if (selectedIndex == 2) {
+                font.setColor(Color.YELLOW);
+            } else {
+                font.setColor(Color.WHITE);
+            }
+            font.draw(batch, quitLayout, quitX, buttonY);
         }
 
         batch.end();
@@ -272,6 +284,8 @@ public class TitleScreen implements Screen {
     private void updateHover() {
         if (font == null) return;
         
+        font.getData().setScale(0.8f);
+        
         Vector2 mouse = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         float mx = mouse.x;
         float my = mouse.y;
@@ -283,10 +297,11 @@ public class TitleScreen implements Screen {
         
         // Calculer les layouts
         GlyphLayout playLayout = new GlyphLayout(font, "PLAY");
+        GlyphLayout optionsLayout = new GlyphLayout(font, "OPTIONS");
         GlyphLayout quitLayout = new GlyphLayout(font, "QUIT");
         
         float buttonSpacing = 80f;
-        float totalWidth = playLayout.width + buttonSpacing + quitLayout.width;
+        float totalWidth = playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing + quitLayout.width;
         float startX = (WORLD_WIDTH - totalWidth) / 2f;
         
         // Zone de collision PLAY
@@ -300,11 +315,27 @@ public class TitleScreen implements Screen {
         
         if (playRect.contains(mx, my)) {
             selectedIndex = 0;
+            font.getData().setScale(1f);
+            return;
+        }
+        
+        // Zone de collision OPTIONS
+        float optionsX = startX + playLayout.width + buttonSpacing;
+        Rectangle optionsRect = new Rectangle(
+            optionsX - 10,
+            buttonY - optionsLayout.height - 5,
+            optionsLayout.width + 20,
+            optionsLayout.height + 10
+        );
+        
+        if (optionsRect.contains(mx, my)) {
+            selectedIndex = 1;
+            font.getData().setScale(1f);
             return;
         }
         
         // Zone de collision QUIT
-        float quitX = startX + playLayout.width + buttonSpacing;
+        float quitX = startX + playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing;
         Rectangle quitRect = new Rectangle(
             quitX - 10,
             buttonY - quitLayout.height - 5,
@@ -313,8 +344,10 @@ public class TitleScreen implements Screen {
         );
         
         if (quitRect.contains(mx, my)) {
-            selectedIndex = 1;
+            selectedIndex = 2;
         }
+        
+        font.getData().setScale(1f);
     }
 
     /**
@@ -326,6 +359,9 @@ public class TitleScreen implements Screen {
             switch (menuItems[selectedIndex]) {
                 case "PLAY":
                     game.showGameScreen();
+                    break;
+                case "OPTIONS":
+                    game.showOptionsScreen(false);
                     break;
                 case "QUIT":
                     Gdx.app.postRunnable(() -> {
