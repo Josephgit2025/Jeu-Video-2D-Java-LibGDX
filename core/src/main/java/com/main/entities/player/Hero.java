@@ -474,6 +474,12 @@ public class Hero extends Unit {
                         "Not enough gold : 200 gold required to buy a Sniper Rifle -> You only have " + this.gold);
             }
         }
+
+        // -- Reload Weapon --
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
+            this.weapon.reload();
+        }
+
         // --- DÉPLACEMENT ---
         moving = false;
 
