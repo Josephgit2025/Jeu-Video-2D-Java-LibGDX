@@ -453,10 +453,8 @@ public class GameScreen implements Screen {
                     com.badlogic.gdx.Gdx.input.getY());
 
             if ("replay".equals(action)) {
-                
                 reset();
             } else if ("quit".equals(action)) {
-                
                 com.badlogic.gdx.Gdx.app.postRunnable(() -> game.showTitleScreen());
             }
         }
