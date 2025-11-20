@@ -798,6 +798,7 @@ public class Hero extends Unit {
                     System.out.println("❌ ERREUR: shootSound est NULL!");
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
+                }
 
                 // Jouer le son de tir
                 if (shootSound != null) {
