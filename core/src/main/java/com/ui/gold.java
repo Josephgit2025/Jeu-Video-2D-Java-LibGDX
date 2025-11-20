@@ -14,65 +14,18 @@ import com.badlogic.gdx.utils.Disposable;
  * Implements {@link Disposable} for proper resource management.
  */
 public class gold implements Disposable {
-    
-    /**
-     * X position of the gold display.
-     */
+
     private float x;
-
-    /**
-     * Y position of the gold display.
-     */
     private float y;
-
-    /**
-     * Current gold value displayed.
-     */
     private int gold;
-
-    /**
-     * Font for rendering the gold value.
-     */
     private BitmapFont font;
-
-    /**
-     * Optional coin icon texture for gold display.
-     */
     private Texture coinIcon;
-
-    /**
-     * Indicates if the gold display has a coin icon.
-     */
     private boolean hasIcon;
-
-    /**
-     * Size of the coin icon in pixels.
-     */
     private static final float ICON_SIZE = 45f;
-
-    /**
-     * Horizontal offset for text when icon is present.
-     */
     private static final float TEXT_OFFSET_X = 49f;
-
-    /**
-     * Color for gold text (bright gold).
-     */
     private static final Color GOLD_COLOR = new Color(1f, 0.84f, 0f, 1f);
-
-    /**
-     * Background color for the gold display (semi-transparent dark gray).
-     */
     private static final Color BACKGROUND_COLOR = new Color(0.2f, 0.2f, 0.2f, 0.7f);
-
-    /**
-     * Horizontal padding for background.
-     */
     private static final float PADDING_X = 10f;
-
-    /**
-     * Vertical padding for background.
-     */
     private static final float PADDING_Y = 8f;
     
     /**
@@ -89,8 +42,15 @@ public class gold implements Disposable {
         
         // Initialize font
         font = new BitmapFont();
-        font.setColor(GOLD_COLOR);
-        font.getData().setScale(1.8f);
+        // Utiliser un jaune plus brillant et saturé pour meilleure visibilité
+        font.setColor(new Color(1f, 1f, 0f, 1f)); // Jaune pur très visible
+        font.getData().setScale(1.9f);
+        
+        // Set text to be bold and crisp
+        font.getRegion().getTexture().setFilter(
+            com.badlogic.gdx.graphics.Texture.TextureFilter.Linear,
+            com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
+        );
     }
     
     /**
@@ -133,13 +93,27 @@ public class gold implements Disposable {
         // Draw coin icon if available (aligned vertically with text)
         if (hasIcon && coinIcon != null) {
             // Calculate vertical center alignment with the text
-            float iconY = y - font.getLineHeight() / 2 - ICON_SIZE / 2 + 2;
+            float iconY = y - font.getLineHeight() / 2 - ICON_SIZE / 3 + 2;
             batch.draw(coinIcon, x, iconY, ICON_SIZE, ICON_SIZE);
             textX += TEXT_OFFSET_X;
         }
         
-        // Draw gold text (sans le label "Gold:")
+        // Draw gold text with subtle black outline
         String goldText = " " + gold;
+        
+        // Save original color
+        Color originalColor = font.getColor().cpy();
+        
+        // Draw subtle black outline (4 directions only)
+        font.setColor(Color.BLACK);
+        float offset = 1f;
+        font.draw(batch, goldText, textX - offset, y);
+        font.draw(batch, goldText, textX + offset, y);
+        font.draw(batch, goldText, textX, y - offset);
+        font.draw(batch, goldText, textX, y + offset);
+        
+        // Draw main text in yellow
+        font.setColor(originalColor);
         font.draw(batch, goldText, textX, y);
         
         batch.end();
