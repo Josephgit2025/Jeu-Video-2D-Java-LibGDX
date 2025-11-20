@@ -478,6 +478,7 @@ public class Hero extends Unit {
         // -- Reload Weapon --
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
             this.weapon.reload();
+            this.attackCooldown = this.weapon.getReloadTimer();
         }
 
         // --- DÉPLACEMENT ---
