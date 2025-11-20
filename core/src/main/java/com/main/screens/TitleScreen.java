@@ -206,15 +206,15 @@ public class TitleScreen implements Screen {
 
         // ==== MENU - BOUTONS EN LIGNE ====
         if (font != null) {
-            font.getData().setScale(0.8f); // Taille réduite des boutons
-            
             // Position Y avec espace entre le logo et les boutons
             float buttonY = 60f; // Position descendue
             
-            // Calculer les layouts pour centrer les trois boutons
+            // Calculer les layouts pour centrer les trois boutons (sans scale)
+            font.getData().setScale(0.8f);
             GlyphLayout playLayout = new GlyphLayout(font, "PLAY");
             GlyphLayout optionsLayout = new GlyphLayout(font, "OPTIONS");
             GlyphLayout quitLayout = new GlyphLayout(font, "QUIT");
+            font.getData().setScale(1f);
             
             // Espacement entre les boutons
             float buttonSpacing = 80f;
@@ -230,9 +230,7 @@ public class TitleScreen implements Screen {
             float playScale = getZoomScale(0);
             font.getData().setScale(0.8f * playScale);
             font.setColor(Color.WHITE);
-            GlyphLayout playScaledLayout = new GlyphLayout(font, "PLAY");
-            float playDrawX = playX + (playLayout.width * playScale - playScaledLayout.width) / 2f;
-            font.draw(batch, playScaledLayout, playDrawX, buttonY);
+            font.draw(batch, "PLAY", playX, buttonY);
             font.getData().setScale(1f);
             
             // Dessiner OPTIONS avec zoom fluide
@@ -240,9 +238,7 @@ public class TitleScreen implements Screen {
             float optionsScale = getZoomScale(1);
             font.getData().setScale(0.8f * optionsScale);
             font.setColor(Color.WHITE);
-            GlyphLayout optionsScaledLayout = new GlyphLayout(font, "OPTIONS");
-            float optionsDrawX = optionsX + (optionsLayout.width * optionsScale - optionsScaledLayout.width) / 2f;
-            font.draw(batch, optionsScaledLayout, optionsDrawX, buttonY);
+            font.draw(batch, "OPTIONS", optionsX, buttonY);
             font.getData().setScale(1f);
             
             // Dessiner QUIT avec zoom fluide
@@ -250,9 +246,7 @@ public class TitleScreen implements Screen {
             float quitScale = getZoomScale(2);
             font.getData().setScale(0.8f * quitScale);
             font.setColor(Color.WHITE);
-            GlyphLayout quitScaledLayout = new GlyphLayout(font, "QUIT");
-            float quitDrawX = quitX + (quitLayout.width * quitScale - quitScaledLayout.width) / 2f;
-            font.draw(batch, quitScaledLayout, quitDrawX, buttonY);
+            font.draw(batch, "QUIT", quitX, buttonY);
             font.getData().setScale(1f);
         }
 
