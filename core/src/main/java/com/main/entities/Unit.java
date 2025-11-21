@@ -189,6 +189,10 @@ public abstract class Unit {
         return target;
     }
 
+    public String getType(){
+        return this.getClass().getSimpleName();
+    }
+
     public int getRange() {
         return range;
     }

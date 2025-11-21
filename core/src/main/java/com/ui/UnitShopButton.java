@@ -95,13 +95,13 @@ public class UnitShopButton {
 
         switch (unitType) {
             case MELEE:
-                this.label = "Melee";
+                this.label = "melees";
                 break;
             case SNIPER:
-                this.label = "Sniper";
+                this.label = "snipers";
                 break;
             case TANK:
-                this.label = "Tank";
+                this.label = "tanks";
                 break;
             default:
                 this.label = "?";
