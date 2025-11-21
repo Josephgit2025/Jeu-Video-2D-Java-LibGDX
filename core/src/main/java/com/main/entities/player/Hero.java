@@ -782,17 +782,9 @@ public class Hero extends Unit {
 
                 weapon.attack();
                 int totalDamage = weapon.getDamage();
-                // Check if target was alive before applying damage
-                boolean wasAlive = !target.isDead();
 
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
-
-                // If the target died as a result of this attack and it was alive before,
-                // award the hero 40 gold.
-                if (wasAlive && target.isDead()) {
-                    this.addGold(40);
-                }
 
                 // Jouer le son de tir si les sons sont activés
                 if (shootSound != null && AudioSettings.isSoundEnabled()) {
