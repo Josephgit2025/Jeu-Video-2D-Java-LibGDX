@@ -12,6 +12,8 @@ public class Pistol extends Weapon {
      * Calls the superclass constructor with pistol parameters.
      */
     public Pistol() {
-        super(10, 150, 1f, 12);
+        super(15, 150, 1f, 12);
+        this.reloadSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/ReloadPistol.mp3"));
+        this.reloadTimer = 1.5f;
     }
 }

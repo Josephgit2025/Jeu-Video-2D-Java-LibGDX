@@ -78,14 +78,34 @@ public class TitleScreen implements Screen {
     private static final float WORLD_HEIGHT = 480f;
 
     /**
-     * Array of menu item labels (PLAY, QUIT).
+     * Array of menu item labels (PLAY, OPTIONS, QUIT).
      */
-    private String[] menuItems = {"PLAY", "QUIT"};
+    private String[] menuItems = {"PLAY", "OPTIONS", "QUIT"};
 
     /**
      * Index of the currently selected menu item (-1 if none).
      */
     protected int selectedIndex = -1;
+
+    /**
+     * Index of the last hovered menu item for tracking hover changes.
+     */
+    private int lastHoveredIndex = -1;
+
+    /**
+     * Time elapsed since hover started, used for smooth zoom transition.
+     */
+    private float hoverTime = 0f;
+
+    /**
+     * Duration of the hover zoom transition animation in seconds.
+     */
+    private static final float ZOOM_TRANSITION_DURATION = 0.15f;
+
+    /**
+     * Maximum scale factor when button is fully hovered (1.2 = 20% bigger).
+     */
+    private static final float MAX_ZOOM_SCALE = 1.2f;
 
     /**
      * Constructs the TitleScreen and initializes all resources (background, logo, font, camera, viewport).
@@ -160,6 +180,12 @@ public class TitleScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
 
         updateHover();
+        
+        // Update zoom animation time
+        if (selectedIndex != -1 && selectedIndex == lastHoveredIndex) {
+            hoverTime = Math.min(hoverTime + delta, ZOOM_TRANSITION_DURATION);
+        }
+        
         handleInput();
 
         batch.begin();
@@ -180,39 +206,48 @@ public class TitleScreen implements Screen {
 
         // ==== MENU - BOUTONS EN LIGNE ====
         if (font != null) {
-            font.getData().setScale(0.8f); // Taille réduite des boutons
-            
             // Position Y avec espace entre le logo et les boutons
             float buttonY = 60f; // Position descendue
             
-            // Calculer les layouts pour centrer les deux boutons
+            // Calculer les layouts pour centrer les trois boutons (sans scale)
+            font.getData().setScale(0.8f);
             GlyphLayout playLayout = new GlyphLayout(font, "PLAY");
+            GlyphLayout optionsLayout = new GlyphLayout(font, "OPTIONS");
             GlyphLayout quitLayout = new GlyphLayout(font, "QUIT");
+            font.getData().setScale(1f);
             
             // Espacement entre les boutons
             float buttonSpacing = 80f;
             
-            // Largeur totale occupée par les deux boutons
-            float totalWidth = playLayout.width + buttonSpacing + quitLayout.width;
+            // Largeur totale occupée par les trois boutons
+            float totalWidth = playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing + quitLayout.width;
             
             // Position de départ pour centrer l'ensemble
             float startX = (WORLD_WIDTH - totalWidth) / 2f;
             
-            // Dessiner PLAY avec effet d'inversion
+            // Dessiner PLAY avec zoom fluide
             float playX = startX;
-            if (selectedIndex == 0) {
-                drawTextWithShadowInverted("PLAY", playX, buttonY);
-            } else {
-                drawTextWithShadow("PLAY", playX, buttonY, Color.WHITE);
-            }
+            float playScale = getZoomScale(0);
+            font.getData().setScale(0.8f * playScale);
+            font.setColor(Color.WHITE);
+            font.draw(batch, "PLAY", playX, buttonY);
+            font.getData().setScale(1f);
             
-            // Dessiner QUIT avec effet d'inversion
-            float quitX = startX + playLayout.width + buttonSpacing;
-            if (selectedIndex == 1) {
-                drawTextWithShadowInverted("QUIT", quitX, buttonY);
-            } else {
-                drawTextWithShadow("QUIT", quitX, buttonY, Color.WHITE);
-            }
+            // Dessiner OPTIONS avec zoom fluide
+            float optionsX = startX + playLayout.width + buttonSpacing;
+            float optionsScale = getZoomScale(1);
+            font.getData().setScale(0.8f * optionsScale);
+            font.setColor(Color.WHITE);
+            font.draw(batch, "OPTIONS", optionsX, buttonY);
+            font.getData().setScale(1f);
+            
+            // Dessiner QUIT avec zoom fluide
+            float quitX = startX + playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing;
+            float quitScale = getZoomScale(2);
+            font.getData().setScale(0.8f * quitScale);
+            font.setColor(Color.WHITE);
+            font.draw(batch, "QUIT", quitX, buttonY);
+            font.getData().setScale(1f);
         }
 
         batch.end();
@@ -272,10 +307,13 @@ public class TitleScreen implements Screen {
     private void updateHover() {
         if (font == null) return;
         
+        font.getData().setScale(0.8f);
+        
         Vector2 mouse = viewport.unproject(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         float mx = mouse.x;
         float my = mouse.y;
 
+        int previousIndex = selectedIndex;
         selectedIndex = -1;
         
         // Position Y des boutons (même que dans render)
@@ -283,10 +321,11 @@ public class TitleScreen implements Screen {
         
         // Calculer les layouts
         GlyphLayout playLayout = new GlyphLayout(font, "PLAY");
+        GlyphLayout optionsLayout = new GlyphLayout(font, "OPTIONS");
         GlyphLayout quitLayout = new GlyphLayout(font, "QUIT");
         
         float buttonSpacing = 80f;
-        float totalWidth = playLayout.width + buttonSpacing + quitLayout.width;
+        float totalWidth = playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing + quitLayout.width;
         float startX = (WORLD_WIDTH - totalWidth) / 2f;
         
         // Zone de collision PLAY
@@ -300,11 +339,27 @@ public class TitleScreen implements Screen {
         
         if (playRect.contains(mx, my)) {
             selectedIndex = 0;
+            font.getData().setScale(1f);
+            return;
+        }
+        
+        // Zone de collision OPTIONS
+        float optionsX = startX + playLayout.width + buttonSpacing;
+        Rectangle optionsRect = new Rectangle(
+            optionsX - 10,
+            buttonY - optionsLayout.height - 5,
+            optionsLayout.width + 20,
+            optionsLayout.height + 10
+        );
+        
+        if (optionsRect.contains(mx, my)) {
+            selectedIndex = 1;
+            font.getData().setScale(1f);
             return;
         }
         
         // Zone de collision QUIT
-        float quitX = startX + playLayout.width + buttonSpacing;
+        float quitX = startX + playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing;
         Rectangle quitRect = new Rectangle(
             quitX - 10,
             buttonY - quitLayout.height - 5,
@@ -313,8 +368,38 @@ public class TitleScreen implements Screen {
         );
         
         if (quitRect.contains(mx, my)) {
-            selectedIndex = 1;
+            selectedIndex = 2;
         }
+        
+        // Reset hover time if we changed button or stopped hovering
+        if (selectedIndex != previousIndex) {
+            hoverTime = 0f;
+            lastHoveredIndex = selectedIndex;
+        }
+        
+        font.getData().setScale(1f);
+    }
+
+    /**
+     * Calculates the zoom scale factor for a button based on hover time.
+     * Creates a smooth zoom transition effect when hovering over menu items.
+     *
+     * @param buttonIndex The index of the button to get the scale for
+     * @return The scale factor (1.0 = normal size, MAX_ZOOM_SCALE = fully zoomed)
+     */
+    private float getZoomScale(int buttonIndex) {
+        if (selectedIndex != buttonIndex) {
+            return 1.0f;
+        }
+        
+        // Calculate interpolation factor (0.0 to 1.0)
+        float t = Math.min(hoverTime / ZOOM_TRANSITION_DURATION, 1.0f);
+        
+        // Smooth interpolation using ease-out cubic function
+        t = 1f - (float)Math.pow(1f - t, 3);
+        
+        // Interpolate between 1.0 (normal) and MAX_ZOOM_SCALE (zoomed)
+        return 1.0f + (MAX_ZOOM_SCALE - 1.0f) * t;
     }
 
     /**
@@ -326,6 +411,9 @@ public class TitleScreen implements Screen {
             switch (menuItems[selectedIndex]) {
                 case "PLAY":
                     game.showGameScreen();
+                    break;
+                case "OPTIONS":
+                    game.showOptionsScreen(false);
                     break;
                 case "QUIT":
                     Gdx.app.postRunnable(() -> {

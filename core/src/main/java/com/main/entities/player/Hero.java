@@ -22,6 +22,7 @@ import com.main.weapons.Pistol;
 import com.main.weapons.SMG;
 import com.main.weapons.Shotgun;
 import com.main.weapons.Weapon;
+import com.utils.AudioSettings;
 import com.ui.Inventory;
 
 /**
@@ -212,6 +213,17 @@ public class Hero extends Unit {
     private final float retargetInterval = 0.1f; // 100ms
 
     /**
+     * Time for gaining gold
+     */
+
+    private float goldTimer = 0f;
+
+    /**
+     * Interval before gaining gold passively
+     */
+    private final float goldInterval = 3f;
+
+    /**
      * Sound effect played when the hero shoots.
      */
     private Sound shootSound;
@@ -375,6 +387,12 @@ public class Hero extends Unit {
             }
         }
 
+        goldTimer += delta;
+        if (goldTimer >= goldInterval){
+            this.addGold(10);
+            goldTimer = 0f;
+        }
+
         // --- ATTAQUE ---
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             if (target != null && !target.isDead()) {
@@ -456,6 +474,13 @@ public class Hero extends Unit {
                         "Not enough gold : 200 gold required to buy a Sniper Rifle -> You only have " + this.gold);
             }
         }
+
+        // -- Reload Weapon --
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
+            this.weapon.reload();
+            this.attackCooldown = this.weapon.getReloadTimer();
+        }
+
         // --- DÉPLACEMENT ---
         moving = false;
 
@@ -757,8 +782,30 @@ public class Hero extends Unit {
 
                 weapon.attack();
                 int totalDamage = weapon.getDamage();
+                System.out.println(
+                        "Hero attacks " + target.getClass().getSimpleName() + " for " + totalDamage + " damage");
+                // Check if target was alive before applying damage
+                boolean wasAlive = !target.isDead();
+
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
+
+                // If the target died as a result of this attack and it was alive before,
+                // award the hero 40 gold.
+                if (wasAlive && target.isDead()) {
+                    this.addGold(40);
+                    System.out.println("Enemy killed by hero! +40 gold. Total: " + this.getGold());
+                }
+
+                // Jouer le son de tir si les sons sont activés
+                if (shootSound != null && AudioSettings.isSoundEnabled()) {
+                    System.out.println("🔊 SON DE TIR: Lecture du son...");
+                    shootSound.play(0.7f); // Volume à 70%
+                } else if (shootSound == null) {
+                    System.out.println("❌ ERREUR: shootSound est NULL!");
+                target.takeDamage(totalDamage);
+                attackCooldown = weapon.getAttackSpeed();
+                }
 
                 // Jouer le son de tir
                 if (shootSound != null) {
@@ -767,6 +814,7 @@ public class Hero extends Unit {
             }
             else {
                 weapon.reload();
+                attackCooldown = weapon.getReloadTimer();
             }
         }
     }
