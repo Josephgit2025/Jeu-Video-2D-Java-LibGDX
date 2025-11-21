@@ -20,15 +20,18 @@ import com.ui.BaseDestroyedOverlay;
 import com.ui.BaseZombieDestroyedOverlay;
 import com.ui.GameOverOverlay;
 import com.ui.Inventory;
+import com.ui.Target;
 import com.ui.PauseOverlay;
 import com.ui.UnitShop;
 import com.ui.hud;
 import com.utils.AudioSettings;
 
 /**
- * Main game screen for the project, managing rendering, input, game state, and UI overlays.
+ * Main game screen for the project, managing rendering, input, game state, and
+ * UI overlays.
  * <p>
- * Handles the core gameplay loop, including unit spawning, camera movement, collision rendering, HUD updates, overlays, and audio management.
+ * Handles the core gameplay loop, including unit spawning, camera movement,
+ * collision rendering, HUD updates, overlays, and audio management.
  * Interacts with all major game entities, bases, hero, map, and UI components.
  */
 public class GameScreen implements Screen {
@@ -115,6 +118,7 @@ public class GameScreen implements Screen {
      */
     private UnitShop unitShop;
     private Inventory inventory;
+    private Target target;
 
     /**
      * Background music for the game.
@@ -131,7 +135,8 @@ public class GameScreen implements Screen {
     private BitmapFont pauseFont;
 
     /**
-     * Enum representing the current state of the game (playing, paused, game over, etc.).
+     * Enum representing the current state of the game (playing, paused, game over,
+     * etc.).
      */
     private enum GameState {
         PLAYING,
@@ -151,7 +156,8 @@ public class GameScreen implements Screen {
     private boolean pauseKeyPressed = false;
 
     /**
-     * Constructs the main game screen, initializing all game entities, overlays, HUD, audio, and UI components.
+     * Constructs the main game screen, initializing all game entities, overlays,
+     * HUD, audio, and UI components.
      *
      * @param game Reference to the main game application
      */
@@ -190,30 +196,33 @@ public class GameScreen implements Screen {
         this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         this.unitShop = new UnitShop(playerBase, hero);
         this.inventory = new Inventory(hero);
+        this.target = new Target(hero, camera);
 
         // Load audio
         loadSounds();
     }
 
     /**
-     * Loads all game sounds and music, assigns audio resources to hero and overlays.
+     * Loads all game sounds and music, assigns audio resources to hero and
+     * overlays.
      * Handles errors and missing files gracefully.
      */
     private void loadSounds() {
-        try {            
+        try {
             // Musique de fond
             backgroundMusic = com.badlogic.gdx.Gdx.audio
                     .newMusic(com.badlogic.gdx.Gdx.files.internal("sounds/debut.mp3"));
             backgroundMusic.setLooping(true);
             backgroundMusic.setVolume(AudioSettings.getMusicVolume());
             backgroundMusic.play();
-            
+
             // Son de tir
-            shootSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/coup de feu heros.mp3"));
-            
+            shootSound = com.badlogic.gdx.Gdx.audio
+                    .newSound(com.badlogic.gdx.Gdx.files.internal("sounds/coup de feu heros.mp3"));
+
             // Passer le son au héros
             hero.setShootSound(shootSound);
-            
+
             // TEST: Jouer le son une fois au démarrage pour vérifier
             shootSound.play(1.0f);
 
@@ -223,7 +232,8 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * Resets the game state after losing, reinitializing map, bases, hero, unit shop, and audio.
+     * Resets the game state after losing, reinitializing map, bases, hero, unit
+     * shop, and audio.
      * Reassigns sound resources and resizes UI components.
      */
     public void reset() {
@@ -234,16 +244,18 @@ public class GameScreen implements Screen {
         this.playerBase.setHero(hero);
         this.unitShop = new UnitShop(playerBase, hero, hudDisplay.getGoldDisplay());
         this.inventory = new Inventory(hero);
+        this.target = new Target(hero, camera);
 
         // ✅ IMPORTANT: Réassigner le son au nouveau héros
-        
+
         if (shootSound != null) {
-            hero.setShootSound(shootSound);   
+            hero.setShootSound(shootSound);
         }
 
         // Resize the new unitShop to match current window size
         this.unitShop.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.inventory.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
+        // this.target.resize(com.badlogic.gdx.Gdx.graphics.getWidth(), com.badlogic.gdx.Gdx.graphics.getHeight());
         this.gameState = GameState.PLAYING;
     }
 
@@ -255,7 +267,8 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * Main render loop for the game screen. Handles all rendering, camera movement, overlays, HUD, and debug drawing.
+     * Main render loop for the game screen. Handles all rendering, camera movement,
+     * overlays, HUD, and debug drawing.
      *
      * @param delta Time elapsed since last frame (seconds)
      */
@@ -308,6 +321,7 @@ public class GameScreen implements Screen {
         // Render Unit Shop buttons
         unitShop.render(shapeRenderer, batch);
         inventory.render(shapeRenderer, batch);
+        target.render(shapeRenderer, batch);
 
         // Render HUD (after game rendering)
         hudDisplay.update(hero.getCurrentHealth(), hero.getMaxHealth(), hero.getGold());
@@ -382,8 +396,10 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * Updates the game state, handles input, unit spawning, overlays, and game logic.
-     * Processes all interactions, state transitions, and checks for win/loss conditions.
+     * Updates the game state, handles input, unit spawning, overlays, and game
+     * logic.
+     * Processes all interactions, state transitions, and checks for win/loss
+     * conditions.
      *
      * @param delta Time elapsed since last frame (seconds)
      */
@@ -396,7 +412,7 @@ public class GameScreen implements Screen {
                     gameState = GameState.PAUSE;
                 } else if (gameState == GameState.PAUSE) {
                     gameState = GameState.PLAYING;
-                    
+
                 }
             }
         } else {
@@ -413,19 +429,19 @@ public class GameScreen implements Screen {
         // Check if hero is dead
         if (hero.getCurrentHealth() <= 0 && gameState == GameState.PLAYING) {
             gameState = GameState.GAME_OVER;
-            
+
         }
 
         // Check if player base is destroyed
         if (playerBase.isDestroyed() && gameState == GameState.PLAYING) {
             gameState = GameState.BASE_DESTROYED;
-            
+
         }
 
         // Check if enemy base is destroyed (Victory!)
         if (enemyBase.isDestroyed() && gameState == GameState.PLAYING) {
             gameState = GameState.ZOMBIE_BASE_DESTROYED;
-            
+
         }
 
         // Handle Game Over clicks
@@ -496,9 +512,8 @@ public class GameScreen implements Screen {
             showRanges = !showRanges;
         }
 
-        
         hero.update(delta, map.getMapWidthInPixels(), map.getMapHeightInPixels(), enemyBase.getUnits());
-        
+
         // Remove dead enemies and give gold to hero
         removeDeadEnemiesAndGiveGold();
 
@@ -514,11 +529,11 @@ public class GameScreen implements Screen {
 
         // Check for game over conditions
         if (playerBase.isDestroyed()) {
-            // 
+            //
             // TODO: Implement game over screen
         }
         if (enemyBase.isDestroyed()) {
-            // 
+            //
             // TODO: Implement victory screen
         }
 
@@ -526,7 +541,8 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * Removes dead enemies from the enemy base and rewards gold to the hero for each kill.
+     * Removes dead enemies from the enemy base and rewards gold to the hero for
+     * each kill.
      */
     private void removeDeadEnemiesAndGiveGold() {
         for (Unit enemy : enemyBase.getUnits()) {
@@ -568,6 +584,9 @@ public class GameScreen implements Screen {
             if (inventory != null) {
                 inventory.resize(width, height);
             }
+            // if (target != null) {
+            //     target.resize(width, height);
+            // }
         }
     }
 
@@ -599,7 +618,8 @@ public class GameScreen implements Screen {
     }
 
     /**
-     * Disposes of all resources used by the game screen, including textures, audio, overlays, and UI components.
+     * Disposes of all resources used by the game screen, including textures, audio,
+     * overlays, and UI components.
      */
     @Override
     public void dispose() {
@@ -622,6 +642,8 @@ public class GameScreen implements Screen {
             pauseOverlay.dispose();
         if (inventory != null)
             inventory.dispose();
+        if (target != null)
+            target.dispose();
         if (pauseFont != null)
             pauseFont.dispose();
 
