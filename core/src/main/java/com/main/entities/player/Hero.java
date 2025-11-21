@@ -38,7 +38,7 @@ public class Hero extends Unit {
     protected enum Direction {
         UP, DOWN, LEFT, RIGHT,
         UP_RIGHT, UP_LEFT, DOWN_RIGHT, DOWN_LEFT,
-        ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT
+        ATTACKUP, ATTACKDOWN, ATTACKLEFT, ATTACKRIGHT, DIE
     }
 
     @lombok.Generated
@@ -229,7 +229,6 @@ public class Hero extends Unit {
      * Sound effect played when the hero shoots.
      */
     private Sound shootSound;
-    private Inventory inventory;
 
     /**
      * Constructs a new Hero instance with initial position, map, and allied base.
@@ -278,7 +277,7 @@ public class Hero extends Unit {
 
         TextureRegion[] dieFrames = loadFrames("sold/Die%d.png", 7);
         die = new Animation<>(FRAME_DURATION, dieFrames);
-        die.setPlayMode(Animation.PlayMode.LOOP);
+        die.setPlayMode(Animation.PlayMode.NORMAL);
 
         // Load single-frame idle textures (cardinal + diagonal)
         idle = loadSingle("sold/Idle.png");
@@ -545,8 +544,18 @@ public class Hero extends Unit {
                     stateTime = 0f;
                 }
 
+            } else if (direction == Direction.DIE) {
+                stateTime += delta;
+
             } else {
                 stateTime = 0f;
+            }
+        }
+        if (this.health <= 0) {
+            if (direction != Direction.DIE) {
+                direction = Direction.DIE;
+                moving = false;
+                stateTime = 0f; 
             }
         }
     }
@@ -913,6 +922,11 @@ public class Hero extends Unit {
             case ATTACKUP:
                 currentFrame = AttackUp.getKeyFrame(stateTime, false);
                 visualWidth = 30;
+                visualHeight = 50;
+                break;
+            case DIE:
+                currentFrame = die.getKeyFrame(stateTime, false);
+                visualWidth = 40;
                 visualHeight = 50;
                 break;
             default:

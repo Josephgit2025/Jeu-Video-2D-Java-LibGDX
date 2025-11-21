@@ -134,6 +134,9 @@ public class GameScreen implements Screen {
      */
     private BitmapFont pauseFont;
 
+    private float deathTimer = 0f;
+    private static final float DEATH_ANIM_DURATION = 1.2f;
+
     /**
      * Enum representing the current state of the game (playing, paused, game over,
      * etc.).
@@ -141,9 +144,11 @@ public class GameScreen implements Screen {
     private enum GameState {
         PLAYING,
         PAUSE,
+        DYING,
         GAME_OVER,
         BASE_DESTROYED,
-        ZOMBIE_BASE_DESTROYED
+        ZOMBIE_BASE_DESTROYED,
+
     }
 
     /**
@@ -428,8 +433,8 @@ public class GameScreen implements Screen {
 
         // Check if hero is dead
         if (hero.getCurrentHealth() <= 0 && gameState == GameState.PLAYING) {
-            gameState = GameState.GAME_OVER;
-
+            backgroundMusic.stop();
+            gameState = GameState.DYING;
         }
 
         // Check if player base is destroyed
@@ -442,6 +447,14 @@ public class GameScreen implements Screen {
         if (enemyBase.isDestroyed() && gameState == GameState.PLAYING) {
             gameState = GameState.ZOMBIE_BASE_DESTROYED;
 
+        }
+
+        if(gameState == gameState.DYING){
+            deathTimer += delta;
+            if(deathTimer >= DEATH_ANIM_DURATION){
+                deathTimer = 0f;
+                gameState = GameState.GAME_OVER;
+            }
         }
 
         // Handle Game Over clicks
