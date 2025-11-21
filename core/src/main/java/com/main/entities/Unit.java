@@ -363,7 +363,6 @@ public abstract class Unit {
         this.health -= damage;
         if (this.health <= 0) {
             this.health = 0;
-            onDeath();
         }
     }
 
@@ -385,9 +384,7 @@ public abstract class Unit {
      * Called when the unit dies. Subclasses may override to implement death animation or effects.
      * Example: trigger animation, play sound, etc.
      */
-    protected void onDeath() {
-        // Override in subclasses to implement death animation or effects.
-    }
+
 
     /**
      * Checks if the unit is dead (health is zero or less).
