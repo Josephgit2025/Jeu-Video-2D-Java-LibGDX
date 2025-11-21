@@ -138,7 +138,7 @@ public abstract class Weapon {
     }
 
     public void playReloadSound(){
-        if (AudioSettings.isSoundEnabled())
+        if (this.reloadSound != null && AudioSettings.isSoundEnabled())
             this.reloadSound.play(1.0f);
     }
 }
