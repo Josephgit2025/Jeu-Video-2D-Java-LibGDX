@@ -166,25 +166,25 @@ public class TitleScreen implements Screen {
             // Position de départ pour centrer l'ensemble
             float startX = (WORLD_WIDTH - totalWidth) / 2f;
             
-            // Dessiner PLAY avec zoom fluide
+            // Dessiner PLAY
             float playX = startX;
-            float playScale = getZoomScale(0);
+            float playScale = 1.0f;
             font.getData().setScale(0.8f * playScale);
             font.setColor(Color.WHITE);
             font.draw(batch, "PLAY", playX, buttonY);
             font.getData().setScale(1f);
             
-            // Dessiner OPTIONS avec zoom fluide
+            // Dessiner OPTIONS
             float optionsX = startX + playLayout.width + buttonSpacing;
-            float optionsScale = getZoomScale(1);
+            float optionsScale = 1.0f;
             font.getData().setScale(0.8f * optionsScale);
             font.setColor(Color.WHITE);
             font.draw(batch, "OPTIONS", optionsX, buttonY);
             font.getData().setScale(1f);
             
-            // Dessiner QUIT avec zoom fluide
+            // Dessiner QUIT
             float quitX = startX + playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing;
-            float quitScale = getZoomScale(2);
+            float quitScale = 1.0f;
             font.getData().setScale(0.8f * quitScale);
             font.setColor(Color.WHITE);
             font.draw(batch, "QUIT", quitX, buttonY);

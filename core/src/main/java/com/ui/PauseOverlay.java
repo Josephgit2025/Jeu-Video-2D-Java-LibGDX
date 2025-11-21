@@ -283,7 +283,7 @@ public class PauseOverlay implements Disposable {
             buttonFont.setColor(Color.WHITE);
             GlyphLayout quitScaledLayout = new GlyphLayout(buttonFont, "QUIT");
             float quitX = (screenWidth - quitScaledLayout.width) / 2f;
-            buttonFont.draw(batch, quitScaledLayout, quitX, quitButton.y + 80);
+            buttonFont.draw(batch, quitScaledLayout, quitX, quitButton.y + 20);
             buttonFont.getData().setScale(1f);
         } else {
             // Confirmation screen
