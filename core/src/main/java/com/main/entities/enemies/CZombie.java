@@ -39,12 +39,12 @@ public class CZombie extends Zombie {
         TextureRegion[] attackTex = loadFrames("zombie/crawl/Attack%d.png", 12);
         attackAnimation = new Animation<>(FRAME_DURATION, attackTex);
         attackAnimation.setPlayMode(Animation.PlayMode.LOOP);
-
         /**
-         * Sets the idle frame for the zombie.
+         * Load idle animation frames for when the zombie is stationary/blocking.
          */
-        Texture idleTex = new Texture(Gdx.files.internal("zombie/crawl/Walk1.png"));
-        loadedTextures.add(idleTex);
-        this.idleFrame = new TextureRegion(idleTex);
+        TextureRegion[] idleFrames = loadFrames("zombie/crawl/Idle%d.png", 9);
+        this.idleFramer = new Animation<>(FRAME_DURATION, idleFrames);
+        this.idleFramer.setPlayMode(Animation.PlayMode.LOOP);
+        this.idleFrame = idleFrames[0];
     }
 }

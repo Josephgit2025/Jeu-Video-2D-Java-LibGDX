@@ -42,6 +42,16 @@ public class Zombie extends Unit {
     protected TextureRegion idleFrame;
 
     /**
+     * Animation for idle (stationary) pose.
+     */
+    protected Animation<TextureRegion> idleFramer;
+
+    /**
+     * Optional animation used while waiting between attacks (cooldown).
+     */
+    protected Animation<TextureRegion> reloadFramer;
+
+    /**
      * Indicates if the zombie is currently moving.
      */
     protected boolean moving = false;
@@ -114,7 +124,7 @@ public class Zombie extends Unit {
         // Only move and animate if not in combat
 
         // If should stop (eg base in range or attack animation), idle
-        if (shouldStopMoving()) {
+        if (shouldStopMoving(delta, -1)) {
             currentState = UnitState.IDLE;
             this.stateTime += delta;
             // Attaque la cible si elle est à portée
@@ -142,12 +152,28 @@ public class Zombie extends Unit {
      */
     @Override
     public void render(SpriteBatch batch) {
-        TextureRegion currentFrame = idleFrame;
+        TextureRegion currentFrame;
         if (currentState == UnitState.WALKING && walkLeft != null) {
             currentFrame = walkLeft.getKeyFrame(stateTime, true);
         } else if (currentState == UnitState.ATTACKING && attackAnimation != null) {
+            // prefer explicit attack animation; otherwise fallback to reloadFramer
             currentFrame = attackAnimation.getKeyFrame(stateTime, false);
+        } else if (currentState == UnitState.IDLE) {
+            if (attackCooldown > 0 && reloadFramer != null) {
+                currentFrame = reloadFramer.getKeyFrame(stateTime, true);
+            } else if (idleFramer != null) {
+                currentFrame = idleFramer.getKeyFrame(stateTime, true);
+            } else {
+                currentFrame = idleFrame;
+            }
+        } else {
+            if (idleFramer != null) {
+                currentFrame = idleFramer.getKeyFrame(stateTime, true);
+            } else {
+                currentFrame = idleFrame;
+            }
         }
+
         batch.draw(currentFrame, posX, posY);
     }
 

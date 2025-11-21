@@ -452,18 +452,31 @@ public abstract class Unit {
     }
 
     /**
-     * Checks if the unit should stop moving (target in range, attacking, or near base).
+     * Checks if the unit should stop moving (target in range, attacking, near base,
+     * or blocked by collision). This version simulates the next movement step and
+     * treats inability to advance as "should stop" so the unit won't play walking
+     * animation while stuck.
      *
+     * @param delta     Time elapsed since last update (seconds)
+     * @param direction Movement direction (1 = right, -1 = left)
      * @return True if the unit should stop moving, false otherwise.
      */
-    protected boolean shouldStopMoving() {
+    protected boolean shouldStopMoving(float delta, int direction) {
         // Stop if attacking
         if (attackAnimationTimer > 0) {
             return true;
         }
-        
+
+        // If moving would result in collision (can't advance), treat as stopped
+        float newX = calculateNewPositionX(delta, direction);
+        if (newX == this.posX) {
+            return true;
+        }
+
         // Stop if unit in front is attacking and target not in range
-        if (this.index != 0 && target != null && !target.isDead() && calculateDistance(target) >= this.range && this.allyBase.getUnitsPerLane().get(this.lane).get(this.index - 1).currentState == UnitState.ATTACKING){
+        if (this.index != 0 && target != null && !target.isDead()
+                && calculateDistance(target) >= this.range
+                && this.allyBase.getUnitsPerLane().get(this.lane).get(this.index - 1).currentState == UnitState.ATTACKING) {
             return true;
         }
 
@@ -479,7 +492,6 @@ public abstract class Unit {
         if (target == null && isNearEnemyBase(targetBase)) {
             return true;
         }
-
 
         return false;
     }
@@ -559,7 +571,6 @@ public abstract class Unit {
      */
     public void move(float delta) {
         if (currentState == UnitState.ATTACKING) {
-            float before = attackAnimationTimer;
             attackAnimationTimer -= delta;
             // advance shared animation timer so attack animations progress when
             // using default move implementation
