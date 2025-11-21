@@ -23,6 +23,10 @@ import com.utils.AudioSettings;
  * Provides controls for music volume and sound effects toggle.
  */
 public class OptionsScreen implements Screen {
+    // Espacement vertical pour chaque section
+    private float volumeLabelY;
+    private float brightnessLabelY;
+    private float soundLabelY;
 
     private Main game;
     private SpriteBatch batch;
@@ -41,6 +45,12 @@ public class OptionsScreen implements Screen {
     private Rectangle volumeHandle;
     private boolean isDraggingVolume = false;
     private float musicVolume;
+
+    // Brightness slider
+    private Rectangle brightnessSlider;
+    private Rectangle brightnessHandle;
+    private boolean isDraggingBrightness = false;
+    private float brightness = 1.0f; // Default brightness (1.0 = normal)
 
     // Sound effects toggle button
     private Rectangle soundButton;
@@ -124,18 +134,34 @@ public class OptionsScreen implements Screen {
         float sliderWidth = 400f;
         float sliderHeight = 10f;
         float sliderX = (WORLD_WIDTH - sliderWidth) / 2f;
-        float sliderY = 280f;
 
-        volumeSlider = new Rectangle(sliderX, sliderY, sliderWidth, sliderHeight);
-        
+        // Espacement entre chaque section
+        float sectionSpacing = 40f;
+
+        // Volume
+        volumeLabelY = 340f;
+        float volumeSliderY = volumeLabelY - 50f; // plus d'espace
+        volumeSlider = new Rectangle(sliderX, volumeSliderY, sliderWidth, sliderHeight);
         float handleX = sliderX + (sliderWidth * musicVolume) - 10f;
-        volumeHandle = new Rectangle(handleX, sliderY - 10f, 20f, 30f);
+        volumeHandle = new Rectangle(handleX, volumeSliderY - 10f, 20f, 30f);
 
-        // Initialize sound toggle button
-        soundButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 130f, 200f, 50f);
+        // Luminosité
+        brightnessLabelY = volumeSliderY - sectionSpacing;
+        float brightnessSliderY = brightnessLabelY - 50f; // plus d'espace
+        brightnessSlider = new Rectangle(sliderX, brightnessSliderY, sliderWidth, sliderHeight);
+        float brightnessHandleX = sliderX + (sliderWidth * ((brightness - 0.5f) / 1.5f)) - 10f;
+        brightnessHandle = new Rectangle(brightnessHandleX, brightnessSliderY - 10f, 20f, 30f);
 
-        // Initialize back button
-        backButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 20f, 200f, 50f);
+        // Effets sonores
+        soundLabelY = brightnessSliderY - sectionSpacing;
+        // Place le bouton sur la même ligne que le label
+        float soundButtonY = soundLabelY - 20f;
+        float soundButtonX = (WORLD_WIDTH / 2f) + 120f;
+        soundButton = new Rectangle(soundButtonX, soundButtonY, 100f, 40f);
+
+        // Bouton retour
+        float backButtonY = 20f; // bien en bas
+        backButton = new Rectangle(WORLD_WIDTH / 2f - 100f, backButtonY, 200f, 50f);
     }
 
     @Override
@@ -181,12 +207,17 @@ public class OptionsScreen implements Screen {
         font.setColor(Color.WHITE);
         GlyphLayout volumeLabel = new GlyphLayout(font, "MUSIC VOLUME");
         float labelX = (WORLD_WIDTH - volumeLabel.width) / 2f;
-        font.draw(batch, volumeLabel, labelX, 330f);
+        font.draw(batch, volumeLabel, labelX, volumeLabelY);
+
+        // Draw brightness label
+        GlyphLayout brightnessLabel = new GlyphLayout(font, "BRIGHTNESS");
+        float brightnessLabelX = (WORLD_WIDTH - brightnessLabel.width) / 2f;
+        font.draw(batch, brightnessLabel, brightnessLabelX, brightnessLabelY);
 
         // Draw sound effects label
         GlyphLayout soundLabel = new GlyphLayout(font, "SOUND EFFECTS");
-        float soundLabelX = (WORLD_WIDTH - soundLabel.width) / 2f;
-        font.draw(batch, soundLabel, soundLabelX, 215f);
+        float soundLabelX = (WORLD_WIDTH / 2f) - soundLabel.width - 20f;
+        font.draw(batch, soundLabel, soundLabelX, soundLabelY);
 
         // Draw back button with zoom effect
         float backScale = getZoomScale(0);
@@ -212,6 +243,14 @@ public class OptionsScreen implements Screen {
         // Slider handle
         shapeRenderer.setColor(Color.YELLOW);
         shapeRenderer.rect(volumeHandle.x, volumeHandle.y, volumeHandle.width, volumeHandle.height);
+
+        // Brightness slider background
+        shapeRenderer.setColor(0.3f, 0.3f, 0.3f, 1f);
+        shapeRenderer.rect(brightnessSlider.x, brightnessSlider.y, brightnessSlider.width, brightnessSlider.height);
+
+        // Brightness slider handle
+        shapeRenderer.setColor(Color.CYAN);
+        shapeRenderer.rect(brightnessHandle.x, brightnessHandle.y, brightnessHandle.width, brightnessHandle.height);
         
         // Sound toggle button background
         if (soundEnabled) {
@@ -231,7 +270,8 @@ public class OptionsScreen implements Screen {
         font.setColor(Color.WHITE);
         GlyphLayout soundButtonText = new GlyphLayout(font, soundEnabled ? "ON" : "OFF");
         float soundTextX = soundButton.x + (soundButton.width - soundButtonText.width) / 2f;
-        font.draw(batch, soundButtonText, soundTextX, soundButton.y + soundButton.height / 2f + soundButtonText.height / 2f);
+        float soundTextY = soundButton.y + soundButton.height / 2f + soundButtonText.height / 2f;
+        font.draw(batch, soundButtonText, soundTextX, soundTextY);
         batch.end();
     }
 
@@ -309,8 +349,17 @@ public class OptionsScreen implements Screen {
             if (isDraggingVolume) {
                 updateVolumeSlider(mx);
             }
+
+            // Handle brightness slider dragging
+            if (!isDraggingBrightness && brightnessHandle.contains(mx, my)) {
+                isDraggingBrightness = true;
+            }
+            if (isDraggingBrightness) {
+                updateBrightnessSlider(mx);
+            }
         } else {
             isDraggingVolume = false;
+            isDraggingBrightness = false;
         }
 
         // Handle clicks
@@ -330,6 +379,21 @@ public class OptionsScreen implements Screen {
                 }
             }
         }
+    }
+    /**
+     * Updates the brightness slider position and applies the new brightness value.
+     * @param mouseX The current mouse X position
+     */
+    private void updateBrightnessSlider(float mouseX) {
+        float newHandleX = Math.max(brightnessSlider.x - 10f, Math.min(mouseX - 10f, brightnessSlider.x + brightnessSlider.width - 10f));
+        brightnessHandle.x = newHandleX;
+
+        // brightness range: 0.5 (min) to 2.0 (max)
+        float percent = (brightnessHandle.x - brightnessSlider.x + 10f) / brightnessSlider.width;
+        brightness = 0.5f + percent * 1.5f;
+        brightness = Math.max(0.5f, Math.min(2.0f, brightness));
+        // Synchronise la luminosité globale du jeu
+        game.setBrightness(brightness);
     }
 
     /**
