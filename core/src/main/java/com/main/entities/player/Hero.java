@@ -782,33 +782,12 @@ public class Hero extends Unit {
 
                 weapon.attack();
                 int totalDamage = weapon.getDamage();
-                System.out.println(
-                        "Hero attacks " + target.getClass().getSimpleName() + " for " + totalDamage + " damage");
-                // Check if target was alive before applying damage
-                boolean wasAlive = !target.isDead();
 
                 target.takeDamage(totalDamage);
                 attackCooldown = weapon.getAttackSpeed();
-
-                // If the target died as a result of this attack and it was alive before,
-                // award the hero 40 gold.
-                if (wasAlive && target.isDead()) {
-                    this.addGold(40);
-                    System.out.println("Enemy killed by hero! +40 gold. Total: " + this.getGold());
-                }
 
                 // Jouer le son de tir si les sons sont activés
                 if (shootSound != null && AudioSettings.isSoundEnabled()) {
-                    System.out.println("🔊 SON DE TIR: Lecture du son...");
-                    shootSound.play(0.7f); // Volume à 70%
-                } else if (shootSound == null) {
-                    System.out.println("❌ ERREUR: shootSound est NULL!");
-                target.takeDamage(totalDamage);
-                attackCooldown = weapon.getAttackSpeed();
-                }
-
-                // Jouer le son de tir
-                if (shootSound != null) {
                     shootSound.play(0.7f); // Volume à 70%
                 }
             }
