@@ -40,6 +40,11 @@ public class Soldier extends Unit {
     protected Animation<TextureRegion> idleFramer;
 
     /**
+     * Animation used while reloading / waiting between attacks (cooldown).
+     */
+    protected Animation<TextureRegion> reloadFramer;
+
+    /**
      * List of loaded textures for animation frames, managed for proper disposal.
      */
     protected List<Texture> loadedTextures = new ArrayList<>();
@@ -100,7 +105,7 @@ public class Soldier extends Unit {
         }
 
         // Stop movement if attack animation or cooldown prevents further action
-        if (shouldStopMoving()) {
+        if (shouldStopMoving(delta, 1)) {
             currentState = UnitState.IDLE;
             this.stateTime += delta;
             return;
@@ -129,6 +134,8 @@ public class Soldier extends Unit {
             case ATTACKING:
                 if (attackAnimation != null) {
                     currentFrame = attackAnimation.getKeyFrame(this.stateTime, false);
+                } else if (reloadFramer != null) {
+                    currentFrame = reloadFramer.getKeyFrame(this.stateTime, true);
                 } else if (idleFramer != null) {
                     currentFrame = idleFramer.getKeyFrame(this.stateTime, true);
                 } else {
@@ -136,7 +143,10 @@ public class Soldier extends Unit {
                 }
                 break;
             case IDLE:
-                if (idleFramer != null) {
+                // If we're in cooldown between shots, prefer the reload animation
+                if (attackCooldown > 0 && reloadFramer != null) {
+                    currentFrame = reloadFramer.getKeyFrame(this.stateTime, true);
+                } else if (idleFramer != null) {
                     currentFrame = idleFramer.getKeyFrame(this.stateTime, true);
                 } else {
                     currentFrame = idleFrame;
