@@ -23,6 +23,10 @@ import com.utils.AudioSettings;
  * Provides controls for music volume and sound effects toggle.
  */
 public class OptionsScreen implements Screen {
+    // Espacement vertical pour chaque section
+    private float volumeLabelY;
+    private float brightnessLabelY;
+    private float soundLabelY;
 
     private Main game;
     private SpriteBatch batch;
@@ -130,24 +134,34 @@ public class OptionsScreen implements Screen {
         float sliderWidth = 400f;
         float sliderHeight = 10f;
         float sliderX = (WORLD_WIDTH - sliderWidth) / 2f;
-        float sliderY = 280f;
 
-        volumeSlider = new Rectangle(sliderX, sliderY, sliderWidth, sliderHeight);
-        
+        // Espacement entre chaque section
+        float sectionSpacing = 40f;
+
+        // Volume
+        volumeLabelY = 340f;
+        float volumeSliderY = volumeLabelY - 50f; // plus d'espace
+        volumeSlider = new Rectangle(sliderX, volumeSliderY, sliderWidth, sliderHeight);
         float handleX = sliderX + (sliderWidth * musicVolume) - 10f;
-        volumeHandle = new Rectangle(handleX, sliderY - 10f, 20f, 30f);
+        volumeHandle = new Rectangle(handleX, volumeSliderY - 10f, 20f, 30f);
 
-        // Initialize brightness slider (just below volume)
-        float brightnessSliderY = sliderY - 60f;
+        // Luminosité
+        brightnessLabelY = volumeSliderY - sectionSpacing;
+        float brightnessSliderY = brightnessLabelY - 50f; // plus d'espace
         brightnessSlider = new Rectangle(sliderX, brightnessSliderY, sliderWidth, sliderHeight);
-        float brightnessHandleX = sliderX + (sliderWidth * ((brightness - 0.5f) / 1.5f)) - 10f; // brightness range 0.5-2.0
+        float brightnessHandleX = sliderX + (sliderWidth * ((brightness - 0.5f) / 1.5f)) - 10f;
         brightnessHandle = new Rectangle(brightnessHandleX, brightnessSliderY - 10f, 20f, 30f);
 
-        // Initialize sound toggle button
-        soundButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 130f, 200f, 50f);
+        // Effets sonores
+        soundLabelY = brightnessSliderY - sectionSpacing;
+        // Place le bouton sur la même ligne que le label
+        float soundButtonY = soundLabelY - 20f;
+        float soundButtonX = (WORLD_WIDTH / 2f) + 120f;
+        soundButton = new Rectangle(soundButtonX, soundButtonY, 100f, 40f);
 
-        // Initialize back button
-        backButton = new Rectangle(WORLD_WIDTH / 2f - 100f, 20f, 200f, 50f);
+        // Bouton retour
+        float backButtonY = 20f; // bien en bas
+        backButton = new Rectangle(WORLD_WIDTH / 2f - 100f, backButtonY, 200f, 50f);
     }
 
     @Override
@@ -193,17 +207,17 @@ public class OptionsScreen implements Screen {
         font.setColor(Color.WHITE);
         GlyphLayout volumeLabel = new GlyphLayout(font, "MUSIC VOLUME");
         float labelX = (WORLD_WIDTH - volumeLabel.width) / 2f;
-        font.draw(batch, volumeLabel, labelX, 330f);
+        font.draw(batch, volumeLabel, labelX, volumeLabelY);
 
         // Draw brightness label
         GlyphLayout brightnessLabel = new GlyphLayout(font, "BRIGHTNESS");
         float brightnessLabelX = (WORLD_WIDTH - brightnessLabel.width) / 2f;
-        font.draw(batch, brightnessLabel, brightnessLabelX, 270f);
+        font.draw(batch, brightnessLabel, brightnessLabelX, brightnessLabelY);
 
         // Draw sound effects label
         GlyphLayout soundLabel = new GlyphLayout(font, "SOUND EFFECTS");
-        float soundLabelX = (WORLD_WIDTH - soundLabel.width) / 2f;
-        font.draw(batch, soundLabel, soundLabelX, 215f);
+        float soundLabelX = (WORLD_WIDTH / 2f) - soundLabel.width - 20f;
+        font.draw(batch, soundLabel, soundLabelX, soundLabelY);
 
         // Draw back button with zoom effect
         float backScale = getZoomScale(0);
@@ -256,7 +270,8 @@ public class OptionsScreen implements Screen {
         font.setColor(Color.WHITE);
         GlyphLayout soundButtonText = new GlyphLayout(font, soundEnabled ? "ON" : "OFF");
         float soundTextX = soundButton.x + (soundButton.width - soundButtonText.width) / 2f;
-        font.draw(batch, soundButtonText, soundTextX, soundButton.y + soundButton.height / 2f + soundButtonText.height / 2f);
+        float soundTextY = soundButton.y + soundButton.height / 2f + soundButtonText.height / 2f;
+        font.draw(batch, soundButtonText, soundTextX, soundTextY);
         batch.end();
     }
 

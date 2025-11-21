@@ -175,41 +175,44 @@ public class PauseOverlay implements Disposable {
         
         // Initialize button rectangles (centered below the title)
         float centerX = OVERLAY_WIDTH / 2;
-        float centerY = OVERLAY_HEIGHT / 2 - 50;
-        
+        float resumeY = OVERLAY_HEIGHT / 2f + 40f;
+        float optionsY = resumeY - BUTTON_HEIGHT - 40f;
+        float quitY = 40f; // bien en bas
+
         resumeButton = new Rectangle(
-            centerX - BUTTON_WIDTH / 2, 
-            centerY - 20, 
-            BUTTON_WIDTH, 
+            centerX - BUTTON_WIDTH / 2,
+            resumeY,
+            BUTTON_WIDTH,
             BUTTON_HEIGHT
         );
-        
+
         optionsButton = new Rectangle(
-            centerX - BUTTON_WIDTH / 2, 
-            centerY - 100, 
-            BUTTON_WIDTH, 
+            centerX - BUTTON_WIDTH / 2,
+            optionsY,
+            BUTTON_WIDTH,
             BUTTON_HEIGHT
         );
-        
+
         quitButton = new Rectangle(
-            centerX - BUTTON_WIDTH / 2, 
-            centerY - 180, 
-            BUTTON_WIDTH, 
+            centerX - BUTTON_WIDTH / 2,
+            quitY,
+            BUTTON_WIDTH,
             BUTTON_HEIGHT
         );
         
         // Confirmation buttons (YES/NO)
+        float confirmY = 100f; // position fixe pour la confirmation, similaire à l'ancien centre -150
         yesButton = new Rectangle(
-            centerX - BUTTON_WIDTH - 20, 
-            centerY - 150, 
-            BUTTON_WIDTH, 
+            centerX - BUTTON_WIDTH - 20,
+            confirmY,
+            BUTTON_WIDTH,
             BUTTON_HEIGHT
         );
-        
+
         noButton = new Rectangle(
-            centerX + 20, 
-            centerY - 150, 
-            BUTTON_WIDTH, 
+            centerX + 20,
+            confirmY,
+            BUTTON_WIDTH,
             BUTTON_HEIGHT
         );
     }
@@ -264,7 +267,7 @@ public class PauseOverlay implements Disposable {
             buttonFont.setColor(Color.WHITE);
             GlyphLayout resumeScaledLayout = new GlyphLayout(buttonFont, "RESUME");
             float resumeX = (screenWidth - resumeScaledLayout.width) / 2f;
-            buttonFont.draw(batch, resumeScaledLayout, resumeX, resumeButton.y + 40);
+            buttonFont.draw(batch, resumeScaledLayout, resumeX, resumeButton.y + 20);
             buttonFont.getData().setScale(1f);
 
             float optionsScale = getZoomScale(1);
@@ -272,7 +275,7 @@ public class PauseOverlay implements Disposable {
             buttonFont.setColor(Color.WHITE);
             GlyphLayout optionsScaledLayout = new GlyphLayout(buttonFont, "OPTIONS");
             float optionsX = (screenWidth - optionsScaledLayout.width) / 2f;
-            buttonFont.draw(batch, optionsScaledLayout, optionsX, optionsButton.y + 40);
+            buttonFont.draw(batch, optionsScaledLayout, optionsX, optionsButton.y + 20);
             buttonFont.getData().setScale(1f);
 
             float quitScale = getZoomScale(2);
@@ -280,7 +283,7 @@ public class PauseOverlay implements Disposable {
             buttonFont.setColor(Color.WHITE);
             GlyphLayout quitScaledLayout = new GlyphLayout(buttonFont, "QUIT");
             float quitX = (screenWidth - quitScaledLayout.width) / 2f;
-            buttonFont.draw(batch, quitScaledLayout, quitX, quitButton.y + 40);
+            buttonFont.draw(batch, quitScaledLayout, quitX, quitButton.y + 80);
             buttonFont.getData().setScale(1f);
         } else {
             // Confirmation screen
