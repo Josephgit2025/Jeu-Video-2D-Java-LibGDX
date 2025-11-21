@@ -33,8 +33,8 @@ public class UnitShop {
     // Selected spawn point (default to 0)
     private int selectedSpawnPoint = 0;
 
-    private static final float BUTTON_WIDTH = 60f;
-    private static final float BUTTON_HEIGHT = 40f;
+    private static final float BUTTON_WIDTH = 70f;
+    private static final float BUTTON_HEIGHT = 50f;
     private static final float BUTTON_SPACING = 10f;
     private static final float START_X = 540f; // À droite (800 - 3*60 - 2*10 - 20)
     private static final float UNIT_BUTTONS_Y = 520f; // En haut

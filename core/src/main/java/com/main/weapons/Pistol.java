@@ -13,5 +13,7 @@ public class Pistol extends Weapon {
      */
     public Pistol() {
         super(15, 150, 1f, 12);
+        this.reloadSound = com.badlogic.gdx.Gdx.audio.newSound(com.badlogic.gdx.Gdx.files.internal("sounds/ReloadPistol.mp3"));
+        this.reloadTimer = 1.5f;
     }
 }

@@ -4,13 +4,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+
+import com.badlogic.gdx.audio.Sound;
 
 public class WeaponTest {
+
+    @Mock
+    private Sound mockSound;
 
     // Classe concrète pour tester la classe abstraite Weapon
     private class TestWeapon extends Weapon {
         public TestWeapon(int damage, int range, int as, int maxMun) {
             super(damage, range, as, maxMun);
+            
         }
     }
 
@@ -19,6 +26,7 @@ public class WeaponTest {
     @Before
     public void setUp() {
         weapon = new TestWeapon(50, 200, 10, 30);
+        weapon.setReloadSound(mockSound);
     }
 
     @Test
