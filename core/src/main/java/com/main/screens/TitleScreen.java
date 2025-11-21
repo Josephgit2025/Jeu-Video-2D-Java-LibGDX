@@ -32,79 +32,20 @@ import com.main.Main;
 public class TitleScreen implements Screen {
 
 
-    /**
-     * Reference to the main game instance for screen transitions.
-     */
     protected Main game;
-
-    /**
-     * SpriteBatch used for rendering all visual elements.
-     */
     protected SpriteBatch batch;
-
-    /**
-     * Orthographic camera for 2D rendering.
-     */
     protected OrthographicCamera camera;
-
-    /**
-     * Viewport for scaling and resizing the screen.
-     */
     protected Viewport viewport;
-
-    /**
-     * BitmapFont for rendering menu text.
-     */
     protected BitmapFont font;
-
-    /**
-     * Background texture for the title screen.
-     */
     protected Texture background;
-
-    /**
-     * Main logo texture displayed at the top of the screen.
-     */
     protected Texture titleLogo;
-
-    /**
-     * Logical width of the game world for layout.
-     */
     private static final float WORLD_WIDTH = 800f;
-
-    /**
-     * Logical height of the game world for layout.
-     */
     private static final float WORLD_HEIGHT = 480f;
-
-    /**
-     * Array of menu item labels (PLAY, OPTIONS, QUIT).
-     */
     private String[] menuItems = {"PLAY", "OPTIONS", "QUIT"};
-
-    /**
-     * Index of the currently selected menu item (-1 if none).
-     */
     protected int selectedIndex = -1;
-
-    /**
-     * Index of the last hovered menu item for tracking hover changes.
-     */
     private int lastHoveredIndex = -1;
-
-    /**
-     * Time elapsed since hover started, used for smooth zoom transition.
-     */
     private float hoverTime = 0f;
-
-    /**
-     * Duration of the hover zoom transition animation in seconds.
-     */
     private static final float ZOOM_TRANSITION_DURATION = 0.15f;
-
-    /**
-     * Maximum scale factor when button is fully hovered (1.2 = 20% bigger).
-     */
     private static final float MAX_ZOOM_SCALE = 1.2f;
 
     /**
@@ -225,25 +166,25 @@ public class TitleScreen implements Screen {
             // Position de départ pour centrer l'ensemble
             float startX = (WORLD_WIDTH - totalWidth) / 2f;
             
-            // Dessiner PLAY avec zoom fluide
+            // Dessiner PLAY
             float playX = startX;
-            float playScale = getZoomScale(0);
+            float playScale = 1.0f;
             font.getData().setScale(0.8f * playScale);
             font.setColor(Color.WHITE);
             font.draw(batch, "PLAY", playX, buttonY);
             font.getData().setScale(1f);
             
-            // Dessiner OPTIONS avec zoom fluide
+            // Dessiner OPTIONS
             float optionsX = startX + playLayout.width + buttonSpacing;
-            float optionsScale = getZoomScale(1);
+            float optionsScale = 1.0f;
             font.getData().setScale(0.8f * optionsScale);
             font.setColor(Color.WHITE);
             font.draw(batch, "OPTIONS", optionsX, buttonY);
             font.getData().setScale(1f);
             
-            // Dessiner QUIT avec zoom fluide
+            // Dessiner QUIT
             float quitX = startX + playLayout.width + buttonSpacing + optionsLayout.width + buttonSpacing;
-            float quitScale = getZoomScale(2);
+            float quitScale = 1.0f;
             font.getData().setScale(0.8f * quitScale);
             font.setColor(Color.WHITE);
             font.draw(batch, "QUIT", quitX, buttonY);

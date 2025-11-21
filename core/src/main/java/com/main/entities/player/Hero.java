@@ -332,7 +332,7 @@ public class Hero extends Unit {
         this.map = map;
 
         // initialiser gold
-        this.gold = 100; // Start with 100 gold
+        this.gold = 50; // Start with 50 gold
     }
 
     /**
