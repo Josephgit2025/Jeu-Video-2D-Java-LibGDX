@@ -1,6 +1,7 @@
 package com.main.weapons;
 
 import com.badlogic.gdx.audio.Sound;
+import com.utils.AudioSettings;
 
 /**
  * Abstract base class for all weapons in the game.
@@ -137,11 +138,7 @@ public abstract class Weapon {
     }
 
     public void playReloadSound(){
-        if (reloadSound != null)
+        if (this.reloadSound != null && AudioSettings.isSoundEnabled())
             this.reloadSound.play(1.0f);
-    }
-
-    public void setReloadSound(Sound sound){
-        this.reloadSound = sound;
     }
 }
