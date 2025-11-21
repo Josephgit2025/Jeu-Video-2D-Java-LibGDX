@@ -150,6 +150,8 @@ public class Hero extends Unit {
      */
     private Animation<TextureRegion> walkDL;
 
+    private Animation<TextureRegion> die;
+
     /**
      * Idle textures for each direction (cardinal and diagonal).
      */
@@ -274,6 +276,10 @@ public class Hero extends Unit {
         walkDL = new Animation<>(FRAME_DURATION, dlFrames);
         walkDL.setPlayMode(Animation.PlayMode.LOOP);
 
+        TextureRegion[] dieFrames = loadFrames("sold/Die%d.png", 7);
+        die = new Animation<>(FRAME_DURATION, dieFrames);
+        die.setPlayMode(Animation.PlayMode.LOOP);
+
         // Load single-frame idle textures (cardinal + diagonal)
         idle = loadSingle("sold/Idle.png");
         idleR = loadSingle("sold/IdleR.png");
@@ -388,7 +394,7 @@ public class Hero extends Unit {
         }
 
         goldTimer += delta;
-        if (goldTimer >= goldInterval){
+        if (goldTimer >= goldInterval) {
             this.addGold(10);
             goldTimer = 0f;
         }
@@ -476,7 +482,7 @@ public class Hero extends Unit {
         }
 
         // -- Reload Weapon --
-        if (Gdx.input.isKeyJustPressed(Input.Keys.R)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
             this.weapon.reload();
             this.attackCooldown = this.weapon.getReloadTimer();
         }
@@ -557,10 +563,11 @@ public class Hero extends Unit {
     private void tryMove(float deltaX, float deltaY, float mapWidth, float mapHeight, Unit closestEnemy) {
         float newX;
         float newY;
-        if (direction == Direction.DOWN_LEFT || direction == Direction.DOWN_RIGHT || direction == Direction.UP_LEFT || direction == Direction.UP_RIGHT){
+        if (direction == Direction.DOWN_LEFT || direction == Direction.DOWN_RIGHT || direction == Direction.UP_LEFT
+                || direction == Direction.UP_RIGHT) {
             newX = this.posX + deltaX / 2;
             newY = this.posY + deltaY / 2;
-        } else{
+        } else {
             newX = this.posX + deltaX;
             newY = this.posY + deltaY;
         }
@@ -790,8 +797,7 @@ public class Hero extends Unit {
                 if (shootSound != null && AudioSettings.isSoundEnabled()) {
                     shootSound.play(0.7f); // Volume à 70%
                 }
-            }
-            else {
+            } else {
                 weapon.reload();
                 attackCooldown = weapon.getReloadTimer();
             }
@@ -1031,7 +1037,7 @@ public class Hero extends Unit {
         return shootSound;
     }
 
-    public Weapon getWeapon(){
+    public Weapon getWeapon() {
         return this.weapon;
     }
 

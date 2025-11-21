@@ -83,7 +83,7 @@ public class Target {
             this.currentTarget = target;
             bounds.x = target.getPosX();
             bounds.y = target.getPosY();
-            System.out.println("Target: target position changed -> " + target);
+            // System.out.println("Target: target position changed -> " + target);
         } catch (Exception e) {
             System.out.println("Target: failed to update for " + target + " : " + e.getMessage());
 
