@@ -137,6 +137,11 @@ public abstract class Weapon {
     }
 
     public void playReloadSound(){
-        this.reloadSound.play(1.0f);
+        if (reloadSound != null)
+            this.reloadSound.play(1.0f);
+    }
+
+    public void setReloadSound(Sound sound){
+        this.reloadSound = sound;
     }
 }
