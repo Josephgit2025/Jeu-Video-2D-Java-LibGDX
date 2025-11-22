@@ -73,5 +73,9 @@ public class Sniper extends Soldier {
         TextureRegion[] idleStoppedFrames = loadFrames("Sniper/Idlee%d.png", 7);
         this.idleFramer = new Animation<>(FRAME_DURATION, idleStoppedFrames);
         this.idleFramer.setPlayMode(Animation.PlayMode.LOOP);
+
+        TextureRegion[] deadFrames = loadFrames("Sniper/Idlee%d.png", 7);
+        this.deadFramer = new Animation<>(FRAME_DURATION, deadFrames);
+        this.deadFramer.setPlayMode(Animation.PlayMode.NORMAL);
     }
 }

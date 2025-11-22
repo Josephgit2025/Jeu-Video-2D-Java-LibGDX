@@ -38,6 +38,8 @@ public class Soldier extends Unit {
      * Animation for idle state, can be used for subtle idle effects.
      */
     protected Animation<TextureRegion> idleFramer;
+    
+    protected Animation<TextureRegion> deadFramer;
 
     /**
      * Animation used while reloading / waiting between attacks (cooldown).
@@ -111,6 +113,13 @@ public class Soldier extends Unit {
             return;
         }
 
+
+        if(this.health <= 0){
+            currentState = UnitState.DYING;
+            this.stateTime += delta;
+            return;
+        }
+
         // Default movement: move right (soldier direction) with collision check
         currentState = UnitState.WALKING;
         float newX = calculateNewPositionX(delta, 1);
@@ -148,6 +157,13 @@ public class Soldier extends Unit {
                     currentFrame = reloadFramer.getKeyFrame(this.stateTime, true);
                 } else if (idleFramer != null) {
                     currentFrame = idleFramer.getKeyFrame(this.stateTime, true);
+                } else {
+                    currentFrame = idleFrame;
+                }
+                break;
+            case DYING:
+                if (deadFramer != null) {
+                    currentFrame = deadFramer.getKeyFrame(this.stateTime, false);
                 } else {
                     currentFrame = idleFrame;
                 }

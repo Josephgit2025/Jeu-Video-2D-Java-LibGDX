@@ -47,7 +47,8 @@ public abstract class Unit {
         /**
          * Unit is performing an attack animation.
          */
-        ATTACKING
+        ATTACKING,
+        DYING
     }
 
     /** X position of the unit. */
