@@ -13,6 +13,16 @@ cd T-JAV-501-NAN_2
 make
 ```
 
+### Commandes du Makefile
+
+```bash
+make // compile et lance le jeu
+make compile // compile uniquement
+make run // lance le jeu uniquement (nécessite une compilation au préalable)
+make test // compile et execute les tests
+make exe // compile et créée un éxécutable pour Windows
+```
+
 ## Structure des modules / Platforms
 
 - `core` : Main module with the application logic shared by all platforms.
@@ -45,12 +55,19 @@ La plupart des tâches peuvent être lancées avec le préfixe du module, par ex
 
 ## Exécution du jeu
 
-Pour jouer sur PC :
+Pour jouer sur PC  (Linux uniquement):
 
 ```bash
 ./gradlew lwjgl3:run
 ```
 Le jar exécutable se trouve dans `lwjgl3/build/libs`.
+
+Pour jouer sur PC Windows:
+
+```bash
+make exe
+```
+Le fichier exécutable se trouve dans `lwjgl3/build/construo/winX64/roast`.
 
 ## Dépendances principales
 
