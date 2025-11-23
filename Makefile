@@ -8,3 +8,7 @@ run:
 
 test:
 	./gradlew test jacocoTestReport
+
+exe:
+	./gradlew clean jar
+	./gradlew lwjgl3:packageWinX64

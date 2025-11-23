@@ -807,14 +807,14 @@ public class UnitTest {
     public void testShouldStopMovingAnimTimer(){
         unit.setTarget(enemy1);
         unit.attack();
-        assertTrue(unit.shouldStopMoving());
+        assertTrue(unit.shouldStopMoving(0.16f, 1));
     }
 
     @Test
     public void testShouldStopMovingIndexZero(){
         unit.setTarget(enemy1);
         unit.setIndex(0);
-        assertTrue(unit.shouldStopMoving());
+        assertTrue(unit.shouldStopMoving(0.16f, 1));
     }
 
     @Test

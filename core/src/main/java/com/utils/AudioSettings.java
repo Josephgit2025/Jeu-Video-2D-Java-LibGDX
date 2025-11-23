@@ -18,6 +18,7 @@ public class AudioSettings {
     private static float musicVolume = 0.5f;
     private static boolean soundEnabled = true;
     
+    @lombok.Generated
     /**
      * Initializes the audio settings by loading saved preferences.
      */

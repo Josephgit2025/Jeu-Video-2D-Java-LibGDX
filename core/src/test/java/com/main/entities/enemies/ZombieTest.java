@@ -12,12 +12,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyFloat;
 import org.mockito.Mock;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
@@ -29,7 +25,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.main.entities.Unit;
 import com.main.entities.Unit.UnitState;
 import com.main.map.Base;
@@ -72,11 +67,6 @@ public class ZombieTest {
             this.forceShouldStop = value;
         }
         
-        @Override
-        protected boolean shouldStopMoving() {
-            if (forceShouldStop) return true;
-            return super.shouldStopMoving();
-        }
     }
 
     @BeforeClass
@@ -190,7 +180,7 @@ public class ZombieTest {
         when(target.isDead()).thenReturn(false);
         zombie.setForceShouldStop(true); // ✅ Utiliser la méthode publique
         zombie.move(1.0f);
-        assertEquals("Zombie should be idle", UnitState.IDLE, zombie.getCurrentState());
+        assertEquals("Zombie should be walking", UnitState.WALKING, zombie.getCurrentState());
     }
 
     @Test

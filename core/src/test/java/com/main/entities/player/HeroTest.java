@@ -118,7 +118,7 @@ public class HeroTest {
 
     @Test
     public void testConstructorInitializesGold() {
-        assertEquals("Hero should start with 100 gold", 100, hero.getGold());
+        assertEquals("Hero should start with 60 gold", 50, hero.getGold());
     }
 
     @Test
@@ -510,7 +510,7 @@ public class HeroTest {
 
     @Test
     public void testGetGold() {
-        assertEquals("Should start with 100 gold", 100, hero.getGold());
+        assertEquals("Should start with 50 gold", 50, hero.getGold());
     }
 
     @Test
@@ -528,7 +528,7 @@ public class HeroTest {
     @Test
     public void testAddGold() {
         hero.addGold(50);
-        assertEquals("Gold should be 150", 150, hero.getGold());
+        assertEquals("Gold should be 100", 100, hero.getGold());
     }
 
     @Test
@@ -536,28 +536,28 @@ public class HeroTest {
         hero.addGold(25);
         hero.addGold(25);
         hero.addGold(50);
-        assertEquals("Gold should be 200", 200, hero.getGold());
+        assertEquals("Gold should be 150", 150, hero.getGold());
     }
 
     @Test
     public void testRemoveGold() {
         boolean result = hero.removeGold(30);
         assertTrue("Should successfully remove gold", result);
-        assertEquals("Gold should be 70", 70, hero.getGold());
+        assertEquals("Gold should be 20", 20, hero.getGold());
     }
 
     @Test
     public void testRemoveGoldInsufficientFunds() {
         boolean result = hero.removeGold(200);
         assertFalse("Should fail to remove gold", result);
-        assertEquals("Gold should remain 120", 100, hero.getGold());
+        assertEquals("Gold should remain 50", 50, hero.getGold());
     }
 
     @Test
     public void testRemoveGoldExact() {
         boolean result = hero.removeGold(50);
         assertTrue("Should successfully remove exact amount", result);
-        assertEquals("Gold should be 50", 50, hero.getGold());
+        assertEquals("Gold should be 0", 0, hero.getGold());
     }
 
     // ===== Render Tests =====
@@ -625,16 +625,16 @@ public class HeroTest {
 
     @Test
     public void testGoldEconomy() {
-        assertEquals("Start with 100 gold", 100, hero.getGold());
+        assertEquals("Start with 50 gold", 50, hero.getGold());
         
         hero.addGold(100); // Gain de l'or
-        assertEquals("Should have 100 gold", 200, hero.getGold());
+        assertEquals("Should have 150 gold", 150, hero.getGold());
         
         assertTrue("Should purchase for 80", hero.removeGold(80));
-        assertEquals("Should have 120 gold left", 120, hero.getGold());
+        assertEquals("Should have 70 gold left", 70, hero.getGold());
         
         assertFalse("Should fail to purchase for 200", hero.removeGold(200));
-        assertEquals("Should still have 120 gold", 120, hero.getGold());
+        assertEquals("Should still have 70 gold", 70, hero.getGold());
     }
 
     @Test

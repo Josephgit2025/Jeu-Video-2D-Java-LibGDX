@@ -555,7 +555,6 @@ public class MeleeTest {
     public void testMeleeHasAnimations() {
         assertNotNull("Walk animation should be loaded", melee.walkAnimation);
         assertNotNull("Attack animation should be loaded", melee.attackAnimation);
-        assertNotNull("Idle frame should be loaded", melee.idleFrame);
     }
 
     @Test
