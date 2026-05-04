@@ -1,4 +1,5 @@
 # zombien-game
+# Jeu-Video-2D-Java-LibGDX
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 Ce projet est un petit jeu développé en Java avec libGDX. Il inclut des launchers simples et une extension `ApplicationAdapter` qui affiche le logo libGDX.
@@ -9,7 +10,8 @@ Clone le projet puis utilise le wrapper Gradle :
 
 ```bash
 git clone <repo-url>
-cd T-JAV-501-NAN_2
+cd Jeu-Video-2D-Java-LibGDX
+
 make
 ```
 
@@ -78,4 +80,4 @@ Le fichier exécutable se trouve dans `lwjgl3/build/construo/winX64/roast`.
 
 - [Documentation libGDX](https://libgdx.com/wiki/)
 - [Gradle](https://gradle.org/)
-# Jeu-Video-2D-Java-LibGDX
+
